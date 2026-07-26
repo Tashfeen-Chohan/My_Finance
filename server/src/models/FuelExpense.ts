@@ -16,13 +16,7 @@ export interface IFuelExpense extends Document {
   computedEconomy?: number;
   currency: string;
   stationName?: string;
-  location?: {
-    type: "Point";
-    coordinates: [number, number]; // [longitude, latitude]
-  };
   notes?: string;
-  receiptUrl?: string;
-  tags?: string[];
   // Audit fields
   createdAt: Date;
   updatedAt: Date;
@@ -106,35 +100,11 @@ const FuelExpenseSchema: Schema = new Schema(
       trim: true,
       maxlength: [100, "Station name cannot exceed 100 characters"],
     },
-    location: {
-      type: {
-        type: String,
-        enum: ["Point"],
-      },
-      coordinates: {
-        type: [Number], // [longitude, latitude]
-        validate: {
-          validator: (val: number[]) => !val || (val.length === 2 && val[0] >= -180 && val[0] <= 180 && val[1] >= -90 && val[1] <= 90),
-          message: "Coordinates must be [longitude, latitude] within valid ranges",
-        },
-      },
-    },
     notes: {
       type: String,
       trim: true,
       maxlength: [1000, "Notes cannot exceed 1000 characters"],
     },
-    receiptUrl: {
-      type: String,
-      trim: true,
-    },
-    tags: [
-      {
-        type: String,
-        trim: true,
-        lowercase: true,
-      },
-    ],
     // Audit fields
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -179,14 +149,8 @@ const FuelExpenseSchema: Schema = new Schema(
   }
 );
 
-// Pre-save hook: clean location without coordinates & compute totalCost if omitted
+// Pre-save hook: compute totalCost if omitted
 FuelExpenseSchema.pre<IFuelExpense>("save", function (next) {
-  if (!this.location || !Array.isArray(this.location.coordinates) || this.location.coordinates.length !== 2) {
-    this.location = undefined;
-  } else if (!this.location.type) {
-    this.location.type = "Point";
-  }
-
   if (!this.totalCost && this.quantity && this.unitPrice) {
     this.totalCost = Number((this.quantity * this.unitPrice).toFixed(2));
   }

@@ -11,18 +11,26 @@ export function ToastProvider({ children }) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const toast = React.useCallback(({ title, description, variant = "default", duration = 4000 }) => {
-    const id = Math.random().toString(36).substring(2, 9);
-    const newToast = { id, title, description, variant, duration };
+  const toast = React.useCallback(
+    (options) => {
+      const { title, description, variant = "default", duration = 4000 } =
+        typeof options === "string" ? { title: options } : options;
 
-    setToasts((prev) => [...prev, newToast]);
+      const normalizedVariant = variant === "destructive" ? "error" : variant;
 
-    if (duration !== Infinity) {
-      setTimeout(() => {
-        dismiss(id);
-      }, duration);
-    }
-  }, [dismiss]);
+      const id = Math.random().toString(36).substring(2, 9);
+      const newToast = { id, title, description, variant: normalizedVariant, duration };
+
+      setToasts((prev) => [...prev, newToast]);
+
+      if (duration !== Infinity) {
+        setTimeout(() => {
+          dismiss(id);
+        }, duration);
+      }
+    },
+    [dismiss]
+  );
 
   return (
     <ToastContext.Provider value={{ toasts, toast, dismiss }}>

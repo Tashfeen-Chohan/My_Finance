@@ -16,7 +16,6 @@ export const createMaintenanceSchema = z.object({
     nextServiceOdometer: z.number().min(0).optional(),
     nextServiceDate: z.string().or(z.date()).optional(),
     notes: z.string().max(1000).optional(),
-    receiptUrls: z.array(z.string()).optional(),
     parts: z
       .array(
         z.object({
@@ -27,14 +26,6 @@ export const createMaintenanceSchema = z.object({
         })
       )
       .optional(),
-    location: z
-      .object({
-        type: z.literal("Point").default("Point"),
-        coordinates: z.tuple([z.number(), z.number()]),
-      })
-      .optional()
-      .nullable()
-      .transform((val) => (val && val.coordinates && val.coordinates.length === 2 ? val : undefined)),
   }),
 });
 
@@ -55,6 +46,5 @@ export const updateMaintenanceSchema = z.object({
     nextServiceOdometer: z.number().min(0).optional(),
     nextServiceDate: z.string().or(z.date()).optional(),
     notes: z.string().max(1000).optional(),
-    tags: z.array(z.string()).optional(),
   }),
 });

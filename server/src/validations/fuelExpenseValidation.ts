@@ -15,17 +15,7 @@ export const createFuelExpenseSchema = z.object({
     computedEconomy: z.number().min(0).optional(),
     currency: z.string().max(5).default("PKR"),
     stationName: z.string().max(100).optional(),
-    location: z
-      .object({
-        type: z.literal("Point").default("Point"),
-        coordinates: z.tuple([z.number(), z.number()]),
-      })
-      .optional()
-      .nullable()
-      .transform((val) => (val && val.coordinates && val.coordinates.length === 2 ? val : undefined)),
     notes: z.string().max(1000).optional(),
-    receiptUrl: z.string().optional(),
-    tags: z.array(z.string()).optional(),
   }),
 });
 
@@ -43,7 +33,6 @@ export const updateFuelExpenseSchema = z.object({
     isFullTank: z.boolean().optional(),
     stationName: z.string().max(100).optional(),
     notes: z.string().max(1000).optional(),
-    tags: z.array(z.string()).optional(),
   }),
 });
 

@@ -55,10 +55,10 @@ export default function VehiclesPage() {
       if (vehicleToEdit) {
         const id = vehicleToEdit.id || vehicleToEdit._id;
         await updateVehicleMutation.mutateAsync({ id, data: formData });
-        toast({ title: "Vehicle Updated", description: "Vehicle details updated successfully" });
+        toast({ title: "Vehicle Updated", description: "Vehicle details updated successfully", variant: "success" });
       } else {
         await addVehicleMutation.mutateAsync(formData);
-        toast({ title: "Vehicle Added", description: "New vehicle registered successfully" });
+        toast({ title: "Vehicle Added", description: "New vehicle registered successfully", variant: "success" });
       }
     } catch (err) {
       toast({
@@ -72,7 +72,7 @@ export default function VehiclesPage() {
   const handleConfirmDelete = async (id) => {
     try {
       await deleteVehicleMutation.mutateAsync(id);
-      toast({ title: "Vehicle Deleted", description: "Vehicle removed successfully" });
+      toast({ title: "Vehicle Deleted", description: "Vehicle removed successfully", variant: "success" });
     } catch (err) {
       toast({
         title: "Delete Failed",
@@ -85,7 +85,7 @@ export default function VehiclesPage() {
   const handleSetDefault = async (id) => {
     try {
       await setDefaultVehicleMutation.mutateAsync(id);
-      toast({ title: "Default Updated", description: "Primary default vehicle updated" });
+      toast({ title: "Default Updated", description: "Primary default vehicle updated", variant: "success" });
     } catch (err) {
       toast({
         title: "Update Failed",

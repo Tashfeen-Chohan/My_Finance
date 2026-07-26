@@ -31,10 +31,6 @@ export const createFuelExpense = async (userId: string, data: Partial<IFuelExpen
     data.totalCost = Number((data.quantity * data.unitPrice).toFixed(2));
   }
 
-  if (data.location && (!Array.isArray(data.location.coordinates) || data.location.coordinates.length !== 2)) {
-    delete data.location;
-  }
-
   return await fuelExpenseRepository.create({
     ...data,
     userId: userId as unknown as IFuelExpense["userId"],

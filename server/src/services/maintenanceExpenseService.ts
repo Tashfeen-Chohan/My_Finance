@@ -21,10 +21,6 @@ export const createMaintenance = async (userId: string, data: Partial<IMaintenan
     data.totalCost = Number(((data.partsCost || 0) + (data.laborCost || 0)).toFixed(2));
   }
 
-  if (data.location && (!Array.isArray(data.location.coordinates) || data.location.coordinates.length !== 2)) {
-    delete data.location;
-  }
-
   return await maintenanceExpenseRepository.create({
     ...data,
     userId: userId as unknown as IMaintenanceExpense["userId"],

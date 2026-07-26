@@ -67,10 +67,10 @@ export default function FuelPage() {
       if (expenseToEdit) {
         const id = expenseToEdit.id || expenseToEdit._id;
         await updateFuelMutation.mutateAsync({ id, data: formData });
-        toast({ title: "Refill Updated", description: "Fuel refill log updated successfully" });
+        toast({ title: "Refill Updated", description: "Fuel refill log updated successfully", variant: "success" });
       } else {
         await addFuelMutation.mutateAsync(formData);
-        toast({ title: "Refill Logged", description: "New fuel refill recorded" });
+        toast({ title: "Refill Logged", description: "New fuel refill recorded", variant: "success" });
       }
     } catch (err) {
       toast({
@@ -84,7 +84,7 @@ export default function FuelPage() {
   const handleConfirmDelete = async (id) => {
     try {
       await deleteFuelMutation.mutateAsync(id);
-      toast({ title: "Refill Deleted", description: "Fuel log entry removed" });
+      toast({ title: "Refill Deleted", description: "Fuel log entry removed", variant: "success" });
     } catch (err) {
       toast({
         title: "Delete Failed",

@@ -91,10 +91,10 @@ export default function MaintenancePage() {
       if (maintenanceToEdit) {
         const id = maintenanceToEdit.id || maintenanceToEdit._id;
         await updateMaintenanceMutation.mutateAsync({ id, data: formData });
-        toast({ title: "Record Updated", description: "Maintenance log updated successfully" });
+        toast({ title: "Record Updated", description: "Maintenance log updated successfully", variant: "success" });
       } else {
         await addMaintenanceMutation.mutateAsync(formData);
-        toast({ title: "Maintenance Logged", description: "New vehicle service logged" });
+        toast({ title: "Maintenance Logged", description: "New vehicle service logged", variant: "success" });
       }
     } catch (err) {
       toast({
@@ -108,7 +108,7 @@ export default function MaintenancePage() {
   const handleConfirmDelete = async (id) => {
     try {
       await deleteMaintenanceMutation.mutateAsync(id);
-      toast({ title: "Record Deleted", description: "Maintenance entry removed" });
+      toast({ title: "Record Deleted", description: "Maintenance entry removed", variant: "success" });
     } catch (err) {
       toast({
         title: "Delete Failed",

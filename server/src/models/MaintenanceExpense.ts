@@ -24,13 +24,7 @@ export interface IMaintenanceExpense extends Document {
   nextServiceOdometer?: number;
   nextServiceDate?: Date;
   notes?: string;
-  receiptUrls?: string[];
   parts?: IPartItem[];
-  location?: {
-    type: "Point";
-    coordinates: [number, number]; // [longitude, latitude]
-  };
-  tags?: string[];
   // Audit fields
   createdAt: Date;
   updatedAt: Date;
@@ -153,33 +147,7 @@ const MaintenanceExpenseSchema: Schema = new Schema(
       trim: true,
       maxlength: [1000, "Notes cannot exceed 1000 characters"],
     },
-    receiptUrls: [
-      {
-        type: String,
-        trim: true,
-      },
-    ],
     parts: [PartItemSchema],
-    location: {
-      type: {
-        type: String,
-        enum: ["Point"],
-      },
-      coordinates: {
-        type: [Number], // [longitude, latitude]
-        validate: {
-          validator: (val: number[]) => !val || (val.length === 2 && val[0] >= -180 && val[0] <= 180 && val[1] >= -90 && val[1] <= 90),
-          message: "Coordinates must be [longitude, latitude] within valid ranges",
-        },
-      },
-    },
-    tags: [
-      {
-        type: String,
-        trim: true,
-        lowercase: true,
-      },
-    ],
     // Audit fields
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -224,14 +192,8 @@ const MaintenanceExpenseSchema: Schema = new Schema(
   }
 );
 
-// Pre-save hook: clean location without coordinates & compute totalCost if omitted
+// Pre-save hook: compute totalCost if omitted or set to 0
 MaintenanceExpenseSchema.pre<IMaintenanceExpense>("save", function (next) {
-  if (!this.location || !Array.isArray(this.location.coordinates) || this.location.coordinates.length !== 2) {
-    this.location = undefined;
-  } else if (!this.location.type) {
-    this.location.type = "Point";
-  }
-
   if (!this.totalCost && (this.partsCost !== undefined || this.laborCost !== undefined)) {
     this.totalCost = Number(((this.partsCost || 0) + (this.laborCost || 0)).toFixed(2));
   }
