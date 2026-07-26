@@ -27,8 +27,7 @@ export const createMaintenanceSchema = z.object({
         })
       )
       .optional(),
-    tags: z.array(z.string()).optional(),
-    clientSyncId: z.string().min(1, "Client sync ID is required"),
+    clientSyncId: z.string().optional(),
   }),
 });
 

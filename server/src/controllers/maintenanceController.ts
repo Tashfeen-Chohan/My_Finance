@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/authMiddleware";
 import {
   createMaintenance as createMaintenanceService,
+  getAllMaintenance as getAllMaintenanceService,
   getMaintenanceByVehicle as getMaintenanceByVehicleService,
   getMaintenanceById as getMaintenanceByIdService,
   getUpcomingServices as getUpcomingServicesService,
@@ -14,6 +15,12 @@ export const createMaintenance = async (req: AuthRequest, res: Response): Promis
   if (!req.user) throw new UnauthorizedError();
   const record = await createMaintenanceService(req.user.id, req.body);
   res.status(201).json({ success: true, data: record });
+};
+
+export const getAllMaintenance = async (req: AuthRequest, res: Response): Promise<void> => {
+  if (!req.user) throw new UnauthorizedError();
+  const records = await getAllMaintenanceService(req.user.id);
+  res.json({ success: true, data: records });
 };
 
 export const getMaintenanceByVehicle = async (req: AuthRequest, res: Response): Promise<void> => {

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createMaintenance,
+  getAllMaintenance,
   getMaintenanceByVehicle,
   getMaintenanceById,
   getUpcomingServices,
@@ -16,6 +17,7 @@ const router = Router();
 
 router.use(authenticateJwt);
 
+router.get("/", asyncHandler(getAllMaintenance));
 router.post("/", validateRequest(createMaintenanceSchema), asyncHandler(createMaintenance));
 router.get("/upcoming", asyncHandler(getUpcomingServices));
 router.get("/vehicle/:vehicleId", asyncHandler(getMaintenanceByVehicle));

@@ -6,6 +6,10 @@ const baseRepo = createBaseRepository<IMaintenanceExpense>(MaintenanceExpense);
 export const maintenanceExpenseRepository = {
   ...baseRepo,
 
+  findAllForUser: async (userId: string): Promise<IMaintenanceExpense[]> => {
+    return await MaintenanceExpense.find({ userId, isDeleted: false }).sort({ date: -1 });
+  },
+
   findByVehicleId: async (vehicleId: string, userId: string): Promise<IMaintenanceExpense[]> => {
     return await MaintenanceExpense.find({ vehicleId, userId, isDeleted: false }).sort({ date: -1 });
   },

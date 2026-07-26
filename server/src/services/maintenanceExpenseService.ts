@@ -8,7 +8,9 @@ export const createMaintenance = async (userId: string, data: Partial<IMaintenan
     throw new Error("Vehicle ID is required");
   }
 
-  if (data.clientSyncId) {
+  if (!data.clientSyncId) {
+    data.clientSyncId = `m-sync-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+  } else {
     const existing = await maintenanceExpenseRepository.findBySyncId(data.clientSyncId, userId);
     if (existing) return existing;
   }
@@ -32,6 +34,10 @@ export const createMaintenance = async (userId: string, data: Partial<IMaintenan
     createdBy: userId as unknown as IMaintenanceExpense["createdBy"],
     updatedBy: userId as unknown as IMaintenanceExpense["updatedBy"],
   });
+};
+
+export const getAllMaintenance = async (userId: string): Promise<IMaintenanceExpense[]> => {
+  return await maintenanceExpenseRepository.findAllForUser(userId);
 };
 
 export const getMaintenanceByVehicle = async (vehicleId: string, userId: string): Promise<IMaintenanceExpense[]> => {
@@ -81,6 +87,7 @@ export const deleteMaintenance = async (id: string, userId: string): Promise<voi
 
 export const MaintenanceExpenseService = {
   createMaintenance,
+  getAllMaintenance,
   getMaintenanceByVehicle,
   getMaintenanceById,
   getUpcomingServices,
