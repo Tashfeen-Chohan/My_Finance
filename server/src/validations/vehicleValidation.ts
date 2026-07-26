@@ -17,7 +17,6 @@ export const createVehicleSchema = z.object({
     isActive: z.boolean().default(true),
     photoUrl: z.string().optional(),
     notes: z.string().max(1000).optional(),
-    clientSyncId: z.string().optional(),
   }),
 });
 

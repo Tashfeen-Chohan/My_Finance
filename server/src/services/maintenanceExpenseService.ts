@@ -1,23 +1,16 @@
 import { maintenanceExpenseRepository } from "../repositories/maintenanceExpenseRepository";
 import { vehicleRepository } from "../repositories/vehicleRepository";
 import { IMaintenanceExpense } from "../models/MaintenanceExpense";
-import { NotFoundError } from "../errors/ApiError";
+import { NotFoundError, BadRequestError } from "../errors/ApiError";
 
 export const createMaintenance = async (userId: string, data: Partial<IMaintenanceExpense>): Promise<IMaintenanceExpense> => {
   if (!data.vehicleId) {
-    throw new Error("Vehicle ID is required");
-  }
-
-  if (!data.clientSyncId) {
-    data.clientSyncId = `m-sync-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-  } else {
-    const existing = await maintenanceExpenseRepository.findBySyncId(data.clientSyncId, userId);
-    if (existing) return existing;
+    throw BadRequestError("Vehicle ID is required");
   }
 
   const vehicle = await vehicleRepository.findById(data.vehicleId.toString());
   if (!vehicle || vehicle.userId.toString() !== userId) {
-    throw new NotFoundError("Vehicle not found");
+    throw NotFoundError("Vehicle not found");
   }
 
   if (data.odometer !== undefined) {
@@ -26,6 +19,10 @@ export const createMaintenance = async (userId: string, data: Partial<IMaintenan
 
   if (!data.totalCost) {
     data.totalCost = Number(((data.partsCost || 0) + (data.laborCost || 0)).toFixed(2));
+  }
+
+  if (data.location && (!Array.isArray(data.location.coordinates) || data.location.coordinates.length !== 2)) {
+    delete data.location;
   }
 
   return await maintenanceExpenseRepository.create({
@@ -43,7 +40,7 @@ export const getAllMaintenance = async (userId: string): Promise<IMaintenanceExp
 export const getMaintenanceByVehicle = async (vehicleId: string, userId: string): Promise<IMaintenanceExpense[]> => {
   const vehicle = await vehicleRepository.findById(vehicleId);
   if (!vehicle || vehicle.userId.toString() !== userId) {
-    throw new NotFoundError("Vehicle not found");
+    throw NotFoundError("Vehicle not found");
   }
   return await maintenanceExpenseRepository.findByVehicleId(vehicleId, userId);
 };
@@ -51,7 +48,7 @@ export const getMaintenanceByVehicle = async (vehicleId: string, userId: string)
 export const getMaintenanceById = async (id: string, userId: string): Promise<IMaintenanceExpense> => {
   const record = await maintenanceExpenseRepository.findById(id);
   if (!record || record.userId.toString() !== userId) {
-    throw new NotFoundError("Maintenance record not found");
+    throw NotFoundError("Maintenance record not found");
   }
   return record;
 };
@@ -76,7 +73,7 @@ export const updateMaintenance = async (id: string, userId: string, updateData: 
     updatedBy: userId as unknown as IMaintenanceExpense["updatedBy"],
   });
 
-  if (!updated) throw new NotFoundError("Maintenance record failed to update");
+  if (!updated) throw NotFoundError("Maintenance record failed to update");
   return updated;
 };
 

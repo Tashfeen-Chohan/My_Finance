@@ -48,7 +48,7 @@ export const verifyAndExtractGoogleUser = async (
           avatarUrl: "https://lh3.googleusercontent.com/a/default-user=s96-c",
         };
       } else {
-        throw new UnauthorizedError("Invalid Google ID token credential");
+        throw UnauthorizedError("Invalid Google ID token credential");
       }
     }
   }
@@ -62,7 +62,7 @@ export const verifyAndExtractGoogleUser = async (
     };
   }
 
-  throw new UnauthorizedError("Google credential is required for authentication");
+  throw UnauthorizedError("Google credential is required for authentication");
 };
 
 export const generateTokens = (userPayload: UserDTO): AuthTokens => {
@@ -89,7 +89,7 @@ export const authenticateGoogleUser = async (
 
 export const refreshSession = async (existingRefreshToken: string): Promise<{ user: UserDTO; tokens: AuthTokens }> => {
   if (!existingRefreshToken) {
-    throw new UnauthorizedError("Refresh token missing");
+    throw UnauthorizedError("Refresh token missing");
   }
 
   let decoded: UserDTO;
@@ -97,7 +97,7 @@ export const refreshSession = async (existingRefreshToken: string): Promise<{ us
     decoded = jwt.verify(existingRefreshToken, getJwtRefreshSecret()) as UserDTO;
   } catch (error) {
     console.log("Invalid or expired refresh token: ", error);
-    throw new UnauthorizedError("Invalid or expired refresh token");
+    throw UnauthorizedError("Invalid or expired refresh token");
   }
 
   const userPayload: UserDTO = {

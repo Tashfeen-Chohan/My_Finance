@@ -5,7 +5,7 @@ import { NotFoundError } from "../errors/ApiError";
 export const getUserSettings = async (userId: string): Promise<IUser> => {
   const user = await userRepository.findById(userId);
   if (!user) {
-    throw new NotFoundError("User settings not found");
+    throw NotFoundError("User settings not found");
   }
   return user;
 };

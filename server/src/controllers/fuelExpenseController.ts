@@ -11,37 +11,37 @@ import {
 import { UnauthorizedError } from "../errors/ApiError";
 
 export const createFuelExpense = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   const expense = await createFuelExpenseService(req.user.id, req.body);
   res.status(201).json({ success: true, data: expense });
 };
 
 export const getAllFuelExpenses = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   const expenses = await getUserFuelExpensesService(req.user.id);
   res.json({ success: true, data: expenses });
 };
 
 export const getFuelExpensesByVehicle = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   const expenses = await getFuelExpensesByVehicleService(String(req.params.vehicleId), req.user.id);
   res.json({ success: true, data: expenses });
 };
 
 export const getFuelExpenseById = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   const expense = await getFuelExpenseByIdService(String(req.params.id), req.user.id);
   res.json({ success: true, data: expense });
 };
 
 export const updateFuelExpense = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   const expense = await updateFuelExpenseService(String(req.params.id), req.user.id, req.body);
   res.json({ success: true, data: expense });
 };
 
 export const deleteFuelExpense = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   await deleteFuelExpenseService(String(req.params.id), req.user.id);
   res.json({ success: true, message: "Fuel expense record deleted successfully" });
 };

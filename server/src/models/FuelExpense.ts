@@ -31,10 +31,6 @@ export interface IFuelExpense extends Document {
   // Soft delete
   isDeleted: boolean;
   deletedAt?: Date | null;
-  deletedBy?: mongoose.Types.ObjectId | null;
-  // Offline sync metadata
-  clientSyncId: string;
-  lastSyncedAt: Date;
   version: number;
 }
 
@@ -114,7 +110,6 @@ const FuelExpenseSchema: Schema = new Schema(
       type: {
         type: String,
         enum: ["Point"],
-        default: "Point",
       },
       coordinates: {
         type: [Number], // [longitude, latitude]
@@ -164,18 +159,6 @@ const FuelExpenseSchema: Schema = new Schema(
       ref: "User",
       default: null,
     },
-    // Offline sync metadata
-    clientSyncId: {
-      type: String,
-      required: [true, "Client sync ID is required for offline sync"],
-      trim: true,
-      index: true,
-    },
-    lastSyncedAt: {
-      type: Date,
-      default: Date.now,
-      index: true,
-    },
     version: {
       type: Number,
       default: 1,
@@ -196,19 +179,22 @@ const FuelExpenseSchema: Schema = new Schema(
   }
 );
 
-// Pre-save hook: compute totalCost if omitted or set to zero
+// Pre-save hook: clean location without coordinates & compute totalCost if omitted
 FuelExpenseSchema.pre<IFuelExpense>("save", function (next) {
+  if (!this.location || !Array.isArray(this.location.coordinates) || this.location.coordinates.length !== 2) {
+    this.location = undefined;
+  } else if (!this.location.type) {
+    this.location.type = "Point";
+  }
+
   if (!this.totalCost && this.quantity && this.unitPrice) {
     this.totalCost = Number((this.quantity * this.unitPrice).toFixed(2));
   }
   next();
 });
 
-// Indexes for query performance and sync lookup
+// Essential indexes for query performance
 FuelExpenseSchema.index({ vehicleId: 1, date: -1, isDeleted: 1 });
 FuelExpenseSchema.index({ userId: 1, date: -1, isDeleted: 1 });
-FuelExpenseSchema.index({ userId: 1, clientSyncId: 1 }, { unique: true });
-FuelExpenseSchema.index({ location: "2dsphere" }, { sparse: true });
-FuelExpenseSchema.index({ updatedAt: 1, isDeleted: 1 });
 
 export const FuelExpense = mongoose.model<IFuelExpense>("FuelExpense", FuelExpenseSchema);

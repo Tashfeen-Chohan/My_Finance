@@ -39,10 +39,6 @@ export interface IMaintenanceExpense extends Document {
   // Soft delete
   isDeleted: boolean;
   deletedAt?: Date | null;
-  deletedBy?: mongoose.Types.ObjectId | null;
-  // Offline sync metadata
-  clientSyncId: string;
-  lastSyncedAt: Date;
   version: number;
 }
 
@@ -168,7 +164,6 @@ const MaintenanceExpenseSchema: Schema = new Schema(
       type: {
         type: String,
         enum: ["Point"],
-        default: "Point",
       },
       coordinates: {
         type: [Number], // [longitude, latitude]
@@ -209,18 +204,6 @@ const MaintenanceExpenseSchema: Schema = new Schema(
       ref: "User",
       default: null,
     },
-    // Offline sync metadata
-    clientSyncId: {
-      type: String,
-      required: [true, "Client sync ID is required for offline sync"],
-      trim: true,
-      index: true,
-    },
-    lastSyncedAt: {
-      type: Date,
-      default: Date.now,
-      index: true,
-    },
     version: {
       type: Number,
       default: 1,
@@ -241,20 +224,23 @@ const MaintenanceExpenseSchema: Schema = new Schema(
   }
 );
 
-// Pre-save hook: compute totalCost if omitted or set to 0
+// Pre-save hook: clean location without coordinates & compute totalCost if omitted
 MaintenanceExpenseSchema.pre<IMaintenanceExpense>("save", function (next) {
+  if (!this.location || !Array.isArray(this.location.coordinates) || this.location.coordinates.length !== 2) {
+    this.location = undefined;
+  } else if (!this.location.type) {
+    this.location.type = "Point";
+  }
+
   if (!this.totalCost && (this.partsCost !== undefined || this.laborCost !== undefined)) {
     this.totalCost = Number(((this.partsCost || 0) + (this.laborCost || 0)).toFixed(2));
   }
   next();
 });
 
-// Indexes for query performance, reminder scheduling, and sync lookup
+// Essential indexes for query performance and reminder scheduling
 MaintenanceExpenseSchema.index({ vehicleId: 1, date: -1, isDeleted: 1 });
-MaintenanceExpenseSchema.index({ userId: 1, category: 1, isDeleted: 1 });
-MaintenanceExpenseSchema.index({ userId: 1, clientSyncId: 1 }, { unique: true });
-MaintenanceExpenseSchema.index({ vehicleId: 1, nextServiceDate: 1, isDeleted: 1 });
-MaintenanceExpenseSchema.index({ location: "2dsphere" }, { sparse: true });
-MaintenanceExpenseSchema.index({ updatedAt: 1, isDeleted: 1 });
+MaintenanceExpenseSchema.index({ userId: 1, date: -1, isDeleted: 1 });
+MaintenanceExpenseSchema.index({ userId: 1, nextServiceDate: 1, isDeleted: 1 });
 
 export const MaintenanceExpense = mongoose.model<IMaintenanceExpense>("MaintenanceExpense", MaintenanceExpenseSchema);

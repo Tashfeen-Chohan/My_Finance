@@ -3,18 +3,9 @@ import { IVehicle } from "../models/Vehicle";
 import { NotFoundError, BadRequestError } from "../errors/ApiError";
 
 export const createVehicle = async (userId: string, data: Partial<IVehicle>): Promise<IVehicle> => {
-  if (data.clientSyncId) {
-    const existing = await vehicleRepository.findBySyncId(data.clientSyncId, userId);
-    if (existing) {
-      return existing;
-    }
-  } else {
-    data.clientSyncId = `vehicle_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-  }
-
   if (data.initialOdometer !== undefined && data.currentOdometer !== undefined) {
     if (data.currentOdometer < data.initialOdometer) {
-      throw new BadRequestError("Current odometer reading cannot be less than initial odometer reading");
+      throw BadRequestError("Current odometer reading cannot be less than initial odometer reading");
     }
   }
 
@@ -42,7 +33,7 @@ export const getUserVehicles = async (userId: string): Promise<IVehicle[]> => {
 export const getVehicleById = async (vehicleId: string, userId: string): Promise<IVehicle> => {
   const vehicle = await vehicleRepository.findById(vehicleId);
   if (!vehicle || vehicle.userId.toString() !== userId) {
-    throw new NotFoundError("Vehicle not found");
+    throw NotFoundError("Vehicle not found");
   }
   return vehicle;
 };
@@ -51,7 +42,7 @@ export const updateVehicle = async (vehicleId: string, userId: string, updateDat
   const vehicle = await getVehicleById(vehicleId, userId);
 
   if (updateData.currentOdometer !== undefined && updateData.currentOdometer < vehicle.initialOdometer) {
-    throw new BadRequestError("Current odometer reading cannot be less than initial odometer reading");
+    throw BadRequestError("Current odometer reading cannot be less than initial odometer reading");
   }
 
   if (updateData.isDefault) {
@@ -64,7 +55,7 @@ export const updateVehicle = async (vehicleId: string, userId: string, updateDat
   });
 
   if (!updated) {
-    throw new NotFoundError("Vehicle failed to update");
+    throw NotFoundError("Vehicle failed to update");
   }
 
   return updated;

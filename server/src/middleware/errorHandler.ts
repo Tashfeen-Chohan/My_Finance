@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ApiError } from "../errors/ApiError";
+import { isApiError, ApiError } from "../errors/ApiError";
 import { logger } from "../utils/logger";
 import { ZodError } from "zod";
 
@@ -14,11 +14,12 @@ export const errorHandler = (
     stack: process.env.NODE_ENV !== "production" ? err.stack : undefined,
   });
 
-  if (err instanceof ApiError) {
-    res.status(err.statusCode).json({
+  if (isApiError(err)) {
+    const apiErr = err as ApiError;
+    res.status(apiErr.statusCode).json({
       success: false,
-      error: err.message,
-      details: err.details,
+      error: apiErr.message,
+      details: apiErr.details,
     });
     return;
   }

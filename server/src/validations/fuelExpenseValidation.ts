@@ -20,11 +20,12 @@ export const createFuelExpenseSchema = z.object({
         type: z.literal("Point").default("Point"),
         coordinates: z.tuple([z.number(), z.number()]),
       })
-      .optional(),
+      .optional()
+      .nullable()
+      .transform((val) => (val && val.coordinates && val.coordinates.length === 2 ? val : undefined)),
     notes: z.string().max(1000).optional(),
     receiptUrl: z.string().optional(),
     tags: z.array(z.string()).optional(),
-    clientSyncId: z.string().optional(),
   }),
 });
 

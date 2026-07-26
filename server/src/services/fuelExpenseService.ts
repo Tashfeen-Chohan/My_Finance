@@ -1,23 +1,16 @@
 import { fuelExpenseRepository } from "../repositories/fuelExpenseRepository";
 import { vehicleRepository } from "../repositories/vehicleRepository";
 import { IFuelExpense } from "../models/FuelExpense";
-import { NotFoundError } from "../errors/ApiError";
+import { NotFoundError, BadRequestError } from "../errors/ApiError";
 
 export const createFuelExpense = async (userId: string, data: Partial<IFuelExpense>): Promise<IFuelExpense> => {
   if (!data.vehicleId) {
-    throw new Error("Vehicle ID is required");
-  }
-
-  if (data.clientSyncId) {
-    const existing = await fuelExpenseRepository.findBySyncId(data.clientSyncId, userId);
-    if (existing) return existing;
-  } else {
-    data.clientSyncId = `fuel_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    throw BadRequestError("Vehicle ID is required");
   }
 
   const vehicle = await vehicleRepository.findById(data.vehicleId.toString());
   if (!vehicle || vehicle.userId.toString() !== userId) {
-    throw new NotFoundError("Vehicle not found");
+    throw NotFoundError("Vehicle not found");
   }
 
   if (data.odometer !== undefined) {
@@ -38,6 +31,10 @@ export const createFuelExpense = async (userId: string, data: Partial<IFuelExpen
     data.totalCost = Number((data.quantity * data.unitPrice).toFixed(2));
   }
 
+  if (data.location && (!Array.isArray(data.location.coordinates) || data.location.coordinates.length !== 2)) {
+    delete data.location;
+  }
+
   return await fuelExpenseRepository.create({
     ...data,
     userId: userId as unknown as IFuelExpense["userId"],
@@ -53,7 +50,7 @@ export const getUserFuelExpenses = async (userId: string): Promise<IFuelExpense[
 export const getFuelExpensesByVehicle = async (vehicleId: string, userId: string): Promise<IFuelExpense[]> => {
   const vehicle = await vehicleRepository.findById(vehicleId);
   if (!vehicle || vehicle.userId.toString() !== userId) {
-    throw new NotFoundError("Vehicle not found");
+    throw NotFoundError("Vehicle not found");
   }
   return await fuelExpenseRepository.findByVehicleId(vehicleId, userId);
 };
@@ -61,7 +58,7 @@ export const getFuelExpensesByVehicle = async (vehicleId: string, userId: string
 export const getFuelExpenseById = async (id: string, userId: string): Promise<IFuelExpense> => {
   const expense = await fuelExpenseRepository.findById(id);
   if (!expense || expense.userId.toString() !== userId) {
-    throw new NotFoundError("Fuel expense record not found");
+    throw NotFoundError("Fuel expense record not found");
   }
   return expense;
 };
@@ -78,7 +75,7 @@ export const updateFuelExpense = async (id: string, userId: string, updateData: 
     updatedBy: userId as unknown as IFuelExpense["updatedBy"],
   });
 
-  if (!updated) throw new NotFoundError("Fuel expense record failed to update");
+  if (!updated) throw NotFoundError("Fuel expense record failed to update");
   return updated;
 };
 

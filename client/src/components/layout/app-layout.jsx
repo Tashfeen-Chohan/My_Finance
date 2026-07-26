@@ -6,7 +6,6 @@ import { useAuthStore } from "@/stores/use-auth-store";
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
 import { MobileNav } from "./mobile-nav";
-import { OfflineIndicator } from "@/components/common/offline-indicator";
 import { Wallet, Loader2 } from "lucide-react";
 
 export function AppLayout({ children }) {
@@ -33,12 +32,7 @@ export function AppLayout({ children }) {
 
   // If on login page, render standalone login view
   if (isLoginPage) {
-    return (
-      <div className="bg-background min-h-screen">
-        {children}
-        <OfflineIndicator />
-      </div>
-    );
+    return <div className="bg-background min-h-screen">{children}</div>;
   }
 
   // Show authentication check loader while session is initializing
@@ -70,7 +64,6 @@ export function AppLayout({ children }) {
         <main className="flex-1 overflow-y-auto p-4 pb-20 md:p-6 md:pb-6">{children}</main>
       </div>
       <MobileNav />
-      <OfflineIndicator />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { getDashboardSummary as getDashboardSummaryService } from "../services/d
 import { UnauthorizedError } from "../errors/ApiError";
 
 export const getDashboardSummary = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   const summary = await getDashboardSummaryService(req.user.id);
   res.json({ success: true, data: summary });
 };

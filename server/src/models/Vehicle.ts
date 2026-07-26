@@ -27,10 +27,6 @@ export interface IVehicle extends Omit<Document, "model"> {
   // Soft delete
   isDeleted: boolean;
   deletedAt?: Date | null;
-  deletedBy?: mongoose.Types.ObjectId | null;
-  // Offline sync metadata
-  clientSyncId: string;
-  lastSyncedAt: Date;
   version: number;
 }
 
@@ -157,18 +153,6 @@ const VehicleSchema: Schema = new Schema(
       ref: "User",
       default: null,
     },
-    // Offline sync metadata
-    clientSyncId: {
-      type: String,
-      required: [true, "Client sync ID is required for offline sync"],
-      trim: true,
-      index: true,
-    },
-    lastSyncedAt: {
-      type: Date,
-      default: Date.now,
-      index: true,
-    },
     version: {
       type: Number,
       default: 1,
@@ -197,10 +181,7 @@ VehicleSchema.pre<IVehicle>("save", function (next) {
   next();
 });
 
-// Indexes for offline sync, soft delete filtering, and performant user queries
+// Essential index for querying user vehicles
 VehicleSchema.index({ userId: 1, isDeleted: 1 });
-VehicleSchema.index({ userId: 1, clientSyncId: 1 }, { unique: true });
-VehicleSchema.index({ userId: 1, isActive: 1, isDeleted: 1 });
-VehicleSchema.index({ updatedAt: 1, isDeleted: 1 });
 
 export const Vehicle = mongoose.model<IVehicle>("Vehicle", VehicleSchema);

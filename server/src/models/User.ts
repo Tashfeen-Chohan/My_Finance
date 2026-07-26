@@ -21,10 +21,6 @@ export interface IUser extends Document {
   // Soft delete
   isDeleted: boolean;
   deletedAt?: Date | null;
-  deletedBy?: mongoose.Types.ObjectId | null;
-  // Offline sync metadata
-  clientSyncId?: string;
-  lastSyncedAt: Date;
   version: number;
 }
 
@@ -107,17 +103,6 @@ const UserSchema: Schema = new Schema(
       ref: "User",
       default: null,
     },
-    // Offline sync metadata
-    clientSyncId: {
-      type: String,
-      sparse: true,
-      index: true,
-    },
-    lastSyncedAt: {
-      type: Date,
-      default: Date.now,
-      index: true,
-    },
     version: {
       type: Number,
       default: 1,
@@ -139,9 +124,6 @@ const UserSchema: Schema = new Schema(
   }
 );
 
-// Compound indexes for performant querying
-UserSchema.index({ email: 1, isDeleted: 1 });
-UserSchema.index({ googleId: 1, isDeleted: 1 });
-UserSchema.index({ updatedAt: 1, isDeleted: 1 });
+// Primary indexes managed via unique constraints in schema fields (email, googleId)
 
 export const User = mongoose.model<IUser>("User", UserSchema);

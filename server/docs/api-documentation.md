@@ -111,8 +111,7 @@ Create a new vehicle record.
   "fuelType": "petrol",
   "initialOdometer": 15000,
   "currentOdometer": 15000,
-  "currency": "PKR",
-  "clientSyncId": "uuid-v4-client-generated-sync-id"
+  "currency": "PKR"
 }
 ```
 - **Response**: `201 Created`
@@ -156,8 +155,7 @@ Record a new fuel refill.
   "unitPrice": 275.50,
   "isFullTank": true,
   "stationName": "PSO Main Boulevard",
-  "currency": "PKR",
-  "clientSyncId": "uuid-v4-client-generated-sync-id"
+  "currency": "PKR"
 }
 ```
 - **Response**: `201 Created` (Auto-calculates `totalCost`, `distanceTraveled`, and `computedEconomy` km/L).
@@ -193,8 +191,7 @@ Record vehicle service or repair work.
   "laborCost": 1500,
   "serviceProvider": "Honda PitStop Service Center",
   "nextServiceOdometer": 23000,
-  "nextServiceDate": "2026-11-26T00:00:00.000Z",
-  "clientSyncId": "uuid-v4-client-generated-sync-id"
+  "nextServiceDate": "2026-11-26T00:00:00.000Z"
 }
 ```
 - **Response**: `201 Created`

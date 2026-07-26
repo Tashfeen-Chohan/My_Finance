@@ -78,9 +78,5 @@ export const createBaseRepository = <T extends { _id: unknown }>(model: Model<T>
         { new: true }
       );
     },
-
-    findBySyncId: async (clientSyncId: string, userId: string): Promise<T | null> => {
-      return await model.findOne({ clientSyncId, userId } as unknown as FilterQuery<T>);
-    },
   };
 };

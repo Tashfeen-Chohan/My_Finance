@@ -27,7 +27,14 @@ export const createMaintenanceSchema = z.object({
         })
       )
       .optional(),
-    clientSyncId: z.string().optional(),
+    location: z
+      .object({
+        type: z.literal("Point").default("Point"),
+        coordinates: z.tuple([z.number(), z.number()]),
+      })
+      .optional()
+      .nullable()
+      .transform((val) => (val && val.coordinates && val.coordinates.length === 2 ? val : undefined)),
   }),
 });
 

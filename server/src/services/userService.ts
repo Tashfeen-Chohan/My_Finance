@@ -66,7 +66,7 @@ export const findOrCreateUser = async (userData: {
 export const getUserById = async (userId: string): Promise<IUser> => {
   const user = await userRepository.findById(userId);
   if (!user) {
-    throw new NotFoundError("User profile not found");
+    throw NotFoundError("User profile not found");
   }
   return user;
 };

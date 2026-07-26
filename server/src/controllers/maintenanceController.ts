@@ -12,43 +12,43 @@ import {
 import { UnauthorizedError } from "../errors/ApiError";
 
 export const createMaintenance = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   const record = await createMaintenanceService(req.user.id, req.body);
   res.status(201).json({ success: true, data: record });
 };
 
 export const getAllMaintenance = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   const records = await getAllMaintenanceService(req.user.id);
   res.json({ success: true, data: records });
 };
 
 export const getMaintenanceByVehicle = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   const records = await getMaintenanceByVehicleService(String(req.params.vehicleId), req.user.id);
   res.json({ success: true, data: records });
 };
 
 export const getMaintenanceById = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   const record = await getMaintenanceByIdService(String(req.params.id), req.user.id);
   res.json({ success: true, data: record });
 };
 
 export const getUpcomingServices = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   const upcoming = await getUpcomingServicesService(req.user.id);
   res.json({ success: true, data: upcoming });
 };
 
 export const updateMaintenance = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   const record = await updateMaintenanceService(String(req.params.id), req.user.id, req.body);
   res.json({ success: true, data: record });
 };
 
 export const deleteMaintenance = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user) throw new UnauthorizedError();
+  if (!req.user) throw UnauthorizedError();
   await deleteMaintenanceService(String(req.params.id), req.user.id);
   res.json({ success: true, message: "Maintenance record deleted successfully" });
 };
