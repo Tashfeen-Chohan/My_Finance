@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { apiClient } from "@/services/api-client";
+import { apiClient, setStoredToken } from "@/services/api-client";
 
 export const useAuthStore = create(
   persist(
@@ -17,7 +17,10 @@ export const useAuthStore = create(
         try {
           const res = await apiClient.post("/auth/google", { credential });
           if (res.success && res.data) {
-            set({ user: res.data, isAuthenticated: true, isLoading: false });
+            const token = res.data.accessToken;
+            if (token) setStoredToken(token);
+            const userObj = res.data.user || res.data;
+            set({ user: userObj, isAuthenticated: true, isLoading: false });
             return { success: true };
           }
           set({ isLoading: false });
@@ -41,7 +44,10 @@ export const useAuthStore = create(
             },
           });
           if (res.success && res.data) {
-            set({ user: res.data, isAuthenticated: true, isLoading: false });
+            const token = res.data.accessToken;
+            if (token) setStoredToken(token);
+            const userObj = res.data.user || res.data;
+            set({ user: userObj, isAuthenticated: true, isLoading: false });
             return { success: true };
           }
           set({ isLoading: false });
@@ -58,22 +64,28 @@ export const useAuthStore = create(
         try {
           const res = await apiClient.get("/auth/me");
           if (res.success && res.data) {
-            set({ user: res.data, isAuthenticated: true, isInitialized: true, isLoading: false });
+            const userObj = res.data.user || res.data;
+            set({ user: userObj, isAuthenticated: true, isInitialized: true, isLoading: false });
           } else {
             // Try refresh token once
             const refreshRes = await apiClient.post("/auth/refresh", {});
             if (refreshRes.success && refreshRes.data) {
+              const token = refreshRes.data.accessToken;
+              if (token) setStoredToken(token);
+              const userObj = refreshRes.data.user || refreshRes.data;
               set({
-                user: refreshRes.data,
+                user: userObj,
                 isAuthenticated: true,
                 isInitialized: true,
                 isLoading: false,
               });
             } else {
+              setStoredToken(null);
               set({ user: null, isAuthenticated: false, isInitialized: true, isLoading: false });
             }
           }
         } catch {
+          setStoredToken(null);
           set({ user: null, isAuthenticated: false, isInitialized: true, isLoading: false });
         }
       },
@@ -83,6 +95,7 @@ export const useAuthStore = create(
         try {
           await apiClient.post("/auth/logout", {});
         } finally {
+          setStoredToken(null);
           set({ user: null, isAuthenticated: false, isLoading: false });
         }
       },

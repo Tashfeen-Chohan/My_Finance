@@ -26,12 +26,13 @@ export const authenticateJwt = (req: AuthRequest, res: Response, next: NextFunct
       return;
     }
 
-    const secret = process.env.JWT_SECRET || "default-secret-key";
+    const secret = process.env.JWT_SECRET || "dev-jwt-access-secret";
     const decoded = jwt.verify(token, secret) as AuthenticatedUser;
 
     req.user = decoded;
     next();
   } catch (error) {
+    console.log("Invalid or expired access token: ", error);
     res.status(401).json({ success: false, error: "Invalid or expired access token" });
   }
 };

@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { AuthService } from "../services/authService";
+import { authenticateGoogleUser, refreshSession, revokeSession } from "../services/authService";
 import { AuthRequest } from "../middleware/authMiddleware";
 
 const setAuthCookies = (res: Response, accessToken: string, refreshToken: string): void => {
@@ -22,7 +22,7 @@ const setAuthCookies = (res: Response, accessToken: string, refreshToken: string
 
 export const googleLogin = async (req: AuthRequest, res: Response): Promise<void> => {
   const { credential, mockUser } = req.body;
-  const { user, tokens } = await AuthService.authenticateGoogleUser(credential, mockUser);
+  const { user, tokens } = await authenticateGoogleUser(credential, mockUser);
 
   setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
 
@@ -35,7 +35,7 @@ export const googleLogin = async (req: AuthRequest, res: Response): Promise<void
 
 export const refreshToken = async (req: AuthRequest, res: Response): Promise<void> => {
   const existingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
-  const { user, tokens } = await AuthService.refreshSession(existingRefreshToken);
+  const { user, tokens } = await refreshSession(existingRefreshToken);
 
   setAuthCookies(res, tokens.accessToken, tokens.refreshToken);
 
@@ -48,7 +48,7 @@ export const refreshToken = async (req: AuthRequest, res: Response): Promise<voi
 
 export const logout = async (req: AuthRequest, res: Response): Promise<void> => {
   const refreshTokenVal = req.cookies?.refreshToken;
-  await AuthService.revokeSession(refreshTokenVal);
+  await revokeSession(refreshTokenVal);
 
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");

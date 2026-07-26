@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { HardDrive, Smartphone } from "lucide-react";
+import { Database, Smartphone } from "lucide-react";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 
 export default function SettingsPage() {
@@ -9,7 +9,7 @@ export default function SettingsPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
         <p className="text-muted-foreground text-sm">
-          Preferences, offline storage, theme configuration, and account details.
+          Preferences, storage connection, theme configuration, and account details.
         </p>
       </div>
 
@@ -33,15 +33,15 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <HardDrive className="text-primary h-5 w-5" />
-              <CardTitle>Offline & IndexedDB</CardTitle>
+              <Database className="text-primary h-5 w-5" />
+              <CardTitle>Cloud Database Connection</CardTitle>
             </div>
-            <CardDescription>Local storage status managed by idb engine.</CardDescription>
+            <CardDescription>Direct MongoDB Database storage & REST API connection.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">IndexedDB Status:</span>
-              <span className="font-semibold text-emerald-500">Active</span>
+              <span className="text-muted-foreground">MongoDB Database:</span>
+              <span className="font-semibold text-emerald-500">Connected</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">PWA Service Worker:</span>

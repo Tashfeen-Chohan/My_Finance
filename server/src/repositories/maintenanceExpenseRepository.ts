@@ -1,26 +1,24 @@
-import { BaseRepository } from "./baseRepository";
+import { createBaseRepository } from "./baseRepository";
 import { MaintenanceExpense, IMaintenanceExpense } from "../models/MaintenanceExpense";
 
-export class MaintenanceExpenseRepository extends BaseRepository<IMaintenanceExpense> {
-  constructor() {
-    super(MaintenanceExpense);
-  }
+const baseRepo = createBaseRepository<IMaintenanceExpense>(MaintenanceExpense);
 
-  async findByVehicleId(vehicleId: string, userId: string): Promise<IMaintenanceExpense[]> {
-    return await this.model.find({ vehicleId, userId, isDeleted: false }).sort({ date: -1 });
-  }
+export const maintenanceExpenseRepository = {
+  ...baseRepo,
 
-  async getUpcomingServices(userId: string): Promise<IMaintenanceExpense[]> {
-    return await this.model
-      .find({
-        userId,
-        isDeleted: false,
-        nextServiceDate: { $gte: new Date() },
-      })
-      .sort({ nextServiceDate: 1 });
-  }
+  findByVehicleId: async (vehicleId: string, userId: string): Promise<IMaintenanceExpense[]> => {
+    return await MaintenanceExpense.find({ vehicleId, userId, isDeleted: false }).sort({ date: -1 });
+  },
 
-  async aggregateTotalMaintenanceCost(userId: string, startDate?: Date, endDate?: Date): Promise<{ totalCost: number; count: number }> {
+  getUpcomingServices: async (userId: string): Promise<IMaintenanceExpense[]> => {
+    return await MaintenanceExpense.find({
+      userId,
+      isDeleted: false,
+      nextServiceDate: { $gte: new Date() },
+    }).sort({ nextServiceDate: 1 });
+  },
+
+  aggregateTotalMaintenanceCost: async (userId: string, startDate?: Date, endDate?: Date): Promise<{ totalCost: number; count: number }> => {
     const match: Record<string, unknown> = { userId, isDeleted: false };
     if (startDate || endDate) {
       match.date = {};
@@ -28,7 +26,7 @@ export class MaintenanceExpenseRepository extends BaseRepository<IMaintenanceExp
       if (endDate) (match.date as Record<string, unknown>).$lte = endDate;
     }
 
-    const result = await this.model.aggregate([
+    const result = await MaintenanceExpense.aggregate([
       { $match: match },
       {
         $group: {
@@ -40,7 +38,5 @@ export class MaintenanceExpenseRepository extends BaseRepository<IMaintenanceExp
     ]);
 
     return result[0] || { totalCost: 0, count: 0 };
-  }
-}
-
-export const maintenanceExpenseRepository = new MaintenanceExpenseRepository();
+  },
+};

@@ -1,24 +1,28 @@
-import { BaseRepository } from "./baseRepository";
+import { createBaseRepository } from "./baseRepository";
 import { FuelExpense, IFuelExpense } from "../models/FuelExpense";
 
-export class FuelExpenseRepository extends BaseRepository<IFuelExpense> {
-  constructor() {
-    super(FuelExpense);
-  }
+const baseRepo = createBaseRepository<IFuelExpense>(FuelExpense);
 
-  async findByVehicleId(vehicleId: string, userId: string): Promise<IFuelExpense[]> {
-    return await this.model.find({ vehicleId, userId, isDeleted: false }).sort({ date: -1, odometer: -1 });
-  }
+export const fuelExpenseRepository = {
+  ...baseRepo,
 
-  async getLatestRefill(vehicleId: string, beforeDate?: Date): Promise<IFuelExpense | null> {
+  findByUserId: async (userId: string): Promise<IFuelExpense[]> => {
+    return await FuelExpense.find({ userId, isDeleted: false }).sort({ date: -1, odometer: -1 });
+  },
+
+  findByVehicleId: async (vehicleId: string, userId: string): Promise<IFuelExpense[]> => {
+    return await FuelExpense.find({ vehicleId, userId, isDeleted: false }).sort({ date: -1, odometer: -1 });
+  },
+
+  getLatestRefill: async (vehicleId: string, beforeDate?: Date): Promise<IFuelExpense | null> => {
     const filter: Record<string, unknown> = { vehicleId, isDeleted: false };
     if (beforeDate) {
       filter.date = { $lt: beforeDate };
     }
-    return await this.model.findOne(filter).sort({ date: -1, odometer: -1 });
-  }
+    return await FuelExpense.findOne(filter).sort({ date: -1, odometer: -1 });
+  },
 
-  async aggregateTotalFuelCost(userId: string, startDate?: Date, endDate?: Date): Promise<{ totalCost: number; totalVolume: number }> {
+  aggregateTotalFuelCost: async (userId: string, startDate?: Date, endDate?: Date): Promise<{ totalCost: number; totalVolume: number }> => {
     const match: Record<string, unknown> = { userId, isDeleted: false };
     if (startDate || endDate) {
       match.date = {};
@@ -26,7 +30,7 @@ export class FuelExpenseRepository extends BaseRepository<IFuelExpense> {
       if (endDate) (match.date as Record<string, unknown>).$lte = endDate;
     }
 
-    const result = await this.model.aggregate([
+    const result = await FuelExpense.aggregate([
       { $match: match },
       {
         $group: {
@@ -38,7 +42,5 @@ export class FuelExpenseRepository extends BaseRepository<IFuelExpense> {
     ]);
 
     return result[0] || { totalCost: 0, totalVolume: 0 };
-  }
-}
-
-export const fuelExpenseRepository = new FuelExpenseRepository();
+  },
+};

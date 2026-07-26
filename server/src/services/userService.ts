@@ -10,61 +10,74 @@ export interface UserDTO {
   avatarUrl?: string;
 }
 
-export class UserService {
-  public static async findOrCreateUser(userData: {
-    googleId: string;
-    email: string;
-    name: string;
-    avatarUrl?: string;
-  }): Promise<UserDTO> {
-    const { googleId, email, name, avatarUrl } = userData;
+export const mapUserToDTO = (user: IUser): UserDTO => {
+  return {
+    id: user._id.toString(),
+    googleId: user.googleId,
+    email: user.email,
+    name: user.name,
+    avatarUrl: user.avatarUrl,
+  };
+};
 
-    let user = await userRepository.findByGoogleId(googleId);
-    if (!user) {
-      user = await userRepository.findByEmail(email);
+export const findOrCreateUser = async (userData: {
+  googleId: string;
+  email: string;
+  name: string;
+  avatarUrl?: string;
+}): Promise<UserDTO> => {
+  const cleanEmail = userData.email.toLowerCase().trim();
+  const cleanGoogleId = userData.googleId.trim();
+
+  let user = await userRepository.findByGoogleIdOrEmail(cleanGoogleId, cleanEmail);
+
+  if (!user) {
+    user = await userRepository.create({
+      googleId: cleanGoogleId,
+      email: cleanEmail,
+      name: userData.name || cleanEmail.split("@")[0],
+      avatarUrl: userData.avatarUrl,
+      preferences: {
+        currency: "PKR",
+        distanceUnit: "km",
+        fuelUnit: "liters",
+        theme: "system",
+      },
+    });
+  } else {
+    // Restore user if soft-deleted
+    if (user.isDeleted) {
+      user.isDeleted = false;
+      user.deletedAt = null;
     }
 
-    if (!user) {
-      user = await userRepository.create({
-        googleId,
-        email,
-        name,
-        avatarUrl,
-        preferences: {
-          currency: "PKR",
-          distanceUnit: "km",
-          fuelUnit: "liters",
-          theme: "system",
-        },
-      });
-    } else {
-      user.name = name;
-      if (avatarUrl) user.avatarUrl = avatarUrl;
-      await user.save();
-    }
+    // Update profile info and ensure googleId/email align
+    if (userData.name) user.name = userData.name;
+    if (userData.avatarUrl) user.avatarUrl = userData.avatarUrl;
+    if (cleanGoogleId && user.googleId !== cleanGoogleId) user.googleId = cleanGoogleId;
+    if (cleanEmail && user.email !== cleanEmail) user.email = cleanEmail;
 
-    return this.mapToDTO(user);
+    await user.save();
   }
 
-  public static async getUserById(userId: string): Promise<IUser> {
-    const user = await userRepository.findById(userId);
-    if (!user) {
-      throw new NotFoundError("User profile not found");
-    }
-    return user;
-  }
+  return mapUserToDTO(user);
+};
 
-  public static async updateRefreshToken(userId: string, refreshToken?: string): Promise<void> {
-    await userRepository.updateRefreshToken(userId, refreshToken);
+export const getUserById = async (userId: string): Promise<IUser> => {
+  const user = await userRepository.findById(userId);
+  if (!user) {
+    throw new NotFoundError("User profile not found");
   }
+  return user;
+};
 
-  public static mapToDTO(user: IUser): UserDTO {
-    return {
-      id: user._id.toString(),
-      googleId: user.googleId,
-      email: user.email,
-      name: user.name,
-      avatarUrl: user.avatarUrl,
-    };
-  }
-}
+export const updateUserRefreshToken = async (userId: string, refreshToken?: string): Promise<void> => {
+  await userRepository.updateRefreshToken(userId, refreshToken);
+};
+
+export const UserService = {
+  findOrCreateUser,
+  getUserById,
+  updateUserRefreshToken,
+  mapUserToDTO,
+};

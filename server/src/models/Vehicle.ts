@@ -10,6 +10,8 @@ export interface IVehicle extends Omit<Document, "model"> {
   licensePlate?: string;
   vin?: string;
   fuelType: "petrol" | "diesel" | "electric" | "hybrid" | "cng" | "other";
+  mileageUnit: "km" | "miles";
+  isDefault: boolean;
   initialOdometer: number;
   currentOdometer: number;
   currency: string;
@@ -83,6 +85,16 @@ const VehicleSchema: Schema = new Schema(
       },
       default: "petrol",
       required: true,
+    },
+    mileageUnit: {
+      type: String,
+      enum: ["km", "miles"],
+      default: "km",
+    },
+    isDefault: {
+      type: Boolean,
+      default: false,
+      index: true,
     },
     initialOdometer: {
       type: Number,

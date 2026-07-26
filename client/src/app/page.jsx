@@ -24,8 +24,8 @@ export default function DashboardPage() {
     { name: "Tailwind CSS & shadcn/ui", category: "Styling", status: "Ready", icon: Layers },
     { name: "TanStack Query v5", category: "Data Fetching", status: "Configured", icon: Zap },
     {
-      name: "Zustand & idb (IndexedDB)",
-      category: "State & Offline DB",
+      name: "Zustand & Direct REST API",
+      category: "State & Storage",
       status: "Configured",
       icon: Database,
     },

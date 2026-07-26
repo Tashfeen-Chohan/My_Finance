@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createFuelExpense,
+  getAllFuelExpenses,
   getFuelExpensesByVehicle,
   getFuelExpenseById,
   updateFuelExpense,
@@ -16,6 +17,7 @@ const router = Router();
 router.use(authenticateJwt);
 
 router.post("/", validateRequest(createFuelExpenseSchema), asyncHandler(createFuelExpense));
+router.get("/", asyncHandler(getAllFuelExpenses));
 router.get("/vehicle/:vehicleId", asyncHandler(getFuelExpensesByVehicle));
 router.get("/:id", validateRequest(expenseIdParamSchema), asyncHandler(getFuelExpenseById));
 router.put("/:id", validateRequest(updateFuelExpenseSchema), asyncHandler(updateFuelExpense));

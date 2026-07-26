@@ -1,22 +1,28 @@
-import { BaseRepository } from "./baseRepository";
+import { createBaseRepository } from "./baseRepository";
 import { User, IUser } from "../models/User";
 
-export class UserRepository extends BaseRepository<IUser> {
-  constructor() {
-    super(User);
-  }
+const baseRepo = createBaseRepository<IUser>(User);
 
-  async findByGoogleId(googleId: string): Promise<IUser | null> {
-    return await this.findOne({ googleId });
-  }
+export const userRepository = {
+  ...baseRepo,
 
-  async findByEmail(email: string): Promise<IUser | null> {
-    return await this.findOne({ email: email.toLowerCase() });
-  }
+  findByGoogleIdOrEmail: async (googleId: string, email: string): Promise<IUser | null> => {
+    const cleanEmail = email.toLowerCase().trim();
+    // Query direct Mongoose User model to find any matching user regardless of soft-delete state
+    return await User.findOne({
+      $or: [{ googleId: googleId.trim() }, { email: cleanEmail }],
+    });
+  },
 
-  async updateRefreshToken(userId: string, refreshToken?: string): Promise<void> {
+  findByGoogleId: async (googleId: string): Promise<IUser | null> => {
+    return await User.findOne({ googleId: googleId.trim() });
+  },
+
+  findByEmail: async (email: string): Promise<IUser | null> => {
+    return await User.findOne({ email: email.toLowerCase().trim() });
+  },
+
+  updateRefreshToken: async (userId: string, refreshToken?: string): Promise<void> => {
     await User.updateOne({ _id: userId }, { $set: { refreshToken } });
-  }
-}
-
-export const userRepository = new UserRepository();
+  },
+};

@@ -3,13 +3,30 @@ import { env } from "@/env";
 let isRefreshing = false;
 let refreshSubscribers = [];
 
-function onRefreshed(token) {
-  refreshSubscribers.forEach((callback) => callback(token));
+function onRefreshed(newToken) {
+  if (typeof window !== "undefined" && newToken) {
+    localStorage.setItem("my_finance_access_token", newToken);
+  }
+  refreshSubscribers.forEach((callback) => callback(newToken));
   refreshSubscribers = [];
 }
 
 function addRefreshSubscriber(callback) {
   refreshSubscribers.push(callback);
+}
+
+export function getStoredToken() {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("my_finance_access_token");
+}
+
+export function setStoredToken(token) {
+  if (typeof window === "undefined") return;
+  if (token) {
+    localStorage.setItem("my_finance_access_token", token);
+  } else {
+    localStorage.removeItem("my_finance_access_token");
+  }
 }
 
 async function apiRequest(endpoint, options = {}, isRetry = false) {
@@ -21,6 +38,11 @@ async function apiRequest(endpoint, options = {}, isRetry = false) {
     ...options.headers,
   };
 
+  const storedToken = getStoredToken();
+  if (storedToken) {
+    headers["Authorization"] = `Bearer ${storedToken}`;
+  }
+
   try {
     const response = await fetch(url, {
       ...options,
@@ -28,25 +50,33 @@ async function apiRequest(endpoint, options = {}, isRetry = false) {
       credentials: "include",
     });
 
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
 
+    // If 401 and we have a storedToken, attempt refresh ONCE
     if (
       response.status === 401 &&
       !isRetry &&
+      storedToken &&
       endpoint !== "/auth/refresh" &&
-      endpoint !== "/auth/google"
+      endpoint !== "/auth/google" &&
+      endpoint !== "/auth/me"
     ) {
       if (!isRefreshing) {
         isRefreshing = true;
         try {
           const refreshRes = await apiPost("/auth/refresh", {});
           isRefreshing = false;
-          if (refreshRes.success) {
-            onRefreshed(refreshRes.data?.accessToken || "refreshed");
+          if (refreshRes.success && refreshRes.data?.accessToken) {
+            const newToken = refreshRes.data.accessToken;
+            setStoredToken(newToken);
+            onRefreshed(newToken);
             return apiRequest(endpoint, options, true);
+          } else {
+            setStoredToken(null);
           }
         } catch {
           isRefreshing = false;
+          setStoredToken(null);
         }
       } else {
         return new Promise((resolve) => {
@@ -62,6 +92,11 @@ async function apiRequest(endpoint, options = {}, isRetry = false) {
         success: false,
         error: data.error || data.message || `HTTP error! Status: ${response.status}`,
       };
+    }
+
+    // Automatically cache token if returned in response
+    if (data?.accessToken) {
+      setStoredToken(data.accessToken);
     }
 
     return {

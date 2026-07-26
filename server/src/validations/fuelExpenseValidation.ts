@@ -24,7 +24,7 @@ export const createFuelExpenseSchema = z.object({
     notes: z.string().max(1000).optional(),
     receiptUrl: z.string().optional(),
     tags: z.array(z.string()).optional(),
-    clientSyncId: z.string().min(1, "Client sync ID is required"),
+    clientSyncId: z.string().optional(),
   }),
 });
 

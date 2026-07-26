@@ -1,21 +1,28 @@
-import { BaseRepository } from "./baseRepository";
+import { createBaseRepository } from "./baseRepository";
 import { Vehicle, IVehicle } from "../models/Vehicle";
 
-export class VehicleRepository extends BaseRepository<IVehicle> {
-  constructor() {
-    super(Vehicle);
-  }
+const baseRepo = createBaseRepository<IVehicle>(Vehicle);
 
-  async findByUserId(userId: string): Promise<IVehicle[]> {
-    return await this.find({ userId });
-  }
+export const vehicleRepository = {
+  ...baseRepo,
 
-  async updateOdometer(vehicleId: string, newOdometer: number): Promise<void> {
+  findByUserId: async (userId: string): Promise<IVehicle[]> => {
+    return await baseRepo.find({ userId });
+  },
+
+  updateOdometer: async (vehicleId: string, newOdometer: number): Promise<void> => {
     await Vehicle.updateOne(
       { _id: vehicleId, currentOdometer: { $lt: newOdometer } },
       { $set: { currentOdometer: newOdometer } }
     );
-  }
-}
+  },
 
-export const vehicleRepository = new VehicleRepository();
+  clearDefaultVehicles: async (userId: string): Promise<void> => {
+    await Vehicle.updateMany({ userId }, { $set: { isDefault: false } });
+  },
+
+  setDefaultVehicle: async (vehicleId: string, userId: string): Promise<void> => {
+    await Vehicle.updateMany({ userId }, { $set: { isDefault: false } });
+    await Vehicle.updateOne({ _id: vehicleId, userId }, { $set: { isDefault: true } });
+  },
+};

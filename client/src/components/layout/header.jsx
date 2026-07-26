@@ -42,11 +42,9 @@ export function Header() {
         <span className="text-sm font-bold">MyFinance</span>
       </div>
 
-      {/* Desktop Search / Status Placeholder */}
-      <div className="text-muted-foreground hidden items-center gap-2 text-sm md:flex">
-        <span className="text-foreground font-medium">Personal Finance PWA</span>
-        <span>•</span>
-        <span className="bg-muted rounded px-2 py-0.5 font-mono text-xs">Google OAuth 2.0</span>
+      {/* Desktop Subtitle */}
+      <div className="text-muted-foreground hidden items-center gap-3 text-sm md:flex">
+        <span className="text-foreground font-medium">Personal Finance Tracker</span>
       </div>
 
       {/* Header Actions */}
@@ -91,7 +89,7 @@ export function Header() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleLogout}
-                className="text-destructive gap-2 font-medium"
+                className="text-destructive gap-2 font-medium cursor-pointer"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>
