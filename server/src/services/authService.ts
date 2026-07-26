@@ -1,6 +1,7 @@
 import { OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
 import { UserService, UserDTO } from "./userService";
+import { UnauthorizedError } from "../errors/ApiError";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const JWT_SECRET = process.env.JWT_SECRET || "dev-jwt-access-secret";
@@ -31,8 +32,7 @@ export class AuthService {
             avatarUrl: payload.picture || "",
           };
         }
-      } catch (verifyError) {
-        // Fallback for custom JWT decode or dev token verification
+      } catch {
         const decoded = jwt.decode(credential) as { sub?: string; email?: string; name?: string; picture?: string } | null;
         if (decoded?.sub) {
           return {
@@ -49,7 +49,7 @@ export class AuthService {
             avatarUrl: "https://lh3.googleusercontent.com/a/default-user=s96-c",
           };
         } else {
-          throw new Error("Invalid Google ID token credential");
+          throw new UnauthorizedError("Invalid Google ID token credential");
         }
       }
     }
@@ -63,7 +63,7 @@ export class AuthService {
       };
     }
 
-    throw new Error("Google credential is required for authentication");
+    throw new UnauthorizedError("Google credential is required for authentication");
   }
 
   public static generateTokens(userPayload: UserDTO): AuthTokens {
@@ -80,21 +80,21 @@ export class AuthService {
     const user = await UserService.findOrCreateUser(extractedUser);
     const tokens = this.generateTokens(user);
 
-    await UserService.updateRefreshToken(user.id, user.googleId, tokens.refreshToken);
+    await UserService.updateRefreshToken(user.id, tokens.refreshToken);
 
     return { user, tokens };
   }
 
   public static async refreshSession(existingRefreshToken: string): Promise<{ user: UserDTO; tokens: AuthTokens }> {
     if (!existingRefreshToken) {
-      throw new Error("Refresh token missing");
+      throw new UnauthorizedError("Refresh token missing");
     }
 
     let decoded: UserDTO;
     try {
       decoded = jwt.verify(existingRefreshToken, JWT_REFRESH_SECRET) as UserDTO;
     } catch {
-      throw new Error("Invalid or expired refresh token");
+      throw new UnauthorizedError("Invalid or expired refresh token");
     }
 
     const userPayload: UserDTO = {
@@ -106,18 +106,17 @@ export class AuthService {
     };
 
     const tokens = this.generateTokens(userPayload);
-    await UserService.updateRefreshToken(userPayload.id, userPayload.googleId, tokens.refreshToken);
+    await UserService.updateRefreshToken(userPayload.id, tokens.refreshToken);
 
     return { user: userPayload, tokens };
   }
 
   public static async revokeSession(refreshTokenValue?: string): Promise<void> {
     if (!refreshTokenValue) return;
-
     try {
-      const decoded = jwt.decode(refreshTokenValue) as { id?: string; googleId?: string } | null;
-      if (decoded?.id && decoded?.googleId) {
-        await UserService.updateRefreshToken(decoded.id, decoded.googleId, undefined);
+      const decoded = jwt.decode(refreshTokenValue) as { id?: string } | null;
+      if (decoded?.id) {
+        await UserService.updateRefreshToken(decoded.id, undefined);
       }
     } catch {
       // Ignore decoding errors during logout

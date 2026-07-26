@@ -77,6 +77,7 @@ export function GoogleLoginButton() {
               theme="filled_blue"
               shape="pill"
               size="large"
+              width="320"
             />
           </div>
         </GoogleOAuthProvider>
@@ -89,11 +90,16 @@ export function GoogleLoginButton() {
             className="flex h-12 w-full items-center justify-center gap-2 rounded-xl text-base font-semibold shadow-md"
             leftIcon={<LogIn className="h-5 w-5" />}
           >
-            Sign in with Google OAuth 2.0
+            Sign in (Dev Mock Login)
           </Button>
-          <div className="text-muted-foreground flex items-center justify-center gap-1.5 text-xs">
-            <Sparkles className="text-primary h-3.5 w-3.5" />
-            <span>Dev Mode: Connects to backend `/api/auth/google` with ID Token</span>
+          <div className="text-muted-foreground flex flex-col items-center justify-center gap-1 text-center text-xs">
+            <div className="flex items-center gap-1.5 font-medium text-amber-500">
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>Dev Mode Active (Mock Client ID)</span>
+            </div>
+            <span className="text-[11px] opacity-80">
+              Set NEXT_PUBLIC_GOOGLE_CLIENT_ID in .env.local to open real Google modal
+            </span>
           </div>
         </div>
       )}

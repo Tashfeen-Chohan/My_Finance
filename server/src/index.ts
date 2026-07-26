@@ -3,7 +3,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import authRoutes from "./routes/authRoutes";
+import apiRoutes from "./routes";
+import { errorHandler } from "./middleware/errorHandler";
+import { logger } from "./utils/logger";
 
 dotenv.config();
 
@@ -11,7 +13,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
 
-// Middleware
+// HTTP request logger middleware
+app.use((req, res, next) => {
+  logger.http(`${req.method} ${req.originalUrl}`);
+  next();
+});
+
+// Security & Parsing Middleware
 app.use(
   cors({
     origin: [CLIENT_URL, "http://localhost:3000", "http://127.0.0.1:3000"],
@@ -21,11 +29,11 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// Routes
-app.use("/api/auth", authRoutes);
+// Mount All API Routes
+app.use("/api", apiRoutes);
 
-// Health Check
-app.get("/api/health", (req, res) => {
+// Health Check Endpoint
+app.get("/api/health", (_req, res) => {
   res.json({
     status: "ok",
     timestamp: new Date().toISOString(),
@@ -33,18 +41,29 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// MongoDB Connection
+// 404 Not Found Handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: `Route not found: ${req.method} ${req.originalUrl}`,
+  });
+});
+
+// Global Centralized Error Handling Middleware
+app.use(errorHandler);
+
+// MongoDB Connection Bootstrap
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/my_finance";
 
 mongoose
   .connect(MONGO_URI)
   .then(() => {
-    console.log("Connected to MongoDB Database");
+    logger.info("Successfully connected to MongoDB Database");
   })
   .catch((err) => {
-    console.warn("MongoDB Connection Warning (Running with in-memory auth mode):", err.message);
+    logger.warn(`MongoDB Connection Warning: ${err.message}`);
   });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} [http://localhost:${PORT}]`);
+  logger.info(`Express REST API Server running on port ${PORT} [http://localhost:${PORT}]`);
 });

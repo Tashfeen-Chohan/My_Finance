@@ -10,8 +10,7 @@ export const env = createEnv({
     NEXT_PUBLIC_API_URL: z.string().url().default("http://localhost:5000/api"),
     NEXT_PUBLIC_GOOGLE_CLIENT_ID: z.string().default("mock-google-client-id-development"),
   },
-  runtimeEnv: {
-    NODE_ENV: process.env.NODE_ENV,
+  experimental__runtimeEnv: {
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
