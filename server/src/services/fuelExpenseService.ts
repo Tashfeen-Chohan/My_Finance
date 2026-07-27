@@ -3,40 +3,60 @@ import { vehicleRepository } from "../repositories/vehicleRepository";
 import { IFuelExpense } from "../models/FuelExpense";
 import { NotFoundError, BadRequestError } from "../errors/ApiError";
 
-export const createFuelExpense = async (userId: string, data: Partial<IFuelExpense>): Promise<IFuelExpense> => {
-  if (!data.vehicleId) {
-    throw BadRequestError("Vehicle ID is required");
-  }
+/**
+ * LIFO (Last-In, First-Out) Fuel Expense Service Logic:
+ * - Only the most recent refill is unlocked (isLocked = false) and editable/deletable.
+ * - When a new refill (B) is created, the previous refill (A) is calculated and locked (isLocked = true).
+ * - Odometer values are strictly validated to prevent entering readings lower than previous refills.
+ * - When the latest refill (B) is deleted, the previous refill (A) is unlocked and reset.
+ */
 
-  const vehicle = await vehicleRepository.findById(data.vehicleId.toString());
+export const createFuelExpense = async (userId: string, data: Partial<IFuelExpense>): Promise<IFuelExpense> => {
+  const vehicleId = data.vehicleId!.toString();
+  const vehicle = await vehicleRepository.findById(vehicleId);
   if (!vehicle || vehicle.userId.toString() !== userId) {
     throw NotFoundError("Vehicle not found");
   }
 
-  if (data.odometer !== undefined) {
-    const lastRefill = await fuelExpenseRepository.getLatestRefill(data.vehicleId.toString());
-    if (lastRefill && lastRefill.odometer < data.odometer) {
-      if (!data.distanceTraveled) {
-        data.distanceTraveled = data.odometer - lastRefill.odometer;
-      }
-      if (data.isFullTank && !data.computedEconomy && data.quantity && data.quantity > 0) {
-        data.computedEconomy = Number((data.distanceTraveled / data.quantity).toFixed(2));
-      }
+  // 1. Fetch current latest refill before creating new one
+  const lastRefill = await fuelExpenseRepository.getLatestRefill(vehicleId);
+
+  // Odometer Validation: Prevent entering odometer lower than previous refill
+  if (lastRefill && data.odometer! < lastRefill.odometer) {
+    throw BadRequestError(`New odometer reading (${data.odometer} km) cannot be less than the previous refill reading (${lastRefill.odometer} km).`);
+  }
+
+  // 2. Create new fuel expense (starts unlocked)
+  const createdExpense = await fuelExpenseRepository.create({
+    ...data,
+    isLocked: false,
+    userId,
+    createdBy: userId,
+    updatedBy: userId,
+  });
+
+  // 3. Finalize and LOCK previous refill (Refill A)
+  if (lastRefill && lastRefill.odometer < data.odometer!) {
+    const distanceTraveled = data.odometer! - lastRefill.odometer;
+    let computedEconomy: number | null = null;
+
+    if (lastRefill.isFullTank && data.isFullTank) {
+      computedEconomy = Number((distanceTraveled / data.quantity!).toFixed(2));
     }
 
-    await vehicleRepository.updateOdometer(data.vehicleId.toString(), data.odometer);
+    const lastRefillId = (lastRefill._id || lastRefill.id).toString();
+    await fuelExpenseRepository.update(lastRefillId, {
+      distanceTraveled,
+      computedEconomy: computedEconomy ?? null,
+      isLocked: true,
+      updatedBy: userId,
+    });
   }
 
-  if (!data.totalCost && data.quantity && data.unitPrice) {
-    data.totalCost = Number((data.quantity * data.unitPrice).toFixed(2));
-  }
+  // 4. Sync vehicle current odometer directly
+  await vehicleRepository.updateOdometer(vehicleId, data.odometer!);
 
-  return await fuelExpenseRepository.create({
-    ...data,
-    userId: userId as unknown as IFuelExpense["userId"],
-    createdBy: userId as unknown as IFuelExpense["createdBy"],
-    updatedBy: userId as unknown as IFuelExpense["updatedBy"],
-  });
+  return createdExpense;
 };
 
 export const getUserFuelExpenses = async (userId: string): Promise<IFuelExpense[]> => {
@@ -60,24 +80,84 @@ export const getFuelExpenseById = async (id: string, userId: string): Promise<IF
 };
 
 export const updateFuelExpense = async (id: string, userId: string, updateData: Partial<IFuelExpense>): Promise<IFuelExpense> => {
-  await getFuelExpenseById(id, userId);
+  const existing = await getFuelExpenseById(id, userId);
 
-  if (updateData.quantity && updateData.unitPrice && !updateData.totalCost) {
-    updateData.totalCost = Number((updateData.quantity * updateData.unitPrice).toFixed(2));
+  // LIFO Guard: Block updating locked (non-latest) refills
+  if (existing.isLocked) {
+    throw BadRequestError("Only the latest fuel entry can be edited. Locked past entries cannot be modified.");
+  }
+
+  const vehicleId = existing.vehicleId.toString();
+  const lastRefill = await fuelExpenseRepository.getLatestRefill(vehicleId, existing.date, id);
+
+  // Odometer Validation: Prevent updating odometer to a value lower than the previous refill
+  if (updateData.odometer !== undefined && lastRefill && updateData.odometer < lastRefill.odometer) {
+    throw BadRequestError(`Updated odometer reading (${updateData.odometer} km) cannot be less than the previous refill reading (${lastRefill.odometer} km).`);
   }
 
   const updated = await fuelExpenseRepository.update(id, {
     ...updateData,
-    updatedBy: userId as unknown as IFuelExpense["updatedBy"],
+    updatedBy: userId,
   });
 
   if (!updated) throw NotFoundError("Fuel expense record failed to update");
+
+  // Re-sync previous refill stats if odometer/quantity/isFullTank of current refill changed
+  if (lastRefill && updated.odometer && lastRefill.odometer < updated.odometer) {
+    const distanceTraveled = updated.odometer - lastRefill.odometer;
+    let computedEconomy: number | null = null;
+
+    if (lastRefill.isFullTank && updated.isFullTank) {
+      computedEconomy = Number((distanceTraveled / updated.quantity).toFixed(2));
+    }
+
+    const lastRefillId = (lastRefill._id || lastRefill.id).toString();
+    await fuelExpenseRepository.update(lastRefillId, {
+      distanceTraveled,
+      computedEconomy: computedEconomy ?? null,
+      isLocked: true,
+      updatedBy: userId,
+    });
+  }
+
+  // Sync vehicle current odometer directly if odometer updated
+  if (updated.odometer) {
+    await vehicleRepository.updateOdometer(vehicleId, updated.odometer);
+  }
+
   return updated;
 };
 
 export const deleteFuelExpense = async (id: string, userId: string): Promise<void> => {
-  await getFuelExpenseById(id, userId);
+  const existing = await getFuelExpenseById(id, userId);
+
+  // LIFO Guard: Block deleting locked (non-latest) refills
+  if (existing.isLocked) {
+    throw BadRequestError("Only the latest fuel entry can be deleted. Please delete subsequent entries first.");
+  }
+
+  // Soft delete current latest entry
   await fuelExpenseRepository.softDelete(id, userId);
+
+  // Unroll previous refill: Unlock it and clear distance/economy
+  const vehicleId = existing.vehicleId.toString();
+  const previousRefill = await fuelExpenseRepository.getLatestRefill(vehicleId);
+
+  if (previousRefill) {
+    const prevId = (previousRefill._id || previousRefill.id).toString();
+    await fuelExpenseRepository.update(prevId, {
+      distanceTraveled: undefined,
+      computedEconomy: undefined,
+      isLocked: false,
+      updatedBy: userId,
+    });
+
+    // Rollback vehicle currentOdometer to previous refill's odometer
+    await vehicleRepository.updateOdometer(vehicleId, previousRefill.odometer);
+  } else {
+    // If no refills left, reset vehicle odometer to 0
+    await vehicleRepository.updateOdometer(vehicleId, 0);
+  }
 };
 
 export const FuelExpenseService = {

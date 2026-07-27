@@ -14,10 +14,13 @@ export const fuelExpenseRepository = {
     return await FuelExpense.find({ vehicleId, userId, isDeleted: false }).sort({ date: -1, odometer: -1 });
   },
 
-  getLatestRefill: async (vehicleId: string, beforeDate?: Date): Promise<IFuelExpense | null> => {
+  getLatestRefill: async (vehicleId: string, beforeDate?: Date, excludeId?: string): Promise<IFuelExpense | null> => {
     const filter: Record<string, unknown> = { vehicleId, isDeleted: false };
     if (beforeDate) {
       filter.date = { $lt: beforeDate };
+    }
+    if (excludeId) {
+      filter._id = { $ne: excludeId };
     }
     return await FuelExpense.findOne(filter).sort({ date: -1, odometer: -1 });
   },

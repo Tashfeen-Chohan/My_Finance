@@ -2,8 +2,8 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface IFuelExpense extends Document {
   _id: mongoose.Types.ObjectId;
-  userId: mongoose.Types.ObjectId;
-  vehicleId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId | string;
+  vehicleId: mongoose.Types.ObjectId | string;
   date: Date;
   odometer: number;
   distanceTraveled?: number;
@@ -14,14 +14,15 @@ export interface IFuelExpense extends Document {
   isFullTank: boolean;
   missedPreviousRefill: boolean;
   computedEconomy?: number;
+  isLocked: boolean;
   currency: string;
   stationName?: string;
   notes?: string;
   // Audit fields
   createdAt: Date;
   updatedAt: Date;
-  createdBy?: mongoose.Types.ObjectId;
-  updatedBy?: mongoose.Types.ObjectId;
+  createdBy?: mongoose.Types.ObjectId | string;
+  updatedBy?: mongoose.Types.ObjectId | string;
   // Soft delete
   isDeleted: boolean;
   deletedAt?: Date | null;
@@ -87,6 +88,10 @@ const FuelExpenseSchema: Schema = new Schema(
     computedEconomy: {
       type: Number,
       min: [0, "Fuel economy cannot be negative"],
+    },
+    isLocked: {
+      type: Boolean,
+      default: false,
     },
     currency: {
       type: String,

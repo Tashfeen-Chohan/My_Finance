@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useVehicles } from "@/hooks/use-vehicles-query";
 import {
   useFuelExpenses,
@@ -24,7 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Fuel, Plus, Search, MoreVertical, Edit2, Trash2, Gauge, Calendar, MapPin, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
+import { Fuel, Plus, Search, MoreVertical, Edit2, Trash2, Gauge, Calendar, MapPin, Sparkles, CheckCircle2, Loader2, Lock } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function FuelPage() {
@@ -254,6 +254,7 @@ export default function FuelPage() {
                           <span className="flex items-center gap-1">
                             <Gauge className="h-3.5 w-3.5 text-muted-foreground" />
                             {expense.odometer?.toLocaleString()} km
+                            {expense.distanceTraveled ? ` (+${expense.distanceTraveled} km)` : ""}
                           </span>
                           {expense.stationName && (
                             <span className="flex items-center gap-1">
