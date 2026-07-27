@@ -65,11 +65,13 @@ app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps, curl, or server-to-server)
-      if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
-        callback(null, true);
-      } else {
-        callback(null, true); // Allow during transition/testing
+      if (!origin) {
+        return callback(null, true);
       }
+      if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+        return callback(null, origin);
+      }
+      return callback(null, origin);
     },
     credentials: true,
   })

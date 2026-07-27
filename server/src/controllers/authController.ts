@@ -3,19 +3,19 @@ import { authenticateGoogleUser, refreshSession, revokeSession } from "../servic
 import { AuthRequest } from "../middleware/authMiddleware";
 
 const setAuthCookies = (res: Response, accessToken: string, refreshToken: string): void => {
-  const isProd = process.env.NODE_ENV === "production";
+  const isProd = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     secure: isProd,
-    sameSite: "lax",
+    sameSite: isProd ? "none" : "lax",
     maxAge: 15 * 60 * 1000, // 15 minutes
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: isProd,
-    sameSite: "lax",
+    sameSite: isProd ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 };
@@ -47,11 +47,20 @@ export const refreshToken = async (req: AuthRequest, res: Response): Promise<voi
 };
 
 export const logout = async (req: AuthRequest, res: Response): Promise<void> => {
+  const isProd = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
   const refreshTokenVal = req.cookies?.refreshToken;
   await revokeSession(refreshTokenVal);
 
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken");
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
+  });
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
+  });
 
   res.json({ success: true, message: "Logged out successfully" });
 };
