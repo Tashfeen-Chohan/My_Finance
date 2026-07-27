@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { useToast } from "@/components/ui/use-toast";
@@ -11,6 +12,7 @@ import { LogIn, Sparkles } from "lucide-react";
 export function GoogleLoginButton() {
   const { loginWithGoogleCredential, loginWithMockUser, isLoading } = useAuthStore();
   const { toast } = useToast();
+  const router = useRouter();
   const [errorMsg, setErrorMsg] = useState(null);
 
   const clientId = env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
@@ -34,6 +36,7 @@ export function GoogleLoginButton() {
         description: "Welcome to MyFinance!",
         variant: "success",
       });
+      router.push("/");
     } else {
       setErrorMsg(result.error || "Login failed");
       toast({
@@ -53,6 +56,7 @@ export function GoogleLoginButton() {
         description: "Logged in with Google test profile",
         variant: "success",
       });
+      router.push("/");
     } else {
       setErrorMsg(result.error || "Dev login failed");
     }

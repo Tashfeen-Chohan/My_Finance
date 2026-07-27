@@ -5,19 +5,22 @@ import { AuthRequest } from "../middleware/authMiddleware";
 const setAuthCookies = (res: Response, accessToken: string, refreshToken: string): void => {
   const isProd = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
 
-  res.cookie("accessToken", accessToken, {
+  const cookieOptions = {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? "none" : "lax",
+    sameSite: (isProd ? "none" : "lax") as "none" | "lax",
+    partitioned: isProd ? true : undefined,
+  };
+
+  res.cookie("accessToken", accessToken, {
+    ...cookieOptions,
     maxAge: 15 * 60 * 1000, // 15 minutes
-  });
+  } as any);
 
   res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? "none" : "lax",
+    ...cookieOptions,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
+  } as any);
 };
 
 export const googleLogin = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -30,6 +33,7 @@ export const googleLogin = async (req: AuthRequest, res: Response): Promise<void
     success: true,
     user,
     accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken,
   });
 };
 
@@ -43,24 +47,24 @@ export const refreshToken = async (req: AuthRequest, res: Response): Promise<voi
     success: true,
     user,
     accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken,
   });
 };
 
 export const logout = async (req: AuthRequest, res: Response): Promise<void> => {
   const isProd = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
-  const refreshTokenVal = req.cookies?.refreshToken;
+  const refreshTokenVal = req.cookies?.refreshToken || req.body?.refreshToken;
   await revokeSession(refreshTokenVal);
 
-  res.clearCookie("accessToken", {
+  const clearOptions = {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? "none" : "lax",
-  });
-  res.clearCookie("refreshToken", {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? "none" : "lax",
-  });
+    sameSite: (isProd ? "none" : "lax") as "none" | "lax",
+    partitioned: isProd ? true : undefined,
+  };
+
+  res.clearCookie("accessToken", clearOptions as any);
+  res.clearCookie("refreshToken", clearOptions as any);
 
   res.json({ success: true, message: "Logged out successfully" });
 };
@@ -72,3 +76,4 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
   }
   res.json({ success: true, user: req.user });
 };
+

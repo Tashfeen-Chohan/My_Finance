@@ -29,6 +29,20 @@ export function setStoredToken(token) {
   }
 }
 
+export function getStoredRefreshToken() {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("my_finance_refresh_token");
+}
+
+export function setStoredRefreshToken(token) {
+  if (typeof window === "undefined") return;
+  if (token) {
+    localStorage.setItem("my_finance_refresh_token", token);
+  } else {
+    localStorage.removeItem("my_finance_refresh_token");
+  }
+}
+
 async function apiRequest(endpoint, options = {}, isRetry = false) {
   const baseUrl = env.NEXT_PUBLIC_API_URL;
   const url = `${baseUrl}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
@@ -56,7 +70,6 @@ async function apiRequest(endpoint, options = {}, isRetry = false) {
     if (
       response.status === 401 &&
       !isRetry &&
-      storedToken &&
       endpoint !== "/auth/refresh" &&
       endpoint !== "/auth/google" &&
       endpoint !== "/auth/me"
@@ -64,19 +77,25 @@ async function apiRequest(endpoint, options = {}, isRetry = false) {
       if (!isRefreshing) {
         isRefreshing = true;
         try {
-          const refreshRes = await apiPost("/auth/refresh", {});
+          const refreshTokenVal = getStoredRefreshToken();
+          const refreshRes = await apiPost("/auth/refresh", { refreshToken: refreshTokenVal });
           isRefreshing = false;
           if (refreshRes.success && refreshRes.data?.accessToken) {
             const newToken = refreshRes.data.accessToken;
             setStoredToken(newToken);
+            if (refreshRes.data.refreshToken) {
+              setStoredRefreshToken(refreshRes.data.refreshToken);
+            }
             onRefreshed(newToken);
             return apiRequest(endpoint, options, true);
           } else {
             setStoredToken(null);
+            setStoredRefreshToken(null);
           }
         } catch {
           isRefreshing = false;
           setStoredToken(null);
+          setStoredRefreshToken(null);
         }
       } else {
         return new Promise((resolve) => {
@@ -97,6 +116,9 @@ async function apiRequest(endpoint, options = {}, isRetry = false) {
     // Automatically cache token if returned in response
     if (data?.accessToken) {
       setStoredToken(data.accessToken);
+    }
+    if (data?.refreshToken) {
+      setStoredRefreshToken(data.refreshToken);
     }
 
     return {
