@@ -11,23 +11,83 @@ import { logger } from "./utils/logger";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+
+// MongoDB Connection Caching for Vercel Serverless Execution & Environment Auto-Switch
+let isConnected = false;
+export const connectDB = async (): Promise<void> => {
+  if (isConnected || mongoose.connection.readyState === 1) return;
+
+  const isProduction = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
+  
+  const MONGO_URI = isProduction
+    ? (process.env.MONGO_URI_PROD || process.env.MONGO_URI || "mongodb://localhost:27017/my_finance")
+    : (process.env.MONGO_URI_DEV || "mongodb://localhost:27017/my_finance");
+
+  const dbTargetName = isProduction ? "MongoDB Atlas (Production)" : "MongoDB Compass (Development)";
+
+  try {
+    await mongoose.connect(MONGO_URI);
+    isConnected = true;
+    logger.info(`Successfully connected to ${dbTargetName}`);
+  } catch (err) {
+    logger.error(`MongoDB Connection Error [${dbTargetName}]: ${(err as Error).message}`);
+    throw err;
+  }
+};
+
+// Middleware: Ensure DB connection before handling requests
+app.use(async (_req, _res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 // HTTP request logger middleware
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
   logger.http(`${req.method} ${req.originalUrl}`);
   next();
 });
 
 // Security & Parsing Middleware
+const allowedOrigins = [
+  CLIENT_URL,
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+];
+
 app.use(
   cors({
-    origin: [CLIENT_URL, "http://localhost:3000", "http://127.0.0.1:3000"],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Allow during transition/testing
+      }
+    },
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
+
+// Root Welcome Endpoint
+app.get("/", (_req, res) => {
+  res.json({
+    message: "🚀 Welcome to My_Finance REST API",
+    status: "online",
+    environment: process.env.NODE_ENV || "development",
+    timestamp: new Date().toISOString(),
+    healthCheck: "/api/health",
+  });
+});
 
 // Mount All API Routes
 app.use("/api", apiRoutes);
@@ -52,18 +112,11 @@ app.use((req, res) => {
 // Global Centralized Error Handling Middleware
 app.use(errorHandler);
 
-// MongoDB Connection Bootstrap
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/my_finance";
-
-mongoose
-  .connect(MONGO_URI)
-  .then(() => {
-    logger.info("Successfully connected to MongoDB Database");
-  })
-  .catch((err) => {
-    logger.warn(`MongoDB Connection Warning: ${err.message}`);
+// Start server locally if not running in Vercel serverless environment
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    logger.info(`Express REST API Server running on port ${PORT} [http://localhost:${PORT}]`);
   });
+}
 
-app.listen(PORT, () => {
-  logger.info(`Express REST API Server running on port ${PORT} [http://localhost:${PORT}]`);
-});
+export default app;
