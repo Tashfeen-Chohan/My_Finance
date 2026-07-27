@@ -66,13 +66,12 @@ async function apiRequest(endpoint, options = {}, isRetry = false) {
 
     const data = await response.json().catch(() => ({}));
 
-    // If 401 and we have a storedToken, attempt refresh ONCE
+    // If 401, attempt refresh ONCE (except on login/refresh endpoints)
     if (
       response.status === 401 &&
       !isRetry &&
       endpoint !== "/auth/refresh" &&
-      endpoint !== "/auth/google" &&
-      endpoint !== "/auth/me"
+      endpoint !== "/auth/google"
     ) {
       if (!isRefreshing) {
         isRefreshing = true;
