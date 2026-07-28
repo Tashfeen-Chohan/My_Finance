@@ -5,7 +5,7 @@ export const createMaintenanceSchema = z.object({
     vehicleId: z.string().min(1, "Vehicle ID is required"),
     date: z.string().or(z.date()).default(() => new Date()),
     odometer: z.number().min(0, "Odometer reading cannot be negative"),
-    category: z.enum(["service", "repair", "part_replacement", "tire", "oil_change", "washing", "inspection", "other"]),
+    category: z.string().min(1, "Category is required"),
     title: z.string().min(1, "Service title is required").max(150),
     description: z.string().max(2000).optional(),
     partsCost: z.number().min(0).default(0),
@@ -36,7 +36,7 @@ export const updateMaintenanceSchema = z.object({
   body: z.object({
     date: z.string().or(z.date()).optional(),
     odometer: z.number().min(0).optional(),
-    category: z.enum(["service", "repair", "part_replacement", "tire", "oil_change", "washing", "inspection", "other"]).optional(),
+    category: z.string().min(1).optional(),
     title: z.string().min(1).max(150).optional(),
     description: z.string().max(2000).optional(),
     partsCost: z.number().min(0).optional(),

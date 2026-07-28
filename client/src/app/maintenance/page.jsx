@@ -27,28 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Wrench, Plus, Search, MoreVertical, Edit2, Trash2, Gauge, Calendar, Droplet, Sparkles, Loader2, Store } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-
-const categoryBadges = {
-  oil_change: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-  service: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  repair: "bg-red-500/10 text-red-400 border-red-500/20",
-  part_replacement: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  tire: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-  washing: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  inspection: "bg-slate-500/10 text-slate-400 border-slate-500/20",
-  other: "bg-slate-500/10 text-slate-400 border-slate-500/20",
-};
-
-const categoryLabels = {
-  oil_change: "Oil Change",
-  service: "Service",
-  repair: "Repair",
-  part_replacement: "Part Replacement",
-  tire: "Tire Job",
-  washing: "Wash & Detailing",
-  inspection: "Inspection",
-  other: "Other",
-};
+import { CATEGORY_BADGES, CATEGORY_LABELS, MAINTENANCE_CATEGORIES } from "@/constants/maintenance";
 
 export default function MaintenancePage() {
   const [selectedVehicleId, setSelectedVehicleId] = useState("all");
@@ -200,14 +179,11 @@ export default function MaintenancePage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="oil_change">Oil Change</SelectItem>
-              <SelectItem value="service">Service</SelectItem>
-              <SelectItem value="repair">Repair</SelectItem>
-              <SelectItem value="part_replacement">Part Replacement</SelectItem>
-              <SelectItem value="tire">Tire Job</SelectItem>
-              <SelectItem value="washing">Wash & Detailing</SelectItem>
-              <SelectItem value="inspection">Inspection</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
+              {MAINTENANCE_CATEGORIES.map((cat) => (
+                <SelectItem key={cat.value} value={cat.value}>
+                  {cat.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -254,14 +230,14 @@ export default function MaintenancePage() {
                   >
                     {/* Left: Service Info */}
                     <div className="flex items-start gap-3.5">
-                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${categoryBadges[item.category] || categoryBadges.other}`}>
+                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${CATEGORY_BADGES[item.category] || CATEGORY_BADGES.other}`}>
                         {isOilChange ? <Droplet className="h-5 w-5" /> : <Wrench className="h-5 w-5" />}
                       </div>
                       <div className="space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <h4 className="font-bold text-foreground">{item.title}</h4>
-                          <Badge className={`capitalize text-[11px] font-medium border ${categoryBadges[item.category] || categoryBadges.other}`}>
-                            {categoryLabels[item.category] || item.category}
+                          <Badge className={`capitalize text-[11px] font-medium border ${CATEGORY_BADGES[item.category] || CATEGORY_BADGES.other}`}>
+                            {CATEGORY_LABELS[item.category] || item.category}
                           </Badge>
                           <Badge variant="outline" className="text-[11px] font-mono">
                             {getVehicleName(item.vehicleId)}

@@ -13,7 +13,7 @@ export interface IMaintenanceExpense extends Document {
   vehicleId: mongoose.Types.ObjectId;
   date: Date;
   odometer: number;
-  category: "service" | "repair" | "part_replacement" | "tire" | "oil_change" | "washing" | "inspection" | "other";
+  category: string;
   title: string;
   description?: string;
   partsCost: number;
@@ -88,11 +88,8 @@ const MaintenanceExpenseSchema: Schema = new Schema(
     },
     category: {
       type: String,
-      enum: {
-        values: ["service", "repair", "part_replacement", "tire", "oil_change", "washing", "inspection", "other"],
-        message: "{VALUE} is not a valid maintenance category",
-      },
       required: [true, "Maintenance category is required"],
+      trim: true,
       default: "service",
       index: true,
     },

@@ -16,10 +16,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Wrench, Loader2 } from "lucide-react";
+import { MAINTENANCE_CATEGORIES } from "@/constants/maintenance";
 
 const maintenanceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
-  category: z.enum(["service", "repair", "part_replacement", "tire", "oil_change", "washing", "inspection", "other"]),
+  category: z.string().min(1, "Category is required"),
   title: z.string().min(1, "Title is required").max(150),
   odometer: z.coerce.number().min(0, "Odometer reading cannot be negative"),
   partsCost: z.coerce.number().min(0, "Parts cost cannot be negative").default(0),
@@ -83,9 +84,8 @@ export function MaintenanceDialog({
     if (!isEditing) {
       if (selectedCategory === "oil_change") setValue("title", "Engine Oil & Filter Change");
       else if (selectedCategory === "service") setValue("title", "Periodic Maintenance Service");
-      else if (selectedCategory === "tire") setValue("title", "Tire Rotation & Alignment");
+      else if (selectedCategory === "tire_puncture") setValue("title", "Tire Puncture Repair");
       else if (selectedCategory === "washing") setValue("title", "Car Wash & Detailing");
-      else if (selectedCategory === "inspection") setValue("title", "General Inspection");
       else if (selectedCategory === "repair") setValue("title", "Vehicle Repair");
       else if (selectedCategory === "part_replacement") setValue("title", "Part Replacement");
     }
@@ -193,14 +193,11 @@ export function MaintenanceDialog({
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="oil_change">Oil Change</SelectItem>
-                  <SelectItem value="service">Periodic Service</SelectItem>
-                  <SelectItem value="repair">Repair</SelectItem>
-                  <SelectItem value="part_replacement">Part Replacement</SelectItem>
-                  <SelectItem value="tire">Tire Rotation / Service</SelectItem>
-                  <SelectItem value="washing">Wash & Detailing</SelectItem>
-                  <SelectItem value="inspection">Inspection</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  {MAINTENANCE_CATEGORIES.map((cat) => (
+                    <SelectItem key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

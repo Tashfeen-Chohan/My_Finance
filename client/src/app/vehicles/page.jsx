@@ -166,7 +166,7 @@ export default function VehiclesPage() {
               <Gauge className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Combined Distance</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Distance Covered</p>
               <h3 className="text-2xl font-bold text-foreground">
                 {vehicles.reduce((acc, v) => acc + (v.currentOdometer || 0), 0).toLocaleString()} km
               </h3>
