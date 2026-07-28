@@ -18,8 +18,8 @@ export const maintenanceExpenseRepository = {
     return await MaintenanceExpense.find({
       userId,
       isDeleted: false,
-      nextServiceDate: { $gte: new Date() },
-    }).sort({ nextServiceDate: 1 });
+      nextServiceOdometer: { $exists: true, $ne: null, $gt: 0 },
+    }).sort({ nextServiceOdometer: 1 });
   },
 
   aggregateTotalMaintenanceCost: async (userId: string, startDate?: Date, endDate?: Date): Promise<{ totalCost: number; count: number }> => {
@@ -35,7 +35,7 @@ export const maintenanceExpenseRepository = {
       {
         $group: {
           _id: null,
-          totalCost: { $sum: "$totalCost" },
+          totalCost: { $sum: "$cost" },
           count: { $sum: 1 },
         },
       },

@@ -6,7 +6,7 @@ import { Wrench, Droplet, DollarSign, CalendarCheck } from "lucide-react";
 
 export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = [] }) {
   // 1. Total Cost
-  const totalCost = maintenanceLogs.reduce((acc, item) => acc + (Number(item.totalCost) || 0), 0);
+  const totalCost = maintenanceLogs.reduce((acc, item) => acc + (Number(item.cost ?? item.totalCost) || 0), 0);
 
   // 2. Oil changes count
   const oilChangesCount = maintenanceLogs.filter((item) => item.category === "oil_change").length;

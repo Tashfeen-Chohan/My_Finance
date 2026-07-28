@@ -18,12 +18,21 @@ export const CATEGORY_LABELS = {
   other: "Other",
 };
 
+export const DEFAULT_CATEGORY_TITLES = {
+  oil_change: "Engine Oil & Filter Change",
+  service: "Maintenance Service",
+  tire_puncture: "Tire Puncture",
+  washing: "Car Wash & Detailing",
+  repair: "Vehicle Repair",
+  part_replacement: "Part Replacement",
+};
+
 export const MAINTENANCE_CATEGORIES = [
-  { value: "oil_change", label: "Oil Change" },
-  { value: "service", label: "Service" },
-  { value: "repair", label: "Repair" },
-  { value: "part_replacement", label: "Part Replacement" },
-  { value: "tire_puncture", label: "Tire Puncture" },
-  { value: "washing", label: "Wash & Detailing" },
-  { value: "other", label: "Other" },
+  { value: "oil_change", label: "Oil Change", defaultTitle: "Engine Oil & Filter Change" },
+  { value: "service", label: "Service", defaultTitle: "Maintenance Service" },
+  { value: "repair", label: "Repair", defaultTitle: "Vehicle Repair" },
+  { value: "part_replacement", label: "Part Replacement", defaultTitle: "Part Replacement" },
+  { value: "tire_puncture", label: "Tire Puncture", defaultTitle: "Tire Puncture" },
+  { value: "washing", label: "Wash & Detailing", defaultTitle: "Car Wash & Detailing" },
+  { value: "other", label: "Other", defaultTitle: "" },
 ];

@@ -17,10 +17,6 @@ export const createMaintenance = async (userId: string, data: Partial<IMaintenan
     await vehicleRepository.updateOdometer(data.vehicleId.toString(), data.odometer);
   }
 
-  if (!data.totalCost) {
-    data.totalCost = Number(((data.partsCost || 0) + (data.laborCost || 0)).toFixed(2));
-  }
-
   return await maintenanceExpenseRepository.create({
     ...data,
     userId: userId as unknown as IMaintenanceExpense["userId"],
@@ -55,14 +51,6 @@ export const getUpcomingServices = async (userId: string): Promise<IMaintenanceE
 
 export const updateMaintenance = async (id: string, userId: string, updateData: Partial<IMaintenanceExpense>): Promise<IMaintenanceExpense> => {
   await getMaintenanceById(id, userId);
-
-  if (updateData.partsCost !== undefined || updateData.laborCost !== undefined) {
-    const partsCost = updateData.partsCost !== undefined ? updateData.partsCost : 0;
-    const laborCost = updateData.laborCost !== undefined ? updateData.laborCost : 0;
-    if (!updateData.totalCost) {
-      updateData.totalCost = Number((partsCost + laborCost).toFixed(2));
-    }
-  }
 
   const updated = await maintenanceExpenseRepository.update(id, {
     ...updateData,

@@ -1,12 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-export interface IPartItem {
-  name: string;
-  quantity: number;
-  unitCost: number;
-  partNumber?: string;
-}
-
 export interface IMaintenanceExpense extends Document {
   _id: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
@@ -16,15 +9,10 @@ export interface IMaintenanceExpense extends Document {
   category: string;
   title: string;
   description?: string;
-  partsCost: number;
-  laborCost: number;
-  totalCost: number;
-  currency: string;
+  cost: number;
   serviceProvider?: string;
   nextServiceOdometer?: number;
-  nextServiceDate?: Date;
   notes?: string;
-  parts?: IPartItem[];
   // Audit fields
   createdAt: Date;
   updatedAt: Date;
@@ -33,33 +21,8 @@ export interface IMaintenanceExpense extends Document {
   // Soft delete
   isDeleted: boolean;
   deletedAt?: Date | null;
-  version: number;
+  deletedBy?: mongoose.Types.ObjectId | null;
 }
-
-const PartItemSchema: Schema = new Schema(
-  {
-    name: {
-      type: String,
-      required: [true, "Part name is required"],
-      trim: true,
-    },
-    quantity: {
-      type: Number,
-      default: 1,
-      min: [0.01, "Quantity must be greater than zero"],
-    },
-    unitCost: {
-      type: Number,
-      default: 0,
-      min: [0, "Unit cost cannot be negative"],
-    },
-    partNumber: {
-      type: String,
-      trim: true,
-    },
-  },
-  { _id: false }
-);
 
 const MaintenanceExpenseSchema: Schema = new Schema(
   {
@@ -104,27 +67,10 @@ const MaintenanceExpenseSchema: Schema = new Schema(
       trim: true,
       maxlength: [2000, "Description cannot exceed 2000 characters"],
     },
-    partsCost: {
+    cost: {
       type: Number,
-      default: 0,
-      min: [0, "Parts cost cannot be negative"],
-    },
-    laborCost: {
-      type: Number,
-      default: 0,
-      min: [0, "Labor cost cannot be negative"],
-    },
-    totalCost: {
-      type: Number,
-      required: [true, "Total cost is required"],
-      min: [0, "Total cost cannot be negative"],
-    },
-    currency: {
-      type: String,
-      default: "PKR",
-      uppercase: true,
-      trim: true,
-      maxlength: 5,
+      required: [true, "Cost is required"],
+      min: [0, "Cost cannot be negative"],
     },
     serviceProvider: {
       type: String,
@@ -135,16 +81,11 @@ const MaintenanceExpenseSchema: Schema = new Schema(
       type: Number,
       min: [0, "Next service odometer cannot be negative"],
     },
-    nextServiceDate: {
-      type: Date,
-      index: true,
-    },
     notes: {
       type: String,
       trim: true,
       maxlength: [1000, "Notes cannot exceed 1000 characters"],
     },
-    parts: [PartItemSchema],
     // Audit fields
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -169,11 +110,6 @@ const MaintenanceExpenseSchema: Schema = new Schema(
       ref: "User",
       default: null,
     },
-    version: {
-      type: Number,
-      default: 1,
-      min: 1,
-    },
   },
   {
     timestamps: true,
@@ -189,17 +125,8 @@ const MaintenanceExpenseSchema: Schema = new Schema(
   }
 );
 
-// Pre-save hook: compute totalCost if omitted or set to 0
-MaintenanceExpenseSchema.pre<IMaintenanceExpense>("save", function (next) {
-  if (!this.totalCost && (this.partsCost !== undefined || this.laborCost !== undefined)) {
-    this.totalCost = Number(((this.partsCost || 0) + (this.laborCost || 0)).toFixed(2));
-  }
-  next();
-});
-
-// Essential indexes for query performance and reminder scheduling
+// Essential indexes for query performance
 MaintenanceExpenseSchema.index({ vehicleId: 1, date: -1, isDeleted: 1 });
 MaintenanceExpenseSchema.index({ userId: 1, date: -1, isDeleted: 1 });
-MaintenanceExpenseSchema.index({ userId: 1, nextServiceDate: 1, isDeleted: 1 });
 
 export const MaintenanceExpense = mongoose.model<IMaintenanceExpense>("MaintenanceExpense", MaintenanceExpenseSchema);

@@ -44,7 +44,7 @@ export const getDashboardSummary = async (userId: string): Promise<DashboardSumm
       id: m._id,
       type: "maintenance" as const,
       title: m.title,
-      cost: m.totalCost,
+      cost: m.cost ?? (m as unknown as { totalCost: number }).totalCost ?? 0,
       date: m.date,
       vehicleId: m.vehicleId,
     })),

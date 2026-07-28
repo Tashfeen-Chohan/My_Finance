@@ -16,20 +16,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Wrench, Loader2 } from "lucide-react";
-import { MAINTENANCE_CATEGORIES } from "@/constants/maintenance";
+import { MAINTENANCE_CATEGORIES, DEFAULT_CATEGORY_TITLES } from "@/constants/maintenance";
 
 const maintenanceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
   category: z.string().min(1, "Category is required"),
   title: z.string().min(1, "Title is required").max(150),
   odometer: z.coerce.number().min(0, "Odometer reading cannot be negative"),
-  partsCost: z.coerce.number().min(0, "Parts cost cannot be negative").default(0),
-  laborCost: z.coerce.number().min(0, "Labor cost cannot be negative").default(0),
-  totalCost: z.coerce.number().min(0).optional(),
+  cost: z.coerce.number().min(0, "Cost cannot be negative"),
   serviceProvider: z.string().max(100).optional(),
   date: z.string().min(1, "Date is required"),
   nextServiceOdometer: z.coerce.number().min(0).optional().or(z.literal("")),
-  nextServiceDate: z.string().optional(),
   notes: z.string().max(1000).optional(),
 });
 
@@ -56,40 +53,22 @@ export function MaintenanceDialog({
     defaultValues: {
       vehicleId: defaultVehicleId,
       category: "oil_change",
-      title: "Engine Oil Change",
+      title: "Engine Oil & Filter Change",
       odometer: 0,
-      partsCost: 0,
-      laborCost: 0,
-      totalCost: 0,
+      cost: 0,
       serviceProvider: "",
       date: new Date().toISOString().split("T")[0],
       nextServiceOdometer: "",
-      nextServiceDate: "",
       notes: "",
     },
   });
 
-  const selectedCategory = watch("category");
-  const partsCostVal = watch("partsCost") || 0;
-  const laborCostVal = watch("laborCost") || 0;
-
-  // Auto calculate total cost
-  useEffect(() => {
-    const computedTotal = Number(partsCostVal) + Number(laborCostVal);
-    setValue("totalCost", computedTotal);
-  }, [partsCostVal, laborCostVal, setValue]);
-
-  // Set default title based on selected category when adding new record
-  useEffect(() => {
-    if (!isEditing) {
-      if (selectedCategory === "oil_change") setValue("title", "Engine Oil & Filter Change");
-      else if (selectedCategory === "service") setValue("title", "Periodic Maintenance Service");
-      else if (selectedCategory === "tire_puncture") setValue("title", "Tire Puncture Repair");
-      else if (selectedCategory === "washing") setValue("title", "Car Wash & Detailing");
-      else if (selectedCategory === "repair") setValue("title", "Vehicle Repair");
-      else if (selectedCategory === "part_replacement") setValue("title", "Part Replacement");
+  const handleCategoryChange = (val) => {
+    setValue("category", val, { shouldValidate: true });
+    if (DEFAULT_CATEGORY_TITLES[val]) {
+      setValue("title", DEFAULT_CATEGORY_TITLES[val], { shouldValidate: true });
     }
-  }, [selectedCategory, isEditing, setValue]);
+  };
 
   useEffect(() => {
     if (maintenanceToEdit) {
@@ -98,22 +77,15 @@ export function MaintenanceDialog({
         ? new Date(maintenanceToEdit.date).toISOString().split("T")[0]
         : new Date().toISOString().split("T")[0];
 
-      const nextDateStr = maintenanceToEdit.nextServiceDate
-        ? new Date(maintenanceToEdit.nextServiceDate).toISOString().split("T")[0]
-        : "";
-
       reset({
         vehicleId: String(vId),
         category: maintenanceToEdit.category || "service",
         title: maintenanceToEdit.title || "",
         odometer: maintenanceToEdit.odometer || 0,
-        partsCost: maintenanceToEdit.partsCost || 0,
-        laborCost: maintenanceToEdit.laborCost || 0,
-        totalCost: maintenanceToEdit.totalCost || 0,
+        cost: maintenanceToEdit.cost ?? maintenanceToEdit.totalCost ?? 0,
         serviceProvider: maintenanceToEdit.serviceProvider || "",
         date: dateStr,
         nextServiceOdometer: maintenanceToEdit.nextServiceOdometer || "",
-        nextServiceDate: nextDateStr,
         notes: maintenanceToEdit.notes || "",
       });
     } else {
@@ -122,13 +94,10 @@ export function MaintenanceDialog({
         category: "oil_change",
         title: "Engine Oil & Filter Change",
         odometer: 0,
-        partsCost: 0,
-        laborCost: 0,
-        totalCost: 0,
+        cost: 0,
         serviceProvider: "",
         date: new Date().toISOString().split("T")[0],
         nextServiceOdometer: "",
-        nextServiceDate: "",
         notes: "",
       });
     }
@@ -137,8 +106,8 @@ export function MaintenanceDialog({
   const onFormSubmit = async (data) => {
     const formattedData = {
       ...data,
+      cost: Number(data.cost),
       nextServiceOdometer: data.nextServiceOdometer ? Number(data.nextServiceOdometer) : undefined,
-      nextServiceDate: data.nextServiceDate ? new Date(data.nextServiceDate).toISOString() : undefined,
     };
     await onSubmit(formattedData);
     onOpenChange(false);
@@ -155,7 +124,7 @@ export function MaintenanceDialog({
             <DialogTitle>{isEditing ? "Edit Maintenance Record" : "Log Vehicle Maintenance"}</DialogTitle>
           </div>
           <DialogDescription>
-            Record oil changes, periodic services, part replacements, and reminder targets.
+            Record oil changes, periodic services, workshop repairs, and reminder targets.
           </DialogDescription>
         </DialogHeader>
 
@@ -187,7 +156,7 @@ export function MaintenanceDialog({
               <label className="text-xs font-semibold text-foreground">Category *</label>
               <Select
                 value={watch("category")}
-                onValueChange={(val) => setValue("category", val, { shouldValidate: true })}
+                onValueChange={handleCategoryChange}
               >
                 <SelectTrigger className="bg-background/50 border-border/50">
                   <SelectValue placeholder="Category" />
@@ -227,51 +196,27 @@ export function MaintenanceDialog({
               {errors.odometer && <p className="text-xs text-destructive">{errors.odometer.message}</p>}
             </div>
 
+            {/* Service Cost */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">Service Cost (PKR) *</label>
+              <Input
+                type="number"
+                step="0.01"
+                placeholder="e.g. 4500"
+                {...register("cost")}
+                className="bg-background/50 border-border/50 font-medium"
+              />
+              {errors.cost && <p className="text-xs text-destructive">{errors.cost.message}</p>}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Date */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground">Service Date *</label>
               <Input type="date" {...register("date")} className="bg-background/50 border-border/50" />
             </div>
-          </div>
 
-          {/* Cost Breakdown */}
-          <div className="rounded-xl border border-border/50 bg-secondary/20 p-3 space-y-3">
-            <p className="text-xs font-bold text-foreground">Cost Breakdown (PKR)</p>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-1">
-                <label className="text-[11px] text-muted-foreground">Parts Cost</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  {...register("partsCost")}
-                  className="bg-background/50 border-border/50 h-8 text-xs"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[11px] text-muted-foreground">Labor Cost</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  {...register("laborCost")}
-                  className="bg-background/50 border-border/50 h-8 text-xs"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[11px] text-muted-foreground font-semibold text-foreground">Total Cost</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  {...register("totalCost")}
-                  readOnly
-                  className="bg-background/80 border-border/50 h-8 text-xs font-bold text-emerald-500 cursor-not-allowed"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Service Provider */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground">Service Workshop / Provider</label>
@@ -281,30 +226,24 @@ export function MaintenanceDialog({
                 className="bg-background/50 border-border/50"
               />
             </div>
-
-            {/* Next Service Odometer Reminder */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">Next Service Odometer (Reminder)</label>
-              <Input
-                type="number"
-                placeholder="e.g. 50000"
-                {...register("nextServiceOdometer")}
-                className="bg-background/50 border-border/50"
-              />
-            </div>
           </div>
 
-          {/* Next Service Date Reminder */}
+          {/* Next Service Odometer Reminder */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground">Next Service Date (Reminder)</label>
-            <Input type="date" {...register("nextServiceDate")} className="bg-background/50 border-border/50" />
+            <label className="text-xs font-semibold text-foreground">Next Service Odometer (Reminder Target)</label>
+            <Input
+              type="number"
+              placeholder="e.g. 50000"
+              {...register("nextServiceOdometer")}
+              className="bg-background/50 border-border/50"
+            />
           </div>
 
           {/* Notes */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground">Notes / Remarks</label>
             <Input
-              placeholder="e.g. Replaced oil filter with OEM Part #12345"
+              placeholder="e.g. Engine oil and oil filter replaced"
               {...register("notes")}
               className="bg-background/50 border-border/50"
             />

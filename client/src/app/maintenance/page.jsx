@@ -269,17 +269,12 @@ export default function MaintenancePage() {
                       </div>
                     </div>
 
-                    {/* Right: Cost Breakdown & Actions */}
+                    {/* Right: Cost & Actions */}
                     <div className="flex items-center justify-between sm:justify-end gap-6 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/40">
                       <div className="text-right">
                         <p className="text-lg font-bold text-foreground">
-                          PKR {Number(item.totalCost).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          PKR {Number(item.cost ?? item.totalCost ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </p>
-                        {(item.partsCost > 0 || item.laborCost > 0) && (
-                          <p className="text-[11px] text-muted-foreground">
-                            Parts: PKR {item.partsCost || 0} | Labor: PKR {item.laborCost || 0}
-                          </p>
-                        )}
                       </div>
 
                       <DropdownMenu>
