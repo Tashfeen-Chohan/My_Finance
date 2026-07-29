@@ -9,15 +9,28 @@ export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = 
   const totalCost = maintenanceLogs.reduce((acc, item) => acc + (Number(item.cost ?? item.totalCost) || 0), 0);
 
   // 2. Oil changes count
-  const oilChangesCount = maintenanceLogs.filter((item) => item.category === "oil_change").length;
+  const oilChangesCount = maintenanceLogs.filter(
+    (item) => item.category === "oil_change" || item.category === "service_and_oil_change"
+  ).length;
 
   // 3. Regular services / repairs count
   const servicesCount = maintenanceLogs.filter(
-    (item) => item.category === "service" || item.category === "repair" || item.category === "part_replacement"
+    (item) =>
+      item.category === "service" ||
+      item.category === "repair" ||
+      item.category === "part_replacement" ||
+      item.category === "service_and_oil_change"
   ).length;
 
   // 4. Upcoming reminders count
-  const upcomingCount = upcomingServices.length;
+  const upcomingCount = upcomingServices.reduce((acc, item) => {
+    let count = 0;
+    const hasOil = item.nextOilChangeOdometerMin || item.nextOilChangeOdometerMax || item.nextOilChangeOdometer;
+    const hasService = item.nextServiceOdometerMin || item.nextServiceOdometerMax || item.nextServiceOdometer;
+    if (hasOil) count++;
+    if (hasService) count++;
+    return acc + count;
+  }, 0);
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

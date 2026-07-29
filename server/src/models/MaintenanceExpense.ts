@@ -12,6 +12,11 @@ export interface IMaintenanceExpense extends Document {
   cost: number;
   serviceProvider?: string;
   nextServiceOdometer?: number;
+  nextServiceOdometerMin?: number;
+  nextServiceOdometerMax?: number;
+  nextOilChangeOdometer?: number;
+  nextOilChangeOdometerMin?: number;
+  nextOilChangeOdometerMax?: number;
   notes?: string;
   // Audit fields
   createdAt: Date;
@@ -80,6 +85,26 @@ const MaintenanceExpenseSchema: Schema = new Schema(
     nextServiceOdometer: {
       type: Number,
       min: [0, "Next service odometer cannot be negative"],
+    },
+    nextServiceOdometerMin: {
+      type: Number,
+      min: [0, "Next service odometer min cannot be negative"],
+    },
+    nextServiceOdometerMax: {
+      type: Number,
+      min: [0, "Next service odometer max cannot be negative"],
+    },
+    nextOilChangeOdometer: {
+      type: Number,
+      min: [0, "Next oil change odometer cannot be negative"],
+    },
+    nextOilChangeOdometerMin: {
+      type: Number,
+      min: [0, "Next oil change odometer min cannot be negative"],
+    },
+    nextOilChangeOdometerMax: {
+      type: Number,
+      min: [0, "Next oil change odometer max cannot be negative"],
     },
     notes: {
       type: String,

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Wrench, Loader2 } from "lucide-react";
+import { Wrench, Droplet, Loader2 } from "lucide-react";
 import { MAINTENANCE_CATEGORIES, DEFAULT_CATEGORY_TITLES } from "@/constants/maintenance";
 
 const maintenanceSchema = z.object({
@@ -26,7 +26,10 @@ const maintenanceSchema = z.object({
   cost: z.coerce.number().min(0, "Cost cannot be negative"),
   serviceProvider: z.string().max(100).optional(),
   date: z.string().min(1, "Date is required"),
-  nextServiceOdometer: z.coerce.number().min(0).optional().or(z.literal("")),
+  nextServiceOdometerMin: z.coerce.number().min(0).optional().or(z.literal("")),
+  nextServiceOdometerMax: z.coerce.number().min(0).optional().or(z.literal("")),
+  nextOilChangeOdometerMin: z.coerce.number().min(0).optional().or(z.literal("")),
+  nextOilChangeOdometerMax: z.coerce.number().min(0).optional().or(z.literal("")),
   notes: z.string().max(1000).optional(),
 });
 
@@ -45,7 +48,7 @@ export function MaintenanceDialog({
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     reset,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -58,10 +61,16 @@ export function MaintenanceDialog({
       cost: 0,
       serviceProvider: "",
       date: new Date().toISOString().split("T")[0],
-      nextServiceOdometer: "",
+      nextServiceOdometerMin: "",
+      nextServiceOdometerMax: "",
+      nextOilChangeOdometerMin: "",
+      nextOilChangeOdometerMax: "",
       notes: "",
     },
   });
+
+  const vehicleId = useWatch({ control, name: "vehicleId" });
+  const category = useWatch({ control, name: "category" });
 
   const handleCategoryChange = (val) => {
     setValue("category", val, { shouldValidate: true });
@@ -85,7 +94,10 @@ export function MaintenanceDialog({
         cost: maintenanceToEdit.cost ?? maintenanceToEdit.totalCost ?? 0,
         serviceProvider: maintenanceToEdit.serviceProvider || "",
         date: dateStr,
-        nextServiceOdometer: maintenanceToEdit.nextServiceOdometer || "",
+        nextServiceOdometerMin: maintenanceToEdit.nextServiceOdometerMin ?? maintenanceToEdit.nextServiceOdometer ?? "",
+        nextServiceOdometerMax: maintenanceToEdit.nextServiceOdometerMax ?? maintenanceToEdit.nextServiceOdometer ?? "",
+        nextOilChangeOdometerMin: maintenanceToEdit.nextOilChangeOdometerMin ?? maintenanceToEdit.nextOilChangeOdometer ?? "",
+        nextOilChangeOdometerMax: maintenanceToEdit.nextOilChangeOdometerMax ?? maintenanceToEdit.nextOilChangeOdometer ?? "",
         notes: maintenanceToEdit.notes || "",
       });
     } else {
@@ -97,17 +109,36 @@ export function MaintenanceDialog({
         cost: 0,
         serviceProvider: "",
         date: new Date().toISOString().split("T")[0],
-        nextServiceOdometer: "",
+        nextServiceOdometerMin: "",
+        nextServiceOdometerMax: "",
+        nextOilChangeOdometerMin: "",
+        nextOilChangeOdometerMax: "",
         notes: "",
       });
     }
   }, [maintenanceToEdit, open, reset, defaultVehicleId]);
 
   const onFormSubmit = async (data) => {
+    const parseNumOrNull = (val) => {
+      if (val === "" || val === null || val === undefined) return null;
+      const num = Number(val);
+      return isNaN(num) ? null : num;
+    };
+
+    const sMin = parseNumOrNull(data.nextServiceOdometerMin);
+    const sMax = parseNumOrNull(data.nextServiceOdometerMax);
+    const oMin = parseNumOrNull(data.nextOilChangeOdometerMin);
+    const oMax = parseNumOrNull(data.nextOilChangeOdometerMax);
+
     const formattedData = {
       ...data,
       cost: Number(data.cost),
-      nextServiceOdometer: data.nextServiceOdometer ? Number(data.nextServiceOdometer) : undefined,
+      nextServiceOdometerMin: sMin,
+      nextServiceOdometerMax: sMax,
+      nextServiceOdometer: sMax ?? sMin ?? null,
+      nextOilChangeOdometerMin: oMin,
+      nextOilChangeOdometerMax: oMax,
+      nextOilChangeOdometer: oMax ?? oMin ?? null,
     };
     await onSubmit(formattedData);
     onOpenChange(false);
@@ -124,7 +155,7 @@ export function MaintenanceDialog({
             <DialogTitle>{isEditing ? "Edit Maintenance Record" : "Log Vehicle Maintenance"}</DialogTitle>
           </div>
           <DialogDescription>
-            Record oil changes, periodic services, workshop repairs, and reminder targets.
+            Record oil changes, periodic services, workshop repairs, and reminder target ranges.
           </DialogDescription>
         </DialogHeader>
 
@@ -134,7 +165,7 @@ export function MaintenanceDialog({
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground">Select Vehicle *</label>
               <Select
-                value={watch("vehicleId")}
+                value={vehicleId}
                 onValueChange={(val) => setValue("vehicleId", val, { shouldValidate: true })}
               >
                 <SelectTrigger className="bg-background/50 border-border/50">
@@ -155,7 +186,7 @@ export function MaintenanceDialog({
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground">Category *</label>
               <Select
-                value={watch("category")}
+                value={category}
                 onValueChange={handleCategoryChange}
               >
                 <SelectTrigger className="bg-background/50 border-border/50">
@@ -228,15 +259,67 @@ export function MaintenanceDialog({
             </div>
           </div>
 
-          {/* Next Service Odometer Reminder */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground">Next Service Odometer (Reminder Target)</label>
-            <Input
-              type="number"
-              placeholder="e.g. 50000"
-              {...register("nextServiceOdometer")}
-              className="bg-background/50 border-border/50"
-            />
+          {/* Reminder Targets Section */}
+          <div className="space-y-3 pt-2 border-t border-border/40">
+            <p className="text-xs font-bold text-foreground uppercase tracking-wider">Reminder Target Ranges</p>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {/* Service Reminder Target Range */}
+              <div className="rounded-xl border border-border/50 bg-background/30 p-3 space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                  <Wrench className="h-3.5 w-3.5 text-blue-400" />
+                  <span>Next Service Target Range</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-muted-foreground">From (km)</label>
+                    <Input
+                      type="number"
+                      placeholder="45000"
+                      {...register("nextServiceOdometerMin")}
+                      className="bg-background/50 border-border/50 h-8 text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-muted-foreground">To (km)</label>
+                    <Input
+                      type="number"
+                      placeholder="50000"
+                      {...register("nextServiceOdometerMax")}
+                      className="bg-background/50 border-border/50 h-8 text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Oil Change Reminder Target Range */}
+              <div className="rounded-xl border border-border/50 bg-background/30 p-3 space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                  <Droplet className="h-3.5 w-3.5 text-amber-500" />
+                  <span>Next Oil Change Range</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-muted-foreground">From (km)</label>
+                    <Input
+                      type="number"
+                      placeholder="40000"
+                      {...register("nextOilChangeOdometerMin")}
+                      className="bg-background/50 border-border/50 h-8 text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-muted-foreground">To (km)</label>
+                    <Input
+                      type="number"
+                      placeholder="45000"
+                      {...register("nextOilChangeOdometerMax")}
+                      className="bg-background/50 border-border/50 h-8 text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Notes */}

@@ -18,8 +18,15 @@ export const maintenanceExpenseRepository = {
     return await MaintenanceExpense.find({
       userId,
       isDeleted: false,
-      nextServiceOdometer: { $exists: true, $ne: null, $gt: 0 },
-    }).sort({ nextServiceOdometer: 1 });
+      $or: [
+        { nextServiceOdometer: { $exists: true, $ne: null, $gt: 0 } },
+        { nextServiceOdometerMin: { $exists: true, $ne: null, $gt: 0 } },
+        { nextServiceOdometerMax: { $exists: true, $ne: null, $gt: 0 } },
+        { nextOilChangeOdometer: { $exists: true, $ne: null, $gt: 0 } },
+        { nextOilChangeOdometerMin: { $exists: true, $ne: null, $gt: 0 } },
+        { nextOilChangeOdometerMax: { $exists: true, $ne: null, $gt: 0 } },
+      ],
+    }).sort({ date: -1 });
   },
 
   aggregateTotalMaintenanceCost: async (userId: string, startDate?: Date, endDate?: Date): Promise<{ totalCost: number; count: number }> => {

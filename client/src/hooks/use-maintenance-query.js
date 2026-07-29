@@ -39,22 +39,7 @@ export function useAddMaintenance() {
 
   return useMutation({
     mutationFn: async (data) => {
-      const partsCost = Number(data.partsCost || 0);
-      const laborCost = Number(data.laborCost || 0);
-      const totalCost = Number(data.totalCost || (partsCost + laborCost).toFixed(2));
-
-      const payload = {
-        ...data,
-        odometer: Number(data.odometer || 0),
-        partsCost,
-        laborCost,
-        totalCost,
-        date: data.date || new Date().toISOString(),
-        nextServiceOdometer: data.nextServiceOdometer ? Number(data.nextServiceOdometer) : undefined,
-        nextServiceDate: data.nextServiceDate || undefined,
-      };
-
-      const res = await apiClient.post("/maintenance", payload);
+      const res = await apiClient.post("/maintenance", data);
       if (!res.success) {
         throw new Error(res.error || "Failed to record maintenance expense");
       }
@@ -73,26 +58,7 @@ export function useUpdateMaintenance() {
 
   return useMutation({
     mutationFn: async ({ id, data }) => {
-      const partsCost = data.partsCost !== undefined ? Number(data.partsCost) : undefined;
-      const laborCost = data.laborCost !== undefined ? Number(data.laborCost) : undefined;
-      const totalCost =
-        data.totalCost !== undefined
-          ? Number(data.totalCost)
-          : partsCost !== undefined && laborCost !== undefined
-          ? Number((partsCost + laborCost).toFixed(2))
-          : undefined;
-
-      const payload = {
-        ...data,
-        odometer: data.odometer !== undefined ? Number(data.odometer) : undefined,
-        partsCost,
-        laborCost,
-        totalCost,
-        nextServiceOdometer: data.nextServiceOdometer ? Number(data.nextServiceOdometer) : undefined,
-        nextServiceDate: data.nextServiceDate || undefined,
-      };
-
-      const res = await apiClient.put(`/maintenance/${id}`, payload);
+      const res = await apiClient.put(`/maintenance/${id}`, data);
       if (!res.success) {
         throw new Error(res.error || "Failed to update maintenance record");
       }
