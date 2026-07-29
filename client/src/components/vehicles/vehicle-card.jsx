@@ -114,23 +114,13 @@ export function VehicleCard({ vehicle, onEdit, onDelete, onSetDefault }) {
         </div>
 
         {/* Specs Grid */}
-        <div className="grid grid-cols-2 gap-3 pt-2">
+        <div className="pt-2">
           <div className="flex items-center gap-2.5 rounded-lg border border-border/50 bg-secondary/30 p-2.5">
             <Gauge className="h-4 w-4 text-primary shrink-0" />
             <div className="min-w-0">
-              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Odometer</p>
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Odometer Reading</p>
               <p className="text-sm font-semibold text-foreground truncate">
                 {vehicle.currentOdometer?.toLocaleString()} {vehicle.mileageUnit || "km"}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2.5 rounded-lg border border-border/50 bg-secondary/30 p-2.5">
-            <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0" />
-            <div className="min-w-0">
-              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Status</p>
-              <p className="text-sm font-semibold text-emerald-500 truncate">
-                {vehicle.isActive ? "Active" : "Inactive"}
               </p>
             </div>
           </div>

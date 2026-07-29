@@ -8,17 +8,13 @@ export interface IVehicle extends Omit<Document, "model"> {
   model: string;
   year?: number;
   licensePlate?: string;
-  vin?: string;
   fuelType: "petrol" | "diesel" | "electric" | "hybrid" | "cng" | "other";
   mileageUnit: "km" | "miles";
   isDefault: boolean;
   initialOdometer: number;
   currentOdometer: number;
-  currency: string;
-  isActive: boolean;
   photoUrl?: string;
   notes?: string;
-  metadata?: Record<string, unknown>;
   // Audit fields
   createdAt: Date;
   updatedAt: Date;
@@ -27,7 +23,6 @@ export interface IVehicle extends Omit<Document, "model"> {
   // Soft delete
   isDeleted: boolean;
   deletedAt?: Date | null;
-  version: number;
 }
 
 const VehicleSchema: Schema = new Schema(
@@ -67,12 +62,6 @@ const VehicleSchema: Schema = new Schema(
       uppercase: true,
       maxlength: [20, "License plate cannot exceed 20 characters"],
     },
-    vin: {
-      type: String,
-      trim: true,
-      uppercase: true,
-      maxlength: [30, "VIN cannot exceed 30 characters"],
-    },
     fuelType: {
       type: String,
       enum: {
@@ -104,18 +93,6 @@ const VehicleSchema: Schema = new Schema(
       min: [0, "Current odometer cannot be negative"],
       default: 0,
     },
-    currency: {
-      type: String,
-      default: "PKR",
-      uppercase: true,
-      trim: true,
-      maxlength: 5,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-      index: true,
-    },
     photoUrl: {
       type: String,
       trim: true,
@@ -124,10 +101,6 @@ const VehicleSchema: Schema = new Schema(
       type: String,
       trim: true,
       maxlength: [1000, "Notes cannot exceed 1000 characters"],
-    },
-    metadata: {
-      type: Schema.Types.Mixed,
-      default: {},
     },
     // Audit fields
     createdBy: {
@@ -152,11 +125,6 @@ const VehicleSchema: Schema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
       default: null,
-    },
-    version: {
-      type: Number,
-      default: 1,
-      min: 1,
     },
   },
   {

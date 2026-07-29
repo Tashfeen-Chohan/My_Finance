@@ -26,8 +26,6 @@ export const getDashboardSummary = async (userId: string): Promise<DashboardSumm
     maintenanceExpenseRepository.getUpcomingServices(userId),
   ]);
 
-  const activeVehicles = vehicles.filter((v) => v.isActive);
-
   const fuelExpenses = await fuelExpenseRepository.find({ userId });
   const maintenanceExpenses = await maintenanceExpenseRepository.find({ userId });
 
@@ -55,7 +53,7 @@ export const getDashboardSummary = async (userId: string): Promise<DashboardSumm
   return {
     vehicles: {
       total: vehicles.length,
-      active: activeVehicles.length,
+      active: vehicles.length,
     },
     expenses: {
       totalFuelSpend: Number(fuelData.totalCost.toFixed(2)),

@@ -14,16 +14,19 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 
 export function Header() {
   const { user, logout, isAuthenticated } = useAuthStore();
+  const queryClient = useQueryClient();
   const router = useRouter();
   const { toast } = useToast();
 
   const handleLogout = async () => {
     await logout();
+    queryClient.clear();
     toast({
       title: "Logged Out",
       description: "Signed out successfully",

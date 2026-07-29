@@ -15,50 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Car, Fuel, Gauge, Star, Image as ImageIcon } from "lucide-react";
-
-const PRESET_IMAGES = [
-  { label: "Black Sedan", url: "https://images.unsplash.com/photo-1590362891991-f776e747a588?w=800&q=80" },
-  { label: "White SUV", url: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&q=80" },
-  { label: "Blue EV", url: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&q=80" },
-  { label: "Red Hatchback", url: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&q=80" },
-];
-
-function getInitialVehicleFormData(vehicleToEdit) {
-  if (vehicleToEdit) {
-    return {
-      name: vehicleToEdit.name || "",
-      make: vehicleToEdit.make || "",
-      model: vehicleToEdit.model || "",
-      year: vehicleToEdit.year || new Date().getFullYear(),
-      licensePlate: vehicleToEdit.licensePlate || "",
-      vin: vehicleToEdit.vin || "",
-      fuelType: vehicleToEdit.fuelType || "petrol",
-      mileageUnit: vehicleToEdit.mileageUnit || "km",
-      initialOdometer: vehicleToEdit.initialOdometer || 0,
-      currentOdometer: vehicleToEdit.currentOdometer || 0,
-      currency: vehicleToEdit.currency || "PKR",
-      photoUrl: vehicleToEdit.photoUrl || PRESET_IMAGES[0].url,
-      isDefault: Boolean(vehicleToEdit.isDefault),
-      notes: vehicleToEdit.notes || "",
-    };
-  }
-  return {
-    name: "",
-    make: "",
-    model: "",
-    year: new Date().getFullYear(),
-    licensePlate: "",
-    vin: "",
-    fuelType: "petrol",
-    mileageUnit: "km",
-    initialOdometer: 0,
-    currentOdometer: 0,
-    currency: "PKR",
-    photoUrl: PRESET_IMAGES[0].url,
-    isDefault: false,
-    notes: "",
-  };
-}
+import { PRESET_IMAGES, getInitialVehicleFormData } from "@/utils/vehicle-utils";
 
 function VehicleForm({ onOpenChange, vehicleToEdit, onSubmit }) {
   const isEditing = Boolean(vehicleToEdit);
