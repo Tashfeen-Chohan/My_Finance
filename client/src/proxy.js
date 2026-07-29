@@ -8,6 +8,7 @@ export function proxy(request) {
   const isAuthenticated = Boolean(accessToken || refreshToken);
 
   const isAuthRoute = pathname.startsWith("/login");
+  const isPublicTestRoute = pathname.startsWith("/test-db");
   const isPublicStatic =
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
@@ -16,7 +17,7 @@ export function proxy(request) {
     pathname === "/sw.js" ||
     pathname === "/manifest.json";
 
-  if (isPublicStatic) {
+  if (isPublicStatic || isPublicTestRoute) {
     return NextResponse.next();
   }
 
@@ -33,6 +34,10 @@ export function proxy(request) {
   }
 
   return NextResponse.next();
+}
+
+export function middleware(request) {
+  return proxy(request);
 }
 
 export const config = {

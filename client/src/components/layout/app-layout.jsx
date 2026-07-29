@@ -14,6 +14,7 @@ export function AppLayout({ children }) {
   const { isAuthenticated, isInitialized, isLoading, checkAuthSession } = useAuthStore();
 
   const isLoginPage = pathname === "/login";
+  const isPublicPage = isLoginPage || pathname === "/test-db" || pathname?.startsWith("/test-db");
 
   useEffect(() => {
     // Check user session on app load
@@ -22,16 +23,16 @@ export function AppLayout({ children }) {
 
   useEffect(() => {
     if (isInitialized) {
-      if (!isAuthenticated && !isLoginPage) {
+      if (!isAuthenticated && !isPublicPage) {
         router.replace("/login");
       } else if (isAuthenticated && isLoginPage) {
         router.replace("/");
       }
     }
-  }, [isInitialized, isAuthenticated, isLoginPage, router]);
+  }, [isInitialized, isAuthenticated, isLoginPage, isPublicPage, router]);
 
-  // If on login page, render standalone login view
-  if (isLoginPage) {
+  // If on login or public test page, render standalone view
+  if (isPublicPage) {
     return <div className="bg-background min-h-screen">{children}</div>;
   }
 
