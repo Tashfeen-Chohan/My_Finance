@@ -29,7 +29,7 @@ export function DeleteMaintenanceDialog({ open, onOpenChange, maintenanceToDelet
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md border-border/40 bg-card/95 backdrop-blur-xl">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-2 text-destructive">
             <Trash2 className="h-5 w-5" />

@@ -8,11 +8,6 @@ export const createMaintenance = async (userId: string, data: Partial<IMaintenan
     throw BadRequestError("Vehicle ID is required");
   }
 
-  const vehicle = await vehicleRepository.findById(data.vehicleId.toString());
-  if (!vehicle || vehicle.userId.toString() !== userId) {
-    throw NotFoundError("Vehicle not found");
-  }
-
   if (data.odometer !== undefined) {
     await vehicleRepository.updateOdometer(data.vehicleId.toString(), data.odometer);
   }

@@ -291,7 +291,7 @@ export function MaintenanceDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto border-border/40 bg-card/95 backdrop-blur-xl">
+      <DialogContent className="max-w-xl">
         <MaintenanceForm
           key={key}
           onOpenChange={onOpenChange}

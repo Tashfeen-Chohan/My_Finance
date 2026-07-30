@@ -13,9 +13,9 @@ import { NotFoundError, BadRequestError } from "../errors/ApiError";
 
 export const createFuelExpense = async (userId: string, data: Partial<IFuelExpense>): Promise<IFuelExpense> => {
   const vehicleId = data.vehicleId!.toString();
-  const vehicle = await vehicleRepository.findById(vehicleId);
-  if (!vehicle || vehicle.userId.toString() !== userId) {
-    throw NotFoundError("Vehicle not found");
+
+  if (!data.vehicleId) {
+    throw BadRequestError("Vehicle ID is required");
   }
 
   // 1. Fetch current latest refill before creating new one

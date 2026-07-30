@@ -269,7 +269,7 @@ export function VehicleDialog({ open, onOpenChange, vehicleToEdit, onSubmit }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto sm:rounded-2xl backdrop-blur-2xl">
+      <DialogContent className="max-w-2xl">
         <VehicleForm
           key={key}
           onOpenChange={onOpenChange}

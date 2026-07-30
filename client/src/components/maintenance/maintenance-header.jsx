@@ -6,23 +6,27 @@ import { Wrench, Plus } from "lucide-react";
 
 export function MaintenanceHeader({ onLogMaintenance }) {
   return (
-    <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+    <div className="flex flex-col justify-between gap-4 sm:gap-6 md:flex-row md:items-center">
       <div className="space-y-1.5">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 shadow-sm">
-            <Wrench className="h-5 w-5" />
+        <div className="flex items-start sm:items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 shadow-md shadow-purple-500/5 mt-0.5 sm:mt-0">
+            <Wrench className="h-6 w-6" />
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Vehicle Maintenance & Reminders</h1>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+              Vehicle Maintenance & Reminders
+            </h1>
+            <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">
+              Track oil changes, periodic services, workshop repairs, and upcoming reminders.
+            </p>
+          </div>
         </div>
-        <p className="text-muted-foreground text-sm">
-          Track oil changes, periodic services, workshop repairs, parts replacement, and upcoming reminders.
-        </p>
       </div>
 
       <Button
         onClick={onLogMaintenance}
         size="lg"
-        className="gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-lg shadow-purple-500/20 cursor-pointer"
+        className="w-full sm:w-auto gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-lg shadow-purple-500/20 cursor-pointer rounded-xl"
       >
         <Plus className="h-5 w-5" />
         Log Maintenance

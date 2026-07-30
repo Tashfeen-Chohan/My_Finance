@@ -30,7 +30,7 @@ export function DeleteFuelDialog({ open, onOpenChange, expenseToDelete, onConfir
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md sm:rounded-2xl backdrop-blur-2xl">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-2 text-destructive">
             <AlertTriangle className="h-5 w-5" />

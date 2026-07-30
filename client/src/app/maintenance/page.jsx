@@ -19,14 +19,11 @@ import { DeleteMaintenanceDialog } from "@/components/maintenance/delete-mainten
 import { useToast } from "@/components/ui/use-toast";
 
 export default function MaintenancePage() {
-  const [selectedVehicleId, setSelectedVehicleId] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: vehicles = [] } = useVehicles();
-  const { data: maintenanceLogs = [], isLoading } = useMaintenanceLogs(
-    selectedVehicleId === "all" ? null : selectedVehicleId
-  );
+  const { data: maintenanceLogs = [], isLoading } = useMaintenanceLogs(null);
   const { data: upcomingServices = [] } = useUpcomingServices();
 
   const addMaintenanceMutation = useAddMaintenance();
@@ -102,7 +99,7 @@ export default function MaintenancePage() {
   });
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 pb-12">
+    <div className="mx-auto max-w-7xl space-y-6 sm:space-y-8 pb-12">
       {/* Header Banner */}
       <MaintenanceHeader onLogMaintenance={handleOpenAddModal} />
 
@@ -116,11 +113,8 @@ export default function MaintenancePage() {
       <MaintenanceFilters
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        selectedVehicleId={selectedVehicleId}
-        onVehicleChange={setSelectedVehicleId}
         selectedCategory={selectedCategory}
         onCategoryChange={setSelectedCategory}
-        vehicles={vehicles}
       />
 
       {/* Maintenance Logs History */}
