@@ -8,7 +8,7 @@ import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
 import { RecentActivityCard } from "@/components/dashboard/recent-activity-card";
 import { MaintenanceRemindersCard } from "@/components/maintenance/maintenance-reminders-card";
 import { useVehicles } from "@/hooks/use-vehicles-query";
-import { LayoutDashboard, Loader2, Sparkles } from "lucide-react";
+import { LayoutDashboard, Loader2 } from "lucide-react";
 
 export default function DashboardPage() {
   const { data: dashboardData, isLoading } = useDashboardSummary();
@@ -25,7 +25,7 @@ export default function DashboardPage() {
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <div className="space-y-1.5">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-sm backdrop-blur-md">
               <LayoutDashboard className="h-5 w-5" />
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight">Finance Dashboard</h1>

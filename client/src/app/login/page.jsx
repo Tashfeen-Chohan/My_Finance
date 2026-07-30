@@ -1,12 +1,11 @@
 "use client";
 
 import React, { useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { GoogleLoginButton } from "@/components/auth/google-login-button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Wallet, ShieldCheck, Smartphone, Zap, Database } from "lucide-react";
+import { Wallet, ShieldCheck, Smartphone, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function LoginPage() {
@@ -49,15 +48,6 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent className="space-y-4 pt-2 pb-6">
             <GoogleLoginButton />
-            <div className="pt-2 border-t border-border text-center">
-              <Link
-                href="/test-db"
-                className="inline-flex items-center justify-center gap-2 w-full text-xs font-medium text-indigo-400 hover:text-indigo-300 py-2.5 px-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 transition-all"
-              >
-                <Database className="w-4 h-4 text-indigo-400" />
-                <span>Test Public API & DB Connection (No Login)</span>
-              </Link>
-            </div>
           </CardContent>
         </Card>
 
