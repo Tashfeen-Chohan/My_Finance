@@ -1,12 +1,13 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MAIN_NAV_ITEMS, SECONDARY_NAV_ITEMS } from "@/constants/navigation";
 import { useAppStore } from "@/stores/use-app-store";
 import { cn } from "@/lib/utils";
-import { Wallet, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Sidebar() {
@@ -23,13 +24,19 @@ export function Sidebar() {
       {/* Brand Header */}
       <div className="border-border flex h-16 items-center justify-between border-b px-4">
         <Link href="/" className="flex items-center gap-3">
-          <div className="bg-primary text-primary-foreground flex h-10 w-10 items-center justify-center rounded-xl shadow-sm">
-            <Wallet className="h-5 w-5" />
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-card/80 p-1 shadow-sm">
+            <Image
+              src="/icons/icon-192x192.png"
+              alt="MyFinance Logo"
+              width={36}
+              height={36}
+              className="h-full w-full rounded-lg object-cover"
+            />
           </div>
           {isSidebarOpen && (
             <div className="flex flex-col">
               <span className="text-base leading-tight font-bold tracking-tight">MyFinance</span>
-              <span className="text-muted-foreground font-mono text-[10px]">PWA Edition</span>
+              <span className="text-muted-foreground font-mono text-[10px]">Mobile PWA</span>
             </div>
           )}
         </Link>

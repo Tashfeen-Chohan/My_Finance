@@ -6,6 +6,7 @@ import { QueryProvider } from "./query-provider";
 import { ToastProvider } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "./auth-provider";
+import { ServiceWorkerRegister } from "./sw-register";
 
 export function AppProviders({ children }) {
   return (
@@ -13,6 +14,7 @@ export function AppProviders({ children }) {
       <QueryProvider>
         <ToastProvider>
           <AuthProvider>
+            <ServiceWorkerRegister />
             {children}
             <Toaster />
           </AuthProvider>

@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { GoogleLoginButton } from "@/components/auth/google-login-button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Wallet, ShieldCheck, Smartphone, Zap } from "lucide-react";
+import { ShieldCheck, Smartphone, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function LoginPage() {
@@ -23,10 +24,17 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-6">
         {/* Brand Header */}
         <div className="space-y-2 text-center">
-          <div className="bg-primary text-primary-foreground shadow-primary/25 mb-2 inline-flex h-14 w-14 items-center justify-center rounded-2xl shadow-lg">
-            <Wallet className="h-7 w-7" />
+          <div className="relative mb-2 inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/20 bg-card/80 p-1.5 shadow-xl shadow-primary/10">
+            <Image
+              src="/icons/icon-192x192.png"
+              alt="MyFinance Logo"
+              width={64}
+              height={64}
+              className="h-full w-full rounded-xl object-cover"
+              priority
+            />
           </div>
-          <h1 className="text-foreground text-3xl font-bold tracking-tight">MyFinance PWA</h1>
+          <h1 className="text-foreground text-3xl font-bold tracking-tight">MyFinance</h1>
           <p className="text-muted-foreground text-sm">
             Personal Finance Manager • Offline-First & Secured with Google OAuth 2.0
           </p>

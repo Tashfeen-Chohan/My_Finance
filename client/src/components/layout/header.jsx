@@ -41,8 +41,14 @@ export function Header() {
     <header className="border-border/60 bg-card/75 sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b px-4 backdrop-blur-xl md:px-6">
       {/* Mobile Brand / Page Title */}
       <div className="flex items-center gap-2 md:hidden">
-        <div className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg shadow-sm">
-          <Wallet className="h-4 w-4" />
+        <div className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-primary/20 bg-card/80 p-0.5 shadow-sm">
+          <Image
+            src="/icons/icon-192x192.png"
+            alt="MyFinance Logo"
+            width={32}
+            height={32}
+            className="h-full w-full rounded-md object-cover"
+          />
         </div>
         <span className="text-sm font-bold tracking-tight">MyFinance</span>
       </div>

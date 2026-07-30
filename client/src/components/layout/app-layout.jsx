@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useEffect } from "react";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/use-auth-store";
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
 import { MobileNav } from "./mobile-nav";
 import { AmbientBackground } from "./ambient-background";
-import { Wallet, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export function AppLayout({ children }) {
   const pathname = usePathname();
@@ -45,15 +46,42 @@ export function AppLayout({ children }) {
   // Show authentication check loader while session is initializing
   if (!isInitialized || (isLoading && !isAuthenticated)) {
     return (
-      <div className="bg-background relative flex min-h-screen flex-col items-center justify-center space-y-4">
+      <div className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden p-4">
         <AmbientBackground />
-        <div className="relative z-10 flex flex-col items-center justify-center space-y-4">
-          <div className="bg-primary/10 text-primary flex h-14 w-14 animate-pulse items-center justify-center rounded-2xl border border-primary/20 shadow-xl shadow-primary/10">
-            <Wallet className="h-7 w-7" />
+
+        {/* Ambient Radial Glow Aura */}
+        <div className="pointer-events-none absolute h-96 w-96 rounded-full bg-primary/10 blur-[130px] animate-pulse" />
+        <div className="pointer-events-none absolute h-72 w-72 rounded-full bg-emerald-500/10 blur-[110px]" />
+
+        <div className="relative z-10 flex flex-col items-center justify-center space-y-6 text-center">
+          {/* Glowing Glass Icon Container */}
+          <div className="group relative flex items-center justify-center">
+            <div className="absolute -inset-3 rounded-3xl bg-gradient-to-r from-primary/30 via-emerald-500/25 to-amber-500/30 blur-xl opacity-80 animate-pulse" />
+            <div className="border-border/80 bg-card/90 relative flex h-24 w-24 items-center justify-center rounded-3xl border p-3 shadow-2xl backdrop-blur-2xl transition-transform duration-500 group-hover:scale-105">
+              <Image
+                src="/icons/icon-192x192.png"
+                alt="MyFinance Logo"
+                width={80}
+                height={80}
+                className="h-full w-full rounded-2xl object-cover shadow-sm"
+                priority
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin text-primary" />
-            <span>Verifying secure session...</span>
+
+          {/* Title & Animated Status Pill */}
+          <div className="flex flex-col items-center space-y-2.5">
+            <h2 className="text-foreground text-2xl font-extrabold tracking-tight">
+              MyFinance
+            </h2>
+            <div className="border-border/60 bg-card/75 flex items-center gap-2.5 rounded-full border px-4 py-1.5 text-xs font-semibold text-muted-foreground shadow-lg backdrop-blur-xl">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+              <span>Verifying secure session...</span>
+            </div>
           </div>
         </div>
       </div>
