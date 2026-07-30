@@ -4,6 +4,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { BadgeSkeleton, MaintenanceLogsListSkeleton } from "@/components/skeletons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Wrench, Plus, MoreVertical, Edit2, Trash2, Gauge, Calendar, Droplet, Sparkles, Loader2, Store } from "lucide-react";
+import { Wrench, Plus, MoreVertical, Edit2, Trash2, Gauge, Calendar, Droplet, Sparkles, Store } from "lucide-react";
 import { CATEGORY_BADGES, CATEGORY_LABELS } from "@/constants/maintenance";
 
 export function MaintenanceLogsList({
@@ -46,22 +47,23 @@ export function MaintenanceLogsList({
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 rounded-xl border border-purple-500/30 bg-purple-500/10 px-3 py-1.5 text-xs font-semibold text-purple-600 dark:text-purple-400 shadow-sm shrink-0">
-            <span className="h-2 w-2 rounded-full bg-purple-500 animate-pulse" />
-            <span className="font-mono font-extrabold text-sm sm:text-base">{logs.length}</span>
-            <span className="hidden sm:inline text-[11px] opacity-80">{logs.length === 1 ? "Log Entry" : "Total Logs"}</span>
-          </div>
+          {isLoading ? (
+            <BadgeSkeleton className="h-8 w-20 rounded-xl" />
+          ) : (
+            <div className="flex items-center gap-1.5 rounded-xl border border-purple-500/30 bg-purple-500/10 px-3 py-1.5 text-xs font-semibold text-purple-600 dark:text-purple-400 shadow-sm shrink-0">
+              <span className="h-2 w-2 rounded-full bg-purple-500 animate-pulse" />
+              <span className="font-mono font-extrabold text-sm sm:text-base">{logs.length}</span>
+              <span className="hidden sm:inline text-[11px] opacity-80">{logs.length === 1 ? "Log Entry" : "Total Logs"}</span>
+            </div>
+          )}
         </div>
       </CardHeader>
 
       <CardContent className="p-0">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center p-12 space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
-            <p className="text-sm font-medium text-muted-foreground">Loading maintenance logs...</p>
-          </div>
+          <MaintenanceLogsListSkeleton />
         ) : logs.length > 0 ? (
-          <div className="divide-y divide-border/40">
+          <div className="p-3 sm:p-4 space-y-3">
             {logs.map((item) => {
               const dateStr = item.date
                 ? new Date(item.date).toLocaleDateString("en-US", {
@@ -80,7 +82,7 @@ export function MaintenanceLogsList({
               return (
                 <div
                   key={item.id || item._id}
-                  className="p-4 sm:p-5 hover:bg-secondary/30 transition-colors"
+                  className="p-4 sm:p-5 rounded-xl border border-border/30 bg-secondary/10 hover:bg-secondary/20 transition-colors"
                 >
                   {/* MOBILE VIEW (Block < sm) */}
                   <div className="sm:hidden space-y-3">
@@ -118,7 +120,7 @@ export function MaintenanceLogsList({
                       </DropdownMenu>
                     </div>
 
-                    {/* Cost & Badges Pill Bar */}
+                    {/* Cost & Badges Pill Bar (Mobile) */}
                     <div className="flex items-center justify-between rounded-xl bg-secondary/40 p-2.5 border border-border/30">
                       <Badge className={`capitalize text-[10px] font-semibold border ${CATEGORY_BADGES[item.category] || CATEGORY_BADGES.other}`}>
                         {CATEGORY_LABELS[item.category] || item.category}
@@ -129,26 +131,29 @@ export function MaintenanceLogsList({
                       </span>
                     </div>
 
-                    {/* Metadata: Date, Odometer & Workshop */}
-                    <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground pt-0.5">
-                      <span className="flex items-center gap-1.5">
+                    {/* Metadata Chips: Date & Odometer (Space-Between with Light Background) */}
+                    <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground pt-0.5">
+                      <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1">
                         <Calendar className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
                         <span>{dateStr}</span>
-                      </span>
-                      <span className="flex items-center gap-1.5 justify-end font-mono font-medium">
-                        <Gauge className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
-                        <span>{item.odometer?.toLocaleString()} km</span>
-                      </span>
-                      {item.serviceProvider && (
-                        <span className="flex items-center gap-1.5 col-span-2 text-foreground/80">
-                          <Store className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
-                          <span className="truncate">{item.serviceProvider}</span>
-                        </span>
+                      </div>
+                      {item.odometer !== undefined && item.odometer !== null && (
+                        <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1 font-mono">
+                          <Gauge className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
+                          <span>{item.odometer?.toLocaleString()} km</span>
+                        </div>
                       )}
                     </div>
 
+                    {item.serviceProvider && (
+                      <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1 text-xs text-foreground/80 w-fit max-w-full">
+                        <Store className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
+                        <span className="truncate">{item.serviceProvider}</span>
+                      </div>
+                    )}
+
                     {item.notes && (
-                      <p className="text-xs text-muted-foreground/80 italic bg-secondary/20 p-2 rounded-xl border border-border/20">
+                      <p className="text-xs text-muted-foreground/80 italic bg-secondary/20 p-2.5 rounded-lg border border-border/20">
                         &quot;{item.notes}&quot;
                       </p>
                     )}
@@ -156,11 +161,11 @@ export function MaintenanceLogsList({
 
                   {/* DESKTOP VIEW (Hidden < sm) */}
                   <div className="hidden sm:flex items-center justify-between gap-4">
-                    <div className="flex items-start gap-3.5">
+                    <div className="flex items-start gap-3.5 min-w-0 flex-1">
                       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${CATEGORY_BADGES[item.category] || CATEGORY_BADGES.other}`}>
                         {isOilChange ? <Droplet className="h-5 w-5" /> : <Wrench className="h-5 w-5" />}
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-2 min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <h4 className="font-bold text-foreground">{item.title}</h4>
                           <Badge className={`capitalize text-[11px] font-medium border ${CATEGORY_BADGES[item.category] || CATEGORY_BADGES.other}`}>
@@ -171,32 +176,34 @@ export function MaintenanceLogsList({
                           </Badge>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                            {dateStr}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Gauge className="h-3.5 w-3.5 text-muted-foreground" />
-                            {item.odometer?.toLocaleString()} km
-                          </span>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1">
+                            <Calendar className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
+                            <span>{dateStr}</span>
+                          </div>
+                          {item.odometer !== undefined && item.odometer !== null && (
+                            <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1 font-mono">
+                              <Gauge className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
+                              <span>{item.odometer?.toLocaleString()} km</span>
+                            </div>
+                          )}
                           {item.serviceProvider && (
-                            <span className="flex items-center gap-1">
-                              <Store className="h-3.5 w-3.5 text-muted-foreground" />
-                              {item.serviceProvider}
-                            </span>
+                            <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1 text-foreground/80">
+                              <Store className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
+                              <span className="truncate max-w-[200px]">{item.serviceProvider}</span>
+                            </div>
                           )}
                         </div>
 
                         {item.notes && (
-                          <p className="text-xs text-muted-foreground/80 italic pt-0.5">
+                          <p className="text-xs text-muted-foreground/80 italic pt-0.5 max-w-2xl line-clamp-2">
                             &quot;{item.notes}&quot;
                           </p>
                         )}
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-6 shrink-0">
                       <div className="text-right">
                         <p className="text-lg font-bold text-foreground">
                           PKR {costFormatted}
@@ -205,7 +212,7 @@ export function MaintenanceLogsList({
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-secondary/60">
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>

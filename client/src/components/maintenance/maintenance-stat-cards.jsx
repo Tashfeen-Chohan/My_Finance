@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { StatValueSkeleton } from "@/components/skeletons";
 import { Wrench, Droplet, DollarSign, CalendarCheck } from "lucide-react";
 
-export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = [] }) {
+export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = [], isLoading = false }) {
   // 1. Total Cost
   const totalCost = maintenanceLogs.reduce((acc, item) => acc + (Number(item.cost ?? item.totalCost) || 0), 0);
 
@@ -37,14 +37,18 @@ export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = 
       {/* Total Maintenance Cost */}
       <Card className="border-border/50 bg-card/50 backdrop-blur-xl">
         <CardContent className="p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 shrink-0">
             <DollarSign className="h-6 w-6" />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Expense</p>
-            <h3 className="text-2xl font-bold text-foreground">
-              PKR {totalCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-            </h3>
+            {isLoading ? (
+              <StatValueSkeleton className="w-32" />
+            ) : (
+              <h3 className="text-2xl font-bold text-foreground truncate">
+                PKR {totalCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+              </h3>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -52,12 +56,16 @@ export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = 
       {/* Oil Changes Logged */}
       <Card className="border-border/50 bg-card/50 backdrop-blur-xl">
         <CardContent className="p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shrink-0">
             <Droplet className="h-6 w-6" />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Oil Changes</p>
-            <h3 className="text-2xl font-bold text-foreground">{oilChangesCount} Logs</h3>
+            {isLoading ? (
+              <StatValueSkeleton className="w-32" />
+            ) : (
+              <h3 className="text-2xl font-bold text-foreground truncate">{oilChangesCount} Logs</h3>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -65,12 +73,16 @@ export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = 
       {/* Services & Repairs */}
       <Card className="border-border/50 bg-card/50 backdrop-blur-xl">
         <CardContent className="p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
             <Wrench className="h-6 w-6" />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Services & Repairs</p>
-            <h3 className="text-2xl font-bold text-foreground">{servicesCount} Jobs</h3>
+            {isLoading ? (
+              <StatValueSkeleton className="w-32" />
+            ) : (
+              <h3 className="text-2xl font-bold text-foreground truncate">{servicesCount} Jobs</h3>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -78,12 +90,16 @@ export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = 
       {/* Reminders Scheduled */}
       <Card className="border-border/50 bg-card/50 backdrop-blur-xl">
         <CardContent className="p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
             <CalendarCheck className="h-6 w-6" />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Service Reminders</p>
-            <h3 className="text-2xl font-bold text-foreground">{upcomingCount} Active</h3>
+            {isLoading ? (
+              <StatValueSkeleton className="w-32" />
+            ) : (
+              <h3 className="text-2xl font-bold text-foreground truncate">{upcomingCount} Active</h3>
+            )}
           </div>
         </CardContent>
       </Card>

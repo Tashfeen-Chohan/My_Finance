@@ -22,9 +22,12 @@ export default function MaintenancePage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: vehicles = [] } = useVehicles();
-  const { data: maintenanceLogs = [], isLoading } = useMaintenanceLogs(null);
-  const { data: upcomingServices = [] } = useUpcomingServices();
+  const { data: vehicles = [], isLoading: isVehiclesLoading } = useVehicles();
+  const { data: maintenanceLogs = [], isLoading: isLogsLoading } = useMaintenanceLogs(null);
+  const { data: upcomingServices = [], isLoading: isRemindersLoading } = useUpcomingServices();
+
+  // const isLoading = isLogsLoading || isVehiclesLoading || isRemindersLoading;
+  const isLoading = true;
 
   const addMaintenanceMutation = useAddMaintenance();
   const updateMaintenanceMutation = useUpdateMaintenance();
@@ -104,10 +107,18 @@ export default function MaintenancePage() {
       <MaintenanceHeader onLogMaintenance={handleOpenAddModal} />
 
       {/* Summary KPI Cards */}
-      <MaintenanceStatCards maintenanceLogs={filteredLogs} upcomingServices={upcomingServices} />
+      <MaintenanceStatCards
+        maintenanceLogs={filteredLogs}
+        upcomingServices={upcomingServices}
+        isLoading={isLoading}
+      />
 
       {/* Upcoming Reminders Card */}
-      <MaintenanceRemindersCard upcomingServices={upcomingServices} vehicles={vehicles} />
+      <MaintenanceRemindersCard
+        upcomingServices={upcomingServices}
+        vehicles={vehicles}
+        isLoading={isLoading}
+      />
 
       {/* Filter and Search Bar */}
       <MaintenanceFilters

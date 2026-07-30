@@ -4,8 +4,14 @@ export const maintenanceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
   category: z.string().min(1, "Category is required"),
   title: z.string().min(1, "Title is required").max(150),
-  odometer: z.coerce.number().min(0, "Odometer reading cannot be negative"),
-  cost: z.coerce.number().min(0, "Cost cannot be negative"),
+  odometer: z.preprocess(
+    (val) => (val === "" || val === null || val === undefined ? undefined : val),
+    z.coerce.number({ invalid_type_error: "Odometer reading is required" }).min(0, "Odometer reading cannot be negative")
+  ),
+  cost: z.preprocess(
+    (val) => (val === "" || val === null || val === undefined ? undefined : val),
+    z.coerce.number({ invalid_type_error: "Service cost is required" }).min(0, "Cost cannot be negative")
+  ),
   serviceProvider: z.string().max(100).optional(),
   date: z.string().min(1, "Date is required"),
   nextServiceOdometerMin: z.coerce.number().min(0).optional().or(z.literal("")),
@@ -28,8 +34,8 @@ export function getInitialMaintenanceValues(maintenanceToEdit, vehicles = []) {
       vehicleId: String(vId),
       category: maintenanceToEdit.category || "service",
       title: maintenanceToEdit.title || "",
-      odometer: maintenanceToEdit.odometer || 0,
-      cost: maintenanceToEdit.cost ?? maintenanceToEdit.totalCost ?? 0,
+      odometer: maintenanceToEdit.odometer ?? "",
+      cost: maintenanceToEdit.cost ?? maintenanceToEdit.totalCost ?? "",
       serviceProvider: maintenanceToEdit.serviceProvider || "",
       date: dateStr,
       nextServiceOdometerMin: maintenanceToEdit.nextServiceOdometerMin ?? maintenanceToEdit.nextServiceOdometer ?? "",
@@ -44,8 +50,8 @@ export function getInitialMaintenanceValues(maintenanceToEdit, vehicles = []) {
     vehicleId: defaultVehicleId,
     category: "oil_change",
     title: "Engine Oil & Filter Change",
-    odometer: 0,
-    cost: 0,
+    odometer: "",
+    cost: "",
     serviceProvider: "",
     date: new Date().toISOString().split("T")[0],
     nextServiceOdometerMin: "",

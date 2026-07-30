@@ -3,9 +3,10 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { BadgeSkeleton, MaintenanceRemindersSkeleton } from "@/components/skeletons";
 import { Bell, Gauge, Wrench, Droplet, Car } from "lucide-react";
 
-export function MaintenanceRemindersCard({ upcomingServices = [], vehicles = [] }) {
+export function MaintenanceRemindersCard({ upcomingServices = [], vehicles = [], isLoading = false }) {
   const getVehicleName = (vehicleId) => {
     const vId = vehicleId?._id || vehicleId;
     const v = vehicles.find((item) => (item.id || item._id) === vId);
@@ -79,17 +80,23 @@ export function MaintenanceRemindersCard({ upcomingServices = [], vehicles = [] 
               </CardDescription>
             </div>
           </div>
-          <Badge
-            variant="outline"
-            className="font-mono text-xs border-amber-500/30 text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full"
-          >
-            {reminders.length} Active
-          </Badge>
+          {isLoading ? (
+            <BadgeSkeleton className="w-16" />
+          ) : (
+            <Badge
+              variant="outline"
+              className="font-mono text-xs border-amber-500/30 text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full"
+            >
+              {reminders.length} Active
+            </Badge>
+          )}
         </div>
       </CardHeader>
 
       <CardContent className="p-4 sm:p-6">
-        {reminders.length > 0 ? (
+        {isLoading ? (
+          <MaintenanceRemindersSkeleton />
+        ) : reminders.length > 0 ? (
           <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
             {reminders.map((rem) => {
               const isOil = rem.type === "oil_change";
