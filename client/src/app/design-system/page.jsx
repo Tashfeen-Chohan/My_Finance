@@ -359,45 +359,75 @@ export default function DesignSystemPage() {
             <Badge variant="outline">Outline</Badge>
           </div>
 
-          <div className="border-border flex flex-wrap gap-3 border-t pt-4">
-            <Button
-              size="sm"
-              onClick={() =>
-                toast({
-                  title: "Fuel Record Added",
-                  description: "Saved locally to IndexedDB",
-                  variant: "success",
-                })
-              }
-            >
-              Trigger Success Toast
-            </Button>
-            <Button
-              size="sm"
-              variant="destructive"
-              onClick={() =>
-                toast({
-                  title: "Sync Failed",
-                  description: "Network connection lost",
-                  variant: "error",
-                })
-              }
-            >
-              Trigger Error Toast
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() =>
-                toast({
-                  title: "Working Offline",
-                  description: "Changes will sync when reconnected",
-                  variant: "warning",
-                })
-              }
-            >
-              Trigger Warning Toast
-            </Button>
+          <div className="border-border space-y-3 border-t pt-4">
+            <h3 className="text-sm font-bold text-foreground">All Toaster Notification Variants</h3>
+            <div className="flex flex-wrap gap-2.5">
+              <Button
+                size="sm"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                onClick={() =>
+                  toast({
+                    title: "Success Notification",
+                    description: "Fuel record saved locally & synced to cloud",
+                    variant: "success",
+                  })
+                }
+              >
+                Success Toast
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() =>
+                  toast({
+                    title: "Error Notification",
+                    description: "Failed to authenticate session token",
+                    variant: "error",
+                  })
+                }
+              >
+                Error Toast
+              </Button>
+              <Button
+                size="sm"
+                className="bg-amber-600 hover:bg-amber-700 text-white"
+                onClick={() =>
+                  toast({
+                    title: "Warning Notification",
+                    description: "Working offline. Changes stored in cache.",
+                    variant: "warning",
+                  })
+                }
+              >
+                Warning Toast
+              </Button>
+              <Button
+                size="sm"
+                className="bg-sky-600 hover:bg-sky-700 text-white"
+                onClick={() =>
+                  toast({
+                    title: "Info Notification",
+                    description: "PWA updraded to latest version",
+                    variant: "info",
+                  })
+                }
+              >
+                Info Toast
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  toast({
+                    title: "Default Notification",
+                    description: "Standard system event log",
+                    variant: "default",
+                  })
+                }
+              >
+                Default Toast
+              </Button>
+            </div>
           </div>
         </div>
       </section>

@@ -37,7 +37,7 @@ export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = 
       {/* Total Maintenance Cost */}
       <Card className="border-border/50 bg-card/50 backdrop-blur-xl">
         <CardContent className="p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
             <DollarSign className="h-6 w-6" />
           </div>
           <div>

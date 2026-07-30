@@ -36,7 +36,6 @@ export function Sidebar() {
           {isSidebarOpen && (
             <div className="flex flex-col">
               <span className="text-base leading-tight font-bold tracking-tight">MyFinance</span>
-              <span className="text-muted-foreground font-mono text-[10px]">Mobile PWA</span>
             </div>
           )}
         </Link>

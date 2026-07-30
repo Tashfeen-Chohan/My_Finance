@@ -9,7 +9,7 @@ export function MaintenanceHeader({ onLogMaintenance }) {
     <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
       <div className="space-y-1.5">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-sm">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 shadow-sm">
             <Wrench className="h-5 w-5" />
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight">Vehicle Maintenance & Reminders</h1>
