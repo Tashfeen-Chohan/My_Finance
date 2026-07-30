@@ -26,8 +26,7 @@ export default function MaintenancePage() {
   const { data: maintenanceLogs = [], isLoading: isLogsLoading } = useMaintenanceLogs(null);
   const { data: upcomingServices = [], isLoading: isRemindersLoading } = useUpcomingServices();
 
-  // const isLoading = isLogsLoading || isVehiclesLoading || isRemindersLoading;
-  const isLoading = true;
+  const isLoading = isLogsLoading || isVehiclesLoading || isRemindersLoading;
 
   const addMaintenanceMutation = useAddMaintenance();
   const updateMaintenanceMutation = useUpdateMaintenance();
