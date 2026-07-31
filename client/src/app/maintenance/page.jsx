@@ -15,6 +15,7 @@ import { MaintenanceRemindersCard } from "@/components/maintenance/maintenance-r
 import { MaintenanceFilters } from "@/components/maintenance/maintenance-filters";
 import { MaintenanceLogsList } from "@/components/maintenance/maintenance-logs-list";
 import { MaintenanceDialog } from "@/components/maintenance/maintenance-dialog";
+import { ViewMaintenanceDialog } from "@/components/maintenance/view-maintenance-dialog";
 import { DeleteMaintenanceDialog } from "@/components/maintenance/delete-maintenance-dialog";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -34,11 +35,19 @@ export default function MaintenancePage() {
 
   const { toast } = useToast();
 
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [maintenanceToView, setMaintenanceToView] = useState(null);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [maintenanceToEdit, setMaintenanceToEdit] = useState(null);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [maintenanceToDelete, setMaintenanceToDelete] = useState(null);
+
+  const handleOpenViewModal = (item) => {
+    setMaintenanceToView(item);
+    setIsViewDialogOpen(true);
+  };
 
   const handleOpenAddModal = () => {
     setMaintenanceToEdit(null);
@@ -132,12 +141,22 @@ export default function MaintenancePage() {
         logs={filteredLogs}
         vehicles={vehicles}
         isLoading={isLoading}
+        onView={handleOpenViewModal}
         onEdit={handleOpenEditModal}
         onDelete={handleOpenDeleteModal}
         onLogMaintenance={handleOpenAddModal}
       />
 
       {/* Modals */}
+      <ViewMaintenanceDialog
+        open={isViewDialogOpen}
+        onOpenChange={setIsViewDialogOpen}
+        maintenance={maintenanceToView}
+        vehicles={vehicles}
+        onEdit={handleOpenEditModal}
+        onDelete={handleOpenDeleteModal}
+      />
+
       <MaintenanceDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}

@@ -3,6 +3,7 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip } from "@/components/ui/tooltip";
 import { BadgeSkeleton, MaintenanceRemindersSkeleton } from "@/components/skeletons";
 import { Bell, Gauge, Wrench, Droplet, Car } from "lucide-react";
 
@@ -106,12 +107,23 @@ export function MaintenanceRemindersCard({ upcomingServices = [], vehicles = [],
                   className="flex flex-col justify-between rounded-2xl border border-border/50 bg-background/60 p-4 space-y-3.5 shadow-sm hover:shadow-md transition-all"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                    <div className="space-y-1 min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground min-w-0">
                         <Car className="h-3.5 w-3.5 text-primary/70 shrink-0" />
-                        <span>{rem.vehicleName}</span>
+                        <span className="truncate">{rem.vehicleName}</span>
                       </div>
-                      <h4 className="font-bold text-sm text-foreground line-clamp-1">{rem.title}</h4>
+                      
+                      {/* Mobile view data heading with Tooltip */}
+                      <div className="sm:hidden">
+                        <Tooltip content={rem.title} side="top">
+                          <h4 className="font-bold text-sm text-foreground line-clamp-1 cursor-pointer">{rem.title}</h4>
+                        </Tooltip>
+                      </div>
+                      
+                      {/* Desktop view data heading */}
+                      <div className="hidden sm:block">
+                        <h4 className="font-bold text-sm text-foreground line-clamp-1">{rem.title}</h4>
+                      </div>
                     </div>
 
                     <Badge

@@ -4,6 +4,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tooltip } from "@/components/ui/tooltip";
 import { BadgeSkeleton, MaintenanceLogsListSkeleton } from "@/components/skeletons";
 import {
   DropdownMenu,
@@ -12,13 +13,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Wrench, Plus, MoreVertical, Edit2, Trash2, Gauge, Calendar, Droplet, Sparkles, Store } from "lucide-react";
+import { Wrench, Plus, MoreVertical, Edit2, Trash2, Gauge, Calendar, Droplet, Sparkles, Store, Eye } from "lucide-react";
 import { CATEGORY_BADGES, CATEGORY_LABELS } from "@/constants/maintenance";
 
 export function MaintenanceLogsList({
   logs = [],
   vehicles = [],
   isLoading = false,
+  onView,
   onEdit,
   onDelete,
   onLogMaintenance,
@@ -82,7 +84,8 @@ export function MaintenanceLogsList({
               return (
                 <div
                   key={item.id || item._id}
-                  className="p-4 sm:p-5 rounded-xl border border-border/30 bg-secondary/10 hover:bg-secondary/20 transition-colors"
+                  onClick={() => onView?.(item)}
+                  className="p-4 sm:p-5 rounded-xl border-2 border-border/80 hover:border-primary/50 bg-secondary/15 hover:bg-secondary/30 shadow-sm transition-all cursor-pointer group"
                 >
                   {/* MOBILE VIEW (Block < sm) */}
                   <div className="sm:hidden space-y-3">
@@ -92,25 +95,46 @@ export function MaintenanceLogsList({
                           {isOilChange ? <Droplet className="h-5 w-5" /> : <Wrench className="h-5 w-5" />}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h4 className="font-bold text-sm text-foreground truncate">{item.title}</h4>
+                          <Tooltip content={item.title} side="top">
+                            <h4 className="font-bold text-sm text-foreground truncate cursor-pointer group-hover:text-primary transition-colors">{item.title}</h4>
+                          </Tooltip>
                           <p className="text-xs text-muted-foreground font-medium truncate">{getVehicleName(item.vehicleId)}</p>
                         </div>
                       </div>
 
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full shrink-0">
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-44 backdrop-blur-xl">
-                          <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer">
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onView?.(item);
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <Eye className="mr-2 h-4 w-4 text-primary" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEdit(item);
+                            }}
+                            className="cursor-pointer"
+                          >
                             <Edit2 className="mr-2 h-4 w-4" />
                             Edit Record
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
-                            onClick={() => onDelete(item)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDelete(item);
+                            }}
                             className="cursor-pointer text-destructive focus:text-destructive"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
@@ -167,7 +191,7 @@ export function MaintenanceLogsList({
                       </div>
                       <div className="space-y-2 min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="font-bold text-foreground">{item.title}</h4>
+                          <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">{item.title}</h4>
                           <Badge className={`capitalize text-[11px] font-medium border ${CATEGORY_BADGES[item.category] || CATEGORY_BADGES.other}`}>
                             {CATEGORY_LABELS[item.category] || item.category}
                           </Badge>
@@ -211,19 +235,38 @@ export function MaintenanceLogsList({
                       </div>
 
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-secondary/60">
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-44 backdrop-blur-xl">
-                          <DropdownMenuItem onClick={() => onEdit(item)} className="cursor-pointer">
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onView?.(item);
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <Eye className="mr-2 h-4 w-4 text-primary" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEdit(item);
+                            }}
+                            className="cursor-pointer"
+                          >
                             <Edit2 className="mr-2 h-4 w-4" />
                             Edit Record
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
-                            onClick={() => onDelete(item)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDelete(item);
+                            }}
                             className="cursor-pointer text-destructive focus:text-destructive"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
