@@ -124,6 +124,7 @@ export const updateFuelExpense = async (id: string, userId: string, updateData: 
   if (updated.odometer) {
     await vehicleRepository.updateOdometer(vehicleId, updated.odometer);
   }
+  await vehicleRepository.syncOdometer(vehicleId);
 
   return updated;
 };
@@ -151,13 +152,9 @@ export const deleteFuelExpense = async (id: string, userId: string): Promise<voi
       isLocked: false,
       updatedBy: userId,
     });
-
-    // Rollback vehicle currentOdometer to previous refill's odometer
-    await vehicleRepository.updateOdometer(vehicleId, previousRefill.odometer);
-  } else {
-    // If no refills left, reset vehicle odometer to 0
-    await vehicleRepository.updateOdometer(vehicleId, 0);
   }
+
+  await vehicleRepository.syncOdometer(vehicleId);
 };
 
 export const FuelExpenseService = {

@@ -8,16 +8,16 @@ export const createMaintenance = async (userId: string, data: Partial<IMaintenan
     throw BadRequestError("Vehicle ID is required");
   }
 
-  if (data.odometer !== undefined) {
-    await vehicleRepository.updateOdometer(data.vehicleId.toString(), data.odometer);
-  }
-
-  return await maintenanceExpenseRepository.create({
+  const created = await maintenanceExpenseRepository.create({
     ...data,
     userId: userId as unknown as IMaintenanceExpense["userId"],
     createdBy: userId as unknown as IMaintenanceExpense["createdBy"],
     updatedBy: userId as unknown as IMaintenanceExpense["updatedBy"],
   });
+
+  await vehicleRepository.syncOdometer(created.vehicleId.toString());
+
+  return created;
 };
 
 export const getAllMaintenance = async (userId: string): Promise<IMaintenanceExpense[]> => {
@@ -45,7 +45,6 @@ export const getUpcomingServices = async (userId: string): Promise<IMaintenanceE
 };
 
 export const updateMaintenance = async (id: string, userId: string, updateData: Partial<IMaintenanceExpense>): Promise<IMaintenanceExpense> => {
-  await getMaintenanceById(id, userId);
 
   const updated = await maintenanceExpenseRepository.update(id, {
     ...updateData,
@@ -53,12 +52,16 @@ export const updateMaintenance = async (id: string, userId: string, updateData: 
   });
 
   if (!updated) throw NotFoundError("Maintenance record failed to update");
+
+  await vehicleRepository.syncOdometer(updated.vehicleId.toString());
+
   return updated;
 };
 
 export const deleteMaintenance = async (id: string, userId: string): Promise<void> => {
-  await getMaintenanceById(id, userId);
+  const existing = await getMaintenanceById(id, userId);
   await maintenanceExpenseRepository.softDelete(id, userId);
+  await vehicleRepository.syncOdometer(existing.vehicleId.toString());
 };
 
 export const MaintenanceExpenseService = {

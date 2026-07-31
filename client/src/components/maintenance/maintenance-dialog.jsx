@@ -100,6 +100,7 @@ function MaintenanceForm({
             <Select
               value={vehicleId}
               onValueChange={(val) => setValue("vehicleId", val, { shouldValidate: true })}
+              disabled={isEditing}
             >
               <SelectTrigger className="bg-background/50 border-border/50">
                 <SelectValue placeholder="Select Vehicle" />

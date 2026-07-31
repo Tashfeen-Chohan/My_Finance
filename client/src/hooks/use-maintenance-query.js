@@ -86,6 +86,7 @@ export function useDeleteMaintenance() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: UPCOMING_MAINTENANCE_KEY });
+      queryClient.invalidateQueries({ queryKey: VEHICLES_QUERY_KEY });
     },
   });
 }
