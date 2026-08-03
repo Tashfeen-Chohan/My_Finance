@@ -1,8 +1,10 @@
 "use client";
 
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { BadgeSkeleton, FuelLogsListSkeleton } from "@/components/skeletons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,13 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Fuel, Plus, MoreVertical, Edit2, Trash2, Gauge, Calendar, MapPin, Sparkles, CheckCircle2 } from "lucide-react";
-import { FuelLogsListSkeleton } from "@/components/skeletons";
+import { Fuel, Plus, MoreVertical, Edit2, Trash2, Gauge, Calendar, MapPin, Sparkles, CheckCircle2, Eye } from "lucide-react";
 
 export function FuelLogsList({
   expenses = [],
   vehicles = [],
   isLoading = false,
+  onView,
   onEdit,
   onDelete,
   onLogFuelRefill,
@@ -45,11 +47,15 @@ export function FuelLogsList({
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 shadow-sm shrink-0">
-            <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-            <span className="font-mono font-extrabold text-sm sm:text-base">{expenses.length}</span>
-            <span className="hidden sm:inline text-[11px] opacity-80">{expenses.length === 1 ? "Refill Log" : "Total Logs"}</span>
-          </div>
+          {isLoading ? (
+            <BadgeSkeleton className="h-8 w-20 rounded-xl" />
+          ) : (
+            <div className="flex items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 shadow-sm shrink-0">
+              <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+              <span className="font-mono font-extrabold text-sm sm:text-base">{expenses.length}</span>
+              <span className="hidden sm:inline text-[11px] opacity-80">{expenses.length === 1 ? "Refill Log" : "Total Logs"}</span>
+            </div>
+          )}
         </div>
       </CardHeader>
 
@@ -57,8 +63,7 @@ export function FuelLogsList({
         {isLoading ? (
           <FuelLogsListSkeleton />
         ) : expenses.length > 0 ? (
-
-          <div className="divide-y divide-border/40">
+          <div className="p-3 sm:p-4 space-y-3">
             {expenses.map((expense) => {
               const dateStr = expense.date
                 ? new Date(expense.date).toLocaleDateString("en-US", {
@@ -76,38 +81,21 @@ export function FuelLogsList({
               return (
                 <div
                   key={expense.id || expense._id}
-                  className="p-4 sm:p-5 hover:bg-secondary/30 transition-colors"
+                  onClick={() => onView?.(expense)}
+                  className="p-4 sm:p-5 rounded-xl border-2 border-border/80 hover:border-primary/50 bg-secondary/15 hover:bg-secondary/30 shadow-sm transition-all cursor-pointer group"
                 >
                   {/* MOBILE VIEW (Block < sm) */}
                   <div className="sm:hidden space-y-3">
-                    {/* Top Row: Icon, Vehicle, Badges & Action Menu */}
+                    {/* Top Row: Vehicle Icon, Vehicle Name, Station & Action Menu */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-sm">
                           <Fuel className="h-5 w-5" />
                         </div>
                         <div className="min-w-0 flex-1 space-y-0.5">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <h4 className="font-bold text-sm text-foreground truncate">
-                              {getVehicleName(expense.vehicleId)}
-                            </h4>
-                            {expense.isFullTank && (
-                              <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[9px] font-semibold gap-0.5 px-1.5 py-0">
-                                <CheckCircle2 className="h-2.5 w-2.5 shrink-0" />
-                                Full Tank
-                              </Badge>
-                            )}
-                            {expense.computedEconomy && (
-                              <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[9px] font-semibold px-1.5 py-0">
-                                {expense.computedEconomy} km/L
-                              </Badge>
-                            )}
-                            {expense.costPerKM && (
-                              <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-[9px] font-semibold px-1.5 py-0">
-                                PKR {expense.costPerKM}/km
-                              </Badge>
-                            )}
-                          </div>
+                          <h4 className="font-bold text-sm text-foreground truncate group-hover:text-primary transition-colors">
+                            {getVehicleName(expense.vehicleId)}
+                          </h4>
                           {expense.stationName ? (
                             <p className="text-xs text-muted-foreground font-medium flex items-center gap-1 truncate">
                               <MapPin className="h-3 w-3 text-muted-foreground/70 shrink-0" />
@@ -120,19 +108,38 @@ export function FuelLogsList({
                       </div>
 
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full shrink-0">
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-44 backdrop-blur-xl">
-                          <DropdownMenuItem onClick={() => onEdit(expense)} className="cursor-pointer">
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onView?.(expense);
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <Eye className="mr-2 h-4 w-4 text-primary" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEdit(expense);
+                            }}
+                            className="cursor-pointer"
+                          >
                             <Edit2 className="mr-2 h-4 w-4" />
                             Edit Refill Log
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
-                            onClick={() => onDelete(expense)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDelete(expense);
+                            }}
                             className="cursor-pointer text-destructive focus:text-destructive"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
@@ -142,7 +149,29 @@ export function FuelLogsList({
                       </DropdownMenu>
                     </div>
 
-                    {/* Single Line Pricing Bar: Copying maintenance page style (bg-secondary/40 border border-border/30) */}
+                    {/* Efficiency Badges Bar */}
+                    {(expense.isFullTank || expense.computedEconomy || expense.costPerKM) && (
+                      <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                        {expense.isFullTank && (
+                          <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] font-semibold gap-0.5 px-2 py-0.5">
+                            <CheckCircle2 className="h-2.5 w-2.5 shrink-0" />
+                            Full Tank
+                          </Badge>
+                        )}
+                        {expense.computedEconomy && (
+                          <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[10px] font-semibold px-2 py-0.5">
+                            {expense.computedEconomy} km/L
+                          </Badge>
+                        )}
+                        {expense.costPerKM && (
+                          <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-[10px] font-semibold px-2 py-0.5">
+                            PKR {expense.costPerKM}/km
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Reverted Single Line Pricing Bar */}
                     <div className="flex items-center justify-between rounded-xl bg-secondary/40 p-2.5 border border-border/30 shadow-sm">
                       <div className="flex items-center gap-1.5 text-xs font-mono font-medium text-muted-foreground">
                         <span className="font-bold text-foreground">{expense.quantity} L</span>
@@ -155,23 +184,23 @@ export function FuelLogsList({
                       </span>
                     </div>
 
-                    {/* Metadata: Date & Odometer (+ Distance) */}
-                    <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground px-0.5 pt-0.5">
-                      <span className="flex items-center gap-1.5">
+                    {/* Metadata Chips: Date & Odometer */}
+                    <div className="flex items-center justify-between gap-1.5 text-xs text-muted-foreground pt-0.5">
+                      <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2 py-1 text-[11px] whitespace-nowrap shrink-0">
                         <Calendar className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
                         <span>{dateStr}</span>
-                      </span>
-                      <span className="flex items-center gap-1.5 font-mono font-medium">
+                      </div>
+                      <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2 py-1 text-[11px] font-mono whitespace-nowrap shrink-0">
                         <Gauge className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
                         <span>
                           {expense.odometer?.toLocaleString()} km
                           {expense.distanceTraveled ? ` (+${expense.distanceTraveled} km)` : ""}
                         </span>
-                      </span>
+                      </div>
                     </div>
 
                     {expense.notes && (
-                      <p className="text-xs text-muted-foreground/80 italic bg-secondary/20 p-2 rounded-xl border border-border/20">
+                      <p className="text-xs text-muted-foreground/80 italic bg-secondary/20 p-2.5 rounded-lg border border-border/20">
                         &quot;{expense.notes}&quot;
                       </p>
                     )}
@@ -179,13 +208,15 @@ export function FuelLogsList({
 
                   {/* DESKTOP VIEW (Hidden < sm) */}
                   <div className="hidden sm:flex items-center justify-between gap-4">
-                    <div className="flex items-start gap-3.5">
+                    <div className="flex items-start gap-3.5 min-w-0 flex-1">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
                         <Fuel className="h-5 w-5" />
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-2 min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="font-bold text-foreground">{getVehicleName(expense.vehicleId)}</h4>
+                          <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">
+                            {getVehicleName(expense.vehicleId)}
+                          </h4>
                           {expense.isFullTank && (
                             <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[11px] font-medium gap-1">
                               <CheckCircle2 className="h-3 w-3" />
@@ -203,32 +234,36 @@ export function FuelLogsList({
                             </Badge>
                           )}
                         </div>
-                        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                            {dateStr}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Gauge className="h-3.5 w-3.5 text-muted-foreground" />
-                            {expense.odometer?.toLocaleString()} km
-                            {expense.distanceTraveled ? ` (+${expense.distanceTraveled} km)` : ""}
-                          </span>
-                          {expense.stationName && (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                              {expense.stationName}
+
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1">
+                            <Calendar className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
+                            <span>{dateStr}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1 font-mono">
+                            <Gauge className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
+                            <span>
+                              {expense.odometer?.toLocaleString()} km
+                              {expense.distanceTraveled ? ` (+${expense.distanceTraveled} km)` : ""}
                             </span>
+                          </div>
+                          {expense.stationName && (
+                            <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1 text-foreground/80">
+                              <MapPin className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
+                              <span className="truncate max-w-[200px]">{expense.stationName}</span>
+                            </div>
                           )}
                         </div>
+
                         {expense.notes && (
-                          <p className="text-xs text-muted-foreground/80 italic pt-0.5">
+                          <p className="text-xs text-muted-foreground/80 italic pt-0.5 max-w-2xl line-clamp-2">
                             &quot;{expense.notes}&quot;
                           </p>
                         )}
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-6 shrink-0">
                       <div className="text-right">
                         <p className="text-lg font-bold text-foreground">
                           PKR {costFormatted}
@@ -239,19 +274,38 @@ export function FuelLogsList({
                       </div>
 
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-secondary/60">
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-44 backdrop-blur-xl">
-                          <DropdownMenuItem onClick={() => onEdit(expense)} className="cursor-pointer">
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onView?.(expense);
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <Eye className="mr-2 h-4 w-4 text-primary" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEdit(expense);
+                            }}
+                            className="cursor-pointer"
+                          >
                             <Edit2 className="mr-2 h-4 w-4" />
                             Edit Refill Log
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
-                            onClick={() => onDelete(expense)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDelete(expense);
+                            }}
                             className="cursor-pointer text-destructive focus:text-destructive"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />

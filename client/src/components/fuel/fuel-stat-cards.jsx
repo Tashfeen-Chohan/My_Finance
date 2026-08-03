@@ -2,19 +2,15 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Fuel, DollarSign, Gauge, TrendingUp, Sparkles } from "lucide-react";
-import { FuelStatCardsSkeleton } from "@/components/skeletons";
+import { Fuel, DollarSign, Gauge, TrendingUp } from "lucide-react";
+import { StatValueSkeleton } from "@/components/skeletons";
 
 export function FuelStatCards({ fuelExpenses = [], isLoading = false }) {
-  if (isLoading) {
-    return <FuelStatCardsSkeleton />;
-  }
-
   // Compute analytics metrics
   const totalCost = fuelExpenses.reduce((acc, curr) => acc + (Number(curr.totalCost) || 0), 0);
   const totalVolume = fuelExpenses.reduce((acc, curr) => acc + (Number(curr.quantity) || 0), 0);
 
-  // Compute total distance traveled between refills
+  // Compute average fuel economy
   const validEconomies = fuelExpenses
     .map((f) => Number(f.computedEconomy))
     .filter((val) => !isNaN(val) && val > 0);
@@ -38,59 +34,75 @@ export function FuelStatCards({ fuelExpenses = [], isLoading = false }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {/* Total Spend */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-xl transition-all hover:shadow-lg hover:border-primary/20">
+      <Card className="border-border/50 bg-card/50 backdrop-blur-xl">
         <CardContent className="p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shrink-0">
             <DollarSign className="h-6 w-6" />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Fuel Cost</p>
-            <h3 className="text-2xl font-bold text-foreground">
-              PKR {totalCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </h3>
+            {isLoading ? (
+              <StatValueSkeleton className="w-32" />
+            ) : (
+              <h3 className="text-2xl font-bold text-foreground truncate">
+                PKR {totalCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+              </h3>
+            )}
           </div>
         </CardContent>
       </Card>
 
       {/* Total Fuel Volume */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-xl transition-all hover:shadow-lg hover:border-amber-500/20">
+      <Card className="border-border/50 bg-card/50 backdrop-blur-xl">
         <CardContent className="p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shrink-0">
             <Fuel className="h-6 w-6" />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Volume</p>
-            <h3 className="text-2xl font-bold text-foreground">{totalVolume.toFixed(1)} L</h3>
+            {isLoading ? (
+              <StatValueSkeleton className="w-32" />
+            ) : (
+              <h3 className="text-2xl font-bold text-foreground truncate">{totalVolume.toFixed(1)} L</h3>
+            )}
           </div>
         </CardContent>
       </Card>
 
       {/* Average Mileage (Fuel Economy) */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-xl transition-all hover:shadow-lg hover:border-cyan-500/20">
+      <Card className="border-border/50 bg-card/50 backdrop-blur-xl">
         <CardContent className="p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shrink-0">
             <Gauge className="h-6 w-6" />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Average Mileage</p>
-            <h3 className="text-2xl font-bold text-foreground">
-              {avgEconomy > 0 ? `${avgEconomy} km/L` : "N/A"}
-            </h3>
+            {isLoading ? (
+              <StatValueSkeleton className="w-32" />
+            ) : (
+              <h3 className="text-2xl font-bold text-foreground truncate">
+                {avgEconomy > 0 ? `${avgEconomy} km/L` : "N/A"}
+              </h3>
+            )}
           </div>
         </CardContent>
       </Card>
 
       {/* Cost Per Kilometer */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-xl transition-all hover:shadow-lg hover:border-purple-500/20">
+      <Card className="border-border/50 bg-card/50 backdrop-blur-xl">
         <CardContent className="p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
             <TrendingUp className="h-6 w-6" />
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Cost per Kilometer</p>
-            <h3 className="text-2xl font-bold text-foreground">
-              {costPerKm > 0 ? `PKR ${costPerKm}/km` : "N/A"}
-            </h3>
+            {isLoading ? (
+              <StatValueSkeleton className="w-32" />
+            ) : (
+              <h3 className="text-2xl font-bold text-foreground truncate">
+                {costPerKm > 0 ? `PKR ${costPerKm}/km` : "N/A"}
+              </h3>
+            )}
           </div>
         </CardContent>
       </Card>

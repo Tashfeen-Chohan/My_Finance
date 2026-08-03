@@ -14,6 +14,7 @@ import { FuelMonthlyChart } from "@/components/fuel/fuel-monthly-chart";
 import { FuelFilters } from "@/components/fuel/fuel-filters";
 import { FuelLogsList } from "@/components/fuel/fuel-logs-list";
 import { FuelDialog } from "@/components/fuel/fuel-dialog";
+import { ViewFuelDialog } from "@/components/fuel/view-fuel-dialog";
 import { DeleteFuelDialog } from "@/components/fuel/delete-fuel-dialog";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -26,18 +27,25 @@ export default function FuelPage() {
 
   const isLoading = isExpensesLoading || isVehiclesLoading;
 
-
   const addFuelMutation = useAddFuelExpense();
   const updateFuelMutation = useUpdateFuelExpense();
   const deleteFuelMutation = useDeleteFuelExpense();
 
   const { toast } = useToast();
 
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [expenseToView, setExpenseToView] = useState(null);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState(null);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
+
+  const handleOpenViewModal = (expense) => {
+    setExpenseToView(expense);
+    setIsViewDialogOpen(true);
+  };
 
   const handleOpenAddModal = () => {
     setExpenseToEdit(null);
@@ -119,7 +127,6 @@ export default function FuelPage() {
       {/* Monthly Expenditure Chart */}
       <FuelMonthlyChart fuelExpenses={filteredExpenses} isLoading={isLoading} />
 
-
       {/* Filter and Search Bar */}
       <FuelFilters
         searchQuery={searchQuery}
@@ -133,12 +140,22 @@ export default function FuelPage() {
         expenses={filteredExpenses}
         vehicles={vehicles}
         isLoading={isLoading}
+        onView={handleOpenViewModal}
         onEdit={handleOpenEditModal}
         onDelete={handleOpenDeleteModal}
         onLogFuelRefill={handleOpenAddModal}
       />
 
       {/* Modals */}
+      <ViewFuelDialog
+        open={isViewDialogOpen}
+        onOpenChange={setIsViewDialogOpen}
+        expense={expenseToView}
+        vehicles={vehicles}
+        onEdit={handleOpenEditModal}
+        onDelete={handleOpenDeleteModal}
+      />
+
       <FuelDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
