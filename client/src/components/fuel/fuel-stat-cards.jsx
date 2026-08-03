@@ -3,8 +3,13 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Fuel, DollarSign, Gauge, TrendingUp, Sparkles } from "lucide-react";
+import { FuelStatCardsSkeleton } from "@/components/skeletons";
 
-export function FuelStatCards({ fuelExpenses }) {
+export function FuelStatCards({ fuelExpenses = [], isLoading = false }) {
+  if (isLoading) {
+    return <FuelStatCardsSkeleton />;
+  }
+
   // Compute analytics metrics
   const totalCost = fuelExpenses.reduce((acc, curr) => acc + (Number(curr.totalCost) || 0), 0);
   const totalVolume = fuelExpenses.reduce((acc, curr) => acc + (Number(curr.quantity) || 0), 0);

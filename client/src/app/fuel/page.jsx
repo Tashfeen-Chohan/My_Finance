@@ -21,8 +21,11 @@ export default function FuelPage() {
   const [timeRangeFilter, setTimeRangeFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: vehicles = [] } = useVehicles();
-  const { data: fuelExpenses = [], isLoading } = useFuelExpenses(null);
+  const { data: vehicles = [], isLoading: isVehiclesLoading } = useVehicles();
+  const { data: fuelExpenses = [], isLoading: isExpensesLoading } = useFuelExpenses(null);
+
+  const isLoading = isExpensesLoading || isVehiclesLoading;
+
 
   const addFuelMutation = useAddFuelExpense();
   const updateFuelMutation = useUpdateFuelExpense();
@@ -111,10 +114,11 @@ export default function FuelPage() {
       <FuelHeader onLogFuelRefill={handleOpenAddModal} />
 
       {/* KPI Stat Cards */}
-      <FuelStatCards fuelExpenses={filteredExpenses} />
+      <FuelStatCards fuelExpenses={filteredExpenses} isLoading={isLoading} />
 
       {/* Monthly Expenditure Chart */}
-      <FuelMonthlyChart fuelExpenses={filteredExpenses} />
+      <FuelMonthlyChart fuelExpenses={filteredExpenses} isLoading={isLoading} />
+
 
       {/* Filter and Search Bar */}
       <FuelFilters

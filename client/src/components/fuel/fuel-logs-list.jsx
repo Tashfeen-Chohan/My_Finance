@@ -10,7 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Fuel, Plus, MoreVertical, Edit2, Trash2, Gauge, Calendar, MapPin, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
+import { Fuel, Plus, MoreVertical, Edit2, Trash2, Gauge, Calendar, MapPin, Sparkles, CheckCircle2 } from "lucide-react";
+import { FuelLogsListSkeleton } from "@/components/skeletons";
 
 export function FuelLogsList({
   expenses = [],
@@ -54,11 +55,9 @@ export function FuelLogsList({
 
       <CardContent className="p-0">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center p-12 space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
-            <p className="text-sm font-medium text-muted-foreground">Loading fuel log data...</p>
-          </div>
+          <FuelLogsListSkeleton />
         ) : expenses.length > 0 ? (
+
           <div className="divide-y divide-border/40">
             {expenses.map((expense) => {
               const dateStr = expense.date

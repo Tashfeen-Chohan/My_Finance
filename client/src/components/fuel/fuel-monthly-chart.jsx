@@ -3,8 +3,13 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { BarChart2, Calendar } from "lucide-react";
+import { FuelMonthlyChartSkeleton } from "@/components/skeletons";
 
-export function FuelMonthlyChart({ fuelExpenses }) {
+export function FuelMonthlyChart({ fuelExpenses = [], isLoading = false }) {
+  if (isLoading) {
+    return <FuelMonthlyChartSkeleton />;
+  }
+
   // Aggregate expenses by month (YYYY-MM)
   const monthlyMap = {};
 
