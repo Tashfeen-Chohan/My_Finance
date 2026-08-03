@@ -12,11 +12,10 @@ import { NotFoundError, BadRequestError } from "../errors/ApiError";
  */
 
 export const createFuelExpense = async (userId: string, data: Partial<IFuelExpense>): Promise<IFuelExpense> => {
-  const vehicleId = data.vehicleId!.toString();
-
   if (!data.vehicleId) {
     throw BadRequestError("Vehicle ID is required");
   }
+  const vehicleId = data.vehicleId.toString();
 
   // 1. Fetch current latest refill before creating new one
   const lastRefill = await fuelExpenseRepository.getLatestRefill(vehicleId);
@@ -36,25 +35,27 @@ export const createFuelExpense = async (userId: string, data: Partial<IFuelExpen
   });
 
   // 3. Finalize and LOCK previous refill (Refill A)
-  if (lastRefill && lastRefill.odometer < data.odometer!) {
+  if (lastRefill) {
     const distanceTraveled = data.odometer! - lastRefill.odometer;
-    let computedEconomy: number | null = null;
+    const computedEconomy = (lastRefill.isFullTank && data.isFullTank)
+      ? Number((distanceTraveled / data.quantity!).toFixed(2))
+      : null;
+    const lastRefillCost = lastRefill.totalCost;
+    const costPerKM = distanceTraveled > 0
+      ? Number((lastRefillCost / distanceTraveled).toFixed(2))
+      : null;
 
-    if (lastRefill.isFullTank && data.isFullTank) {
-      computedEconomy = Number((distanceTraveled / data.quantity!).toFixed(2));
-    }
-
-    const lastRefillId = (lastRefill._id || lastRefill.id).toString();
-    await fuelExpenseRepository.update(lastRefillId, {
+    await fuelExpenseRepository.update(lastRefill._id.toString(), {
       distanceTraveled,
-      computedEconomy: computedEconomy ?? null,
+      computedEconomy,
+      costPerKM,
       isLocked: true,
       updatedBy: userId,
     });
   }
 
-  // 4. Sync vehicle current odometer directly
-  await vehicleRepository.updateOdometer(vehicleId, data.odometer!);
+  // 4. Sync vehicle current odometer
+  await vehicleRepository.syncOdometer(vehicleId);
 
   return createdExpense;
 };
@@ -64,16 +65,12 @@ export const getUserFuelExpenses = async (userId: string): Promise<IFuelExpense[
 };
 
 export const getFuelExpensesByVehicle = async (vehicleId: string, userId: string): Promise<IFuelExpense[]> => {
-  const vehicle = await vehicleRepository.findById(vehicleId);
-  if (!vehicle || vehicle.userId.toString() !== userId) {
-    throw NotFoundError("Vehicle not found");
-  }
   return await fuelExpenseRepository.findByVehicleId(vehicleId, userId);
 };
 
 export const getFuelExpenseById = async (id: string, userId: string): Promise<IFuelExpense> => {
-  const expense = await fuelExpenseRepository.findById(id);
-  if (!expense || expense.userId.toString() !== userId) {
+  const expense = await fuelExpenseRepository.findOne({ _id: id, userId });
+  if (!expense) {
     throw NotFoundError("Fuel expense record not found");
   }
   return expense;
@@ -100,30 +97,31 @@ export const updateFuelExpense = async (id: string, userId: string, updateData: 
     updatedBy: userId,
   });
 
-  if (!updated) throw NotFoundError("Fuel expense record failed to update");
+  if (!updated) {
+    throw NotFoundError("Fuel expense record failed to update");
+  }
 
   // Re-sync previous refill stats if odometer/quantity/isFullTank of current refill changed
   if (lastRefill && updated.odometer && lastRefill.odometer < updated.odometer) {
     const distanceTraveled = updated.odometer - lastRefill.odometer;
-    let computedEconomy: number | null = null;
+    const computedEconomy = (lastRefill.isFullTank && updated.isFullTank)
+      ? Number((distanceTraveled / updated.quantity).toFixed(2))
+      : null;
+    const lastRefillCost = lastRefill.totalCost;
+    const costPerKM = distanceTraveled > 0
+      ? Number((lastRefillCost / distanceTraveled).toFixed(2))
+      : null;
 
-    if (lastRefill.isFullTank && updated.isFullTank) {
-      computedEconomy = Number((distanceTraveled / updated.quantity).toFixed(2));
-    }
-
-    const lastRefillId = (lastRefill._id || lastRefill.id).toString();
-    await fuelExpenseRepository.update(lastRefillId, {
+    await fuelExpenseRepository.update(lastRefill._id.toString(), {
       distanceTraveled,
-      computedEconomy: computedEconomy ?? null,
+      computedEconomy,
+      costPerKM,
       isLocked: true,
       updatedBy: userId,
     });
   }
 
-  // Sync vehicle current odometer directly if odometer updated
-  if (updated.odometer) {
-    await vehicleRepository.updateOdometer(vehicleId, updated.odometer);
-  }
+  // Sync vehicle current odometer
   await vehicleRepository.syncOdometer(vehicleId);
 
   return updated;
@@ -140,15 +138,15 @@ export const deleteFuelExpense = async (id: string, userId: string): Promise<voi
   // Soft delete current latest entry
   await fuelExpenseRepository.softDelete(id, userId);
 
-  // Unroll previous refill: Unlock it and clear distance/economy
+  // Unroll previous refill: Unlock it and clear distance/economy/costPerKM
   const vehicleId = existing.vehicleId.toString();
   const previousRefill = await fuelExpenseRepository.getLatestRefill(vehicleId);
 
   if (previousRefill) {
-    const prevId = (previousRefill._id || previousRefill.id).toString();
-    await fuelExpenseRepository.update(prevId, {
+    await fuelExpenseRepository.update(previousRefill._id.toString(), {
       distanceTraveled: undefined,
       computedEconomy: undefined,
+      costPerKM: undefined,
       isLocked: false,
       updatedBy: userId,
     });

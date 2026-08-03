@@ -22,7 +22,7 @@ export const fuelExpenseRepository = {
     if (excludeId) {
       filter._id = { $ne: excludeId };
     }
-    return await FuelExpense.findOne(filter).sort({ date: -1, odometer: -1 });
+    return await FuelExpense.findOne(filter).sort({ odometer: -1 });
   },
 
   aggregateTotalFuelCost: async (userId: string, startDate?: Date, endDate?: Date): Promise<{ totalCost: number; totalVolume: number }> => {

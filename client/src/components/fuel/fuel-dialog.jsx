@@ -94,7 +94,9 @@ function FuelForm({ onOpenChange, expenseToEdit, vehicles = [], onSubmit }) {
           <Select
             value={formData.vehicleId}
             onValueChange={(val) => setFormData((prev) => ({ ...prev, vehicleId: val }))}
+            disabled={isEditing}
           >
+
             <SelectTrigger>
               <SelectValue placeholder="Choose vehicle" />
             </SelectTrigger>

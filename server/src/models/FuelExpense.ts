@@ -10,12 +10,10 @@ export interface IFuelExpense extends Document {
   quantity: number;
   unitPrice: number;
   totalCost: number;
-  fuelType?: string;
   isFullTank: boolean;
-  missedPreviousRefill: boolean;
   computedEconomy?: number;
+  costPerKM?: number;
   isLocked: boolean;
-  currency: string;
   stationName?: string;
   notes?: string;
   // Audit fields
@@ -26,7 +24,6 @@ export interface IFuelExpense extends Document {
   // Soft delete
   isDeleted: boolean;
   deletedAt?: Date | null;
-  version: number;
 }
 
 const FuelExpenseSchema: Schema = new Schema(
@@ -73,32 +70,21 @@ const FuelExpenseSchema: Schema = new Schema(
       required: [true, "Total cost is required"],
       min: [0, "Total cost cannot be negative"],
     },
-    fuelType: {
-      type: String,
-      trim: true,
-    },
     isFullTank: {
       type: Boolean,
       default: true,
-    },
-    missedPreviousRefill: {
-      type: Boolean,
-      default: false,
     },
     computedEconomy: {
       type: Number,
       min: [0, "Fuel economy cannot be negative"],
     },
+    costPerKM: {
+      type: Number,
+      min: [0, "Cost per kilometer cannot be negative"],
+    },
     isLocked: {
       type: Boolean,
       default: false,
-    },
-    currency: {
-      type: String,
-      default: "PKR",
-      uppercase: true,
-      trim: true,
-      maxlength: 5,
     },
     stationName: {
       type: String,
@@ -133,11 +119,6 @@ const FuelExpenseSchema: Schema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
       default: null,
-    },
-    version: {
-      type: Number,
-      default: 1,
-      min: 1,
     },
   },
   {

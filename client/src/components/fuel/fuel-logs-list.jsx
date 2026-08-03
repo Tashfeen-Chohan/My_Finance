@@ -102,6 +102,11 @@ export function FuelLogsList({
                                 {expense.computedEconomy} km/L
                               </Badge>
                             )}
+                            {expense.costPerKM && (
+                              <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-[9px] font-semibold px-1.5 py-0">
+                                PKR {expense.costPerKM}/km
+                              </Badge>
+                            )}
                           </div>
                           {expense.stationName ? (
                             <p className="text-xs text-muted-foreground font-medium flex items-center gap-1 truncate">
@@ -190,6 +195,11 @@ export function FuelLogsList({
                           {expense.computedEconomy && (
                             <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[11px] font-medium">
                               {expense.computedEconomy} km/L
+                            </Badge>
+                          )}
+                          {expense.costPerKM && (
+                            <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-[11px] font-medium">
+                              PKR {expense.costPerKM}/km
                             </Badge>
                           )}
                         </div>
