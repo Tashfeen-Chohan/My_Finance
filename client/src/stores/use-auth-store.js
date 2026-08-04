@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { apiClient, setStoredToken, setStoredRefreshToken, getStoredRefreshToken } from "@/services/api-client";
+import { apiClient, setStoredToken, setStoredRefreshToken, getStoredToken, getStoredRefreshToken } from "@/services/api-client";
 
 export const useAuthStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       isAuthenticated: false,
       isLoading: false,
@@ -60,15 +60,32 @@ export const useAuthStore = create(
       },
 
       checkAuthSession: async () => {
-        set({ isLoading: true });
+        const token = getStoredToken();
+        const refresh = getStoredRefreshToken();
+
+        // If no tokens exist at all, clear session immediately without calling server
+        if (!token && !refresh) {
+          set({ user: null, isAuthenticated: false, isInitialized: true, isLoading: false });
+          return;
+        }
+
+        // Mark initialized so saved session renders immediately without blocking UI
+        set({ isInitialized: true, isLoading: !get().isAuthenticated });
+
         try {
           const res = await apiClient.get("/auth/me");
           if (res.success && res.data) {
             const userObj = res.data.user || res.data;
             set({ user: userObj, isAuthenticated: true, isInitialized: true, isLoading: false });
           } else {
-            // Try refresh token once
+            // Try refresh token if access token failed
             const storedRefresh = getStoredRefreshToken();
+            if (!storedRefresh) {
+              setStoredToken(null);
+              setStoredRefreshToken(null);
+              set({ user: null, isAuthenticated: false, isInitialized: true, isLoading: false });
+              return;
+            }
             const refreshRes = await apiClient.post("/auth/refresh", { refreshToken: storedRefresh });
             if (refreshRes.success && refreshRes.data) {
               if (refreshRes.data.accessToken) setStoredToken(refreshRes.data.accessToken);
@@ -108,6 +125,11 @@ export const useAuthStore = create(
       name: "my-finance-auth-storage",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.isInitialized = true;
+        }
+      },
     }
   )
 );

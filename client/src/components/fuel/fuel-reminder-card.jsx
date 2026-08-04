@@ -6,12 +6,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Gauge, AlertTriangle, Fuel, Settings2, Sparkles, ShieldCheck } from "lucide-react";
 import { DEFAULT_PREFERENCES } from "@/constants/preferences";
+import { FuelReminderCardSkeleton } from "@/components/skeletons";
 
 export function FuelReminderCard({
   expenses = [],
   preferences = DEFAULT_PREFERENCES,
+  isLoading = false,
   onOpenPreferences,
 }) {
+  if (isLoading) {
+    return <FuelReminderCardSkeleton />;
+  }
+
   // Find latest unlocked FULL TANK refill entry
   const latestRefill = expenses.find((item) => !item.isLocked && item.isFullTank);
 

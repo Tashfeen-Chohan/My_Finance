@@ -19,7 +19,7 @@ export function AppLayout({ children }) {
   const isPublicPage = isLoginPage;
 
   useEffect(() => {
-    // Check user session on app load
+    // Verify session asynchronously in background on mount
     checkAuthSession();
   }, [checkAuthSession]);
 
@@ -33,7 +33,7 @@ export function AppLayout({ children }) {
     }
   }, [isInitialized, isAuthenticated, isLoginPage, isPublicPage, router]);
 
-  // If on login or public test page, render standalone view with ambient background
+  // If on login or public page, render standalone view with ambient background
   if (isPublicPage) {
     return (
       <div className="bg-background relative min-h-screen">
@@ -43,8 +43,8 @@ export function AppLayout({ children }) {
     );
   }
 
-  // Show authentication check loader while session is initializing
-  if (!isInitialized || (isLoading && !isAuthenticated)) {
+  // Show fullscreen authentication loader ONLY if uninitialized AND not authenticated
+  if (!isInitialized && !isAuthenticated) {
     return (
       <div className="bg-background relative flex min-h-screen items-center justify-center overflow-hidden p-4">
         <AmbientBackground />
@@ -88,7 +88,7 @@ export function AppLayout({ children }) {
     );
   }
 
-  // If unauthenticated on private route, return empty while router redirects to /login
+  // If unauthenticated on private route, return null while router redirects to /login
   if (!isAuthenticated) {
     return null;
   }
@@ -97,9 +97,9 @@ export function AppLayout({ children }) {
   return (
     <div className="bg-background relative flex min-h-screen">
       <AmbientBackground />
-      <Sidebar />
+        <Sidebar />
       <div className="relative z-10 flex min-w-0 flex-1 flex-col">
-        <Header />
+          <Header />
         <main className="flex-1 overflow-y-auto p-4 pb-20 md:p-6 md:pb-6">{children}</main>
       </div>
       <MobileNav />

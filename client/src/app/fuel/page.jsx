@@ -140,6 +140,7 @@ export default function FuelPage() {
       <FuelReminderCard
         expenses={fuelExpenses}
         preferences={preferences}
+        isLoading={isLoading}
         onOpenPreferences={() => setIsPrefDialogOpen(true)}
       />
 

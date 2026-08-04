@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useDashboardSummary } from "@/hooks/use-dashboard-query";
 import { DashboardKpiCards } from "@/components/dashboard/dashboard-kpi-cards";
 import { QuickActionsBar } from "@/components/dashboard/quick-actions-bar";
