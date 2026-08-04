@@ -8,14 +8,18 @@ import {
   useUpdateFuelExpense,
   useDeleteFuelExpense,
 } from "@/hooks/use-fuel-query";
+import { usePreferences, useUpdatePreferences } from "@/hooks/use-preferences-query";
+import { DEFAULT_PREFERENCES } from "@/constants/preferences";
 import { FuelHeader } from "@/components/fuel/fuel-header";
 import { FuelStatCards } from "@/components/fuel/fuel-stat-cards";
+import { FuelReminderCard } from "@/components/fuel/fuel-reminder-card";
 import { FuelMonthlyChart } from "@/components/fuel/fuel-monthly-chart";
 import { FuelFilters } from "@/components/fuel/fuel-filters";
 import { FuelLogsList } from "@/components/fuel/fuel-logs-list";
 import { FuelDialog } from "@/components/fuel/fuel-dialog";
 import { ViewFuelDialog } from "@/components/fuel/view-fuel-dialog";
 import { DeleteFuelDialog } from "@/components/fuel/delete-fuel-dialog";
+import { PreferencesDialog } from "@/components/fuel/preferences-dialog";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function FuelPage() {
@@ -24,6 +28,8 @@ export default function FuelPage() {
 
   const { data: vehicles = [], isLoading: isVehiclesLoading } = useVehicles();
   const { data: fuelExpenses = [], isLoading: isExpensesLoading } = useFuelExpenses(null);
+  const { data: preferences = DEFAULT_PREFERENCES } = usePreferences();
+  const updatePreferencesMutation = useUpdatePreferences();
 
   const isLoading = isExpensesLoading || isVehiclesLoading;
 
@@ -41,6 +47,8 @@ export default function FuelPage() {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
+
+  const [isPrefDialogOpen, setIsPrefDialogOpen] = useState(false);
 
   const handleOpenViewModal = (expense) => {
     setExpenseToView(expense);
@@ -60,6 +68,10 @@ export default function FuelPage() {
   const handleOpenDeleteModal = (expense) => {
     setExpenseToDelete(expense);
     setIsDeleteDialogOpen(true);
+  };
+
+  const handleSavePreferences = async (newPrefs) => {
+    await updatePreferencesMutation.mutateAsync(newPrefs);
   };
 
   const handleSubmitExpense = async (formData) => {
@@ -124,6 +136,13 @@ export default function FuelPage() {
       {/* KPI Stat Cards */}
       <FuelStatCards fuelExpenses={filteredExpenses} isLoading={isLoading} />
 
+      {/* Real Fuel Range & Reserve Reminder Card */}
+      <FuelReminderCard
+        expenses={fuelExpenses}
+        preferences={preferences}
+        onOpenPreferences={() => setIsPrefDialogOpen(true)}
+      />
+
       {/* Monthly Expenditure Chart */}
       <FuelMonthlyChart fuelExpenses={filteredExpenses} isLoading={isLoading} />
 
@@ -147,6 +166,14 @@ export default function FuelPage() {
       />
 
       {/* Modals */}
+      <PreferencesDialog
+        open={isPrefDialogOpen}
+        onOpenChange={setIsPrefDialogOpen}
+        preferences={preferences}
+        onSave={handleSavePreferences}
+        isLoading={updatePreferencesMutation.isPending}
+      />
+
       <ViewFuelDialog
         open={isViewDialogOpen}
         onOpenChange={setIsViewDialogOpen}

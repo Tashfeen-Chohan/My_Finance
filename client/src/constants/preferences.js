@@ -1,0 +1,7 @@
+export const DEFAULT_FULL_TANK_DISTANCE = 400;
+export const DEFAULT_RESERVE_DISTANCE = 90;
+
+export const DEFAULT_PREFERENCES = {
+  fullTankDistance: DEFAULT_FULL_TANK_DISTANCE,
+  reserveDistance: DEFAULT_RESERVE_DISTANCE,
+};
