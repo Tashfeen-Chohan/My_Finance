@@ -117,7 +117,7 @@ export function FuelReminderCard({
           </div>
 
           {/* Visual Range Bar */}
-          <div className="relative h-3 w-full rounded-full bg-slate-800/40 overflow-hidden flex border border-border/30">
+          <div className="relative h-1.5 w-full rounded-full bg-slate-800/40 overflow-hidden flex border border-border/30">
             <div
               style={{ width: `${reservePercent}%` }}
               className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400"

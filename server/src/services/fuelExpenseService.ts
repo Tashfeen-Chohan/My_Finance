@@ -144,9 +144,9 @@ export const deleteFuelExpense = async (id: string, userId: string): Promise<voi
 
   if (previousRefill) {
     await fuelExpenseRepository.update(previousRefill._id.toString(), {
-      distanceTraveled: undefined,
-      computedEconomy: undefined,
-      costPerKM: undefined,
+      distanceTraveled: null,
+      computedEconomy: null,
+      costPerKM: null,
       isLocked: false,
       updatedBy: userId,
     });

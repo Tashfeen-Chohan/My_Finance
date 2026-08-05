@@ -2,6 +2,7 @@ import { OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
 import { findOrCreateUser, updateUserRefreshToken, UserDTO } from "./userService";
 import { UnauthorizedError } from "../errors/ApiError";
+import { logger } from "../utils/logger";
 
 const getGoogleClient = () => new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const getJwtSecret = () => process.env.JWT_SECRET || "dev-jwt-access-secret";
@@ -96,7 +97,11 @@ export const refreshSession = async (existingRefreshToken: string): Promise<{ us
   try {
     decoded = jwt.verify(existingRefreshToken, getJwtRefreshSecret()) as UserDTO;
   } catch (error) {
-    console.log("Invalid or expired refresh token: ", error);
+    if ((error as Error)?.name === "TokenExpiredError") {
+      logger.warn("[Auth] Refresh token expired");
+    } else {
+      logger.warn(`[Auth] Invalid refresh token: ${(error as Error)?.message || error}`);
+    }
     throw UnauthorizedError("Invalid or expired refresh token");
   }
 

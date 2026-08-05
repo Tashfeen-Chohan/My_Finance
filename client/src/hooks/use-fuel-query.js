@@ -91,6 +91,7 @@ export function useDeleteFuelExpense() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: FUEL_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: VEHICLES_QUERY_KEY });
     },
   });
 }

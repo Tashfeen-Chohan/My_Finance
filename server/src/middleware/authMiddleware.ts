@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { logger } from "../utils/logger";
 
 export interface AuthenticatedUser {
   id: string;
@@ -55,7 +56,12 @@ export const authenticateJwt = (req: AuthRequest, res: Response, next: NextFunct
       throw primaryErr;
     }
   } catch (error) {
-    console.log("Invalid or expired access token: ", error);
+    if ((error as Error)?.name === "TokenExpiredError") {
+      logger.warn(`[Auth] Access token expired for request ${req.method} ${req.originalUrl}`);
+    } else {
+      logger.warn(`[Auth] Invalid access token for request ${req.method} ${req.originalUrl}: ${(error as Error)?.message || error}`);
+    }
     res.status(401).json({ success: false, error: "Invalid or expired access token" });
   }
 };
+
