@@ -1,22 +1,28 @@
 "use client";
 
-import { useDashboardSummary } from "@/hooks/use-dashboard-query";
+import {
+  useDashboardStats,
+  useDashboardRecentActivity,
+  useDashboardUpcomingReminders,
+} from "@/hooks/use-dashboard-query";
 import { DashboardKpiCards } from "@/components/dashboard/dashboard-kpi-cards";
 import { QuickActionsBar } from "@/components/dashboard/quick-actions-bar";
 import { DashboardCharts } from "@/components/dashboard/dashboard-charts";
 import { RecentActivityCard } from "@/components/dashboard/recent-activity-card";
 import { MaintenanceRemindersCard } from "@/components/maintenance/maintenance-reminders-card";
-import { useVehicles } from "@/hooks/use-vehicles-query";
-import { LayoutDashboard, Loader2 } from "lucide-react";
+import { useVehicles, useDefaultVehicle } from "@/hooks/use-vehicles-query";
+import { LayoutDashboard } from "lucide-react";
 
 export default function DashboardPage() {
-  const { data: dashboardData, isLoading } = useDashboardSummary();
+  const { defaultVehicleId } = useDefaultVehicle();
+
+  const { data: statsData, isLoading: isStatsLoading } = useDashboardStats(defaultVehicleId);
+  const { data: recentActivity = [], isLoading: isActivityLoading } = useDashboardRecentActivity(defaultVehicleId);
+  const { data: upcomingServices = [], isLoading: isRemindersLoading } = useDashboardUpcomingReminders(defaultVehicleId);
   const { data: vehicles = [] } = useVehicles();
 
-  const expenses = dashboardData?.expenses || {};
-  const vehiclesCount = dashboardData?.vehicles || {};
-  const upcomingServices = dashboardData?.upcomingServices || [];
-  const recentActivity = dashboardData?.recentActivity || [];
+  const expenses = statsData?.expenses || {};
+  const vehiclesCount = statsData?.vehicles || {};
 
   return (
     <div className="mx-auto max-w-7xl space-y-8 pb-12">
@@ -37,26 +43,17 @@ export default function DashboardPage() {
         <QuickActionsBar />
       </div>
 
-      {isLoading ? (
-        <div className="flex flex-col items-center justify-center p-16 space-y-3">
-          <Loader2 className="h-9 w-9 animate-spin text-primary" />
-          <p className="text-sm font-medium text-muted-foreground">Loading dashboard overview...</p>
-        </div>
-      ) : (
-        <>
-          {/* Summary KPI Cards */}
-          <DashboardKpiCards expenses={expenses} vehicles={vehiclesCount} />
+      {/* Summary KPI Cards */}
+      <DashboardKpiCards expenses={expenses} vehicles={vehiclesCount} isLoading={isStatsLoading} />
 
-          {/* Charts & Distribution */}
-          <DashboardCharts expenses={expenses} />
+      {/* Expense Distribution Charts (Uses expenses from Stats query) */}
+      <DashboardCharts expenses={expenses} isLoading={isStatsLoading} />
 
-          {/* Grid Layout for Reminders & Recent Activity */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <MaintenanceRemindersCard upcomingServices={upcomingServices} vehicles={vehicles} />
-            <RecentActivityCard activityList={recentActivity} />
-          </div>
-        </>
-      )}
+      {/* Grid Layout for Reminders & Recent Activity */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <MaintenanceRemindersCard upcomingServices={upcomingServices} vehicles={vehicles} isLoading={isRemindersLoading} />
+        <RecentActivityCard activityList={recentActivity} isLoading={isActivityLoading} />
+      </div>
     </div>
   );
 }

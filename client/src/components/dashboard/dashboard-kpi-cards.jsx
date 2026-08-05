@@ -1,9 +1,10 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { StatValueSkeleton } from "@/components/skeletons";
 import { DollarSign, Fuel, Wrench, Car } from "lucide-react";
 
-export function DashboardKpiCards({ expenses = {}, vehicles = {} }) {
+export function DashboardKpiCards({ expenses = {}, vehicles = {}, isLoading = false }) {
   const grandTotal = expenses.grandTotalSpend || 0;
   const fuelSpend = expenses.totalFuelSpend || 0;
   const maintenanceSpend = expenses.totalMaintenanceSpend || 0;
@@ -19,9 +20,13 @@ export function DashboardKpiCards({ expenses = {}, vehicles = {} }) {
           </div>
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Grand Total Spend</p>
-            <h3 className="text-2xl font-extrabold text-foreground">
-              PKR {grandTotal.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-            </h3>
+            {isLoading ? (
+              <StatValueSkeleton className="w-28" />
+            ) : (
+              <h3 className="text-2xl font-extrabold text-foreground">
+                PKR {grandTotal.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+              </h3>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -34,9 +39,13 @@ export function DashboardKpiCards({ expenses = {}, vehicles = {} }) {
           </div>
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Fuel Spend</p>
-            <h3 className="text-2xl font-bold text-foreground">
-              PKR {fuelSpend.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-            </h3>
+            {isLoading ? (
+              <StatValueSkeleton className="w-24" />
+            ) : (
+              <h3 className="text-2xl font-bold text-foreground">
+                PKR {fuelSpend.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+              </h3>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -49,9 +58,13 @@ export function DashboardKpiCards({ expenses = {}, vehicles = {} }) {
           </div>
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Maintenance Spend</p>
-            <h3 className="text-2xl font-bold text-foreground">
-              PKR {maintenanceSpend.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-            </h3>
+            {isLoading ? (
+              <StatValueSkeleton className="w-24" />
+            ) : (
+              <h3 className="text-2xl font-bold text-foreground">
+                PKR {maintenanceSpend.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+              </h3>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -64,7 +77,11 @@ export function DashboardKpiCards({ expenses = {}, vehicles = {} }) {
           </div>
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Registered Garage</p>
-            <h3 className="text-2xl font-bold text-foreground">{totalVehicles} Vehicles</h3>
+            {isLoading ? (
+              <StatValueSkeleton className="w-20" />
+            ) : (
+              <h3 className="text-2xl font-bold text-foreground">{totalVehicles} Vehicles</h3>
+            )}
           </div>
         </CardContent>
       </Card>

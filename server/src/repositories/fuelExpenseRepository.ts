@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { createBaseRepository } from "./baseRepository";
 import { FuelExpense, IFuelExpense } from "../models/FuelExpense";
 
@@ -25,8 +26,13 @@ export const fuelExpenseRepository = {
     return await FuelExpense.findOne(filter).sort({ odometer: -1 });
   },
 
-  aggregateTotalFuelCost: async (userId: string, startDate?: Date, endDate?: Date): Promise<{ totalCost: number; totalVolume: number }> => {
-    const match: Record<string, unknown> = { userId, isDeleted: false };
+  aggregateTotalFuelCost: async (userId: string, vehicleId: string, startDate?: Date, endDate?: Date): Promise<{ totalCost: number; totalVolume: number }> => {
+    const match: Record<string, unknown> = {
+      userId: new mongoose.Types.ObjectId(userId),
+      vehicleId: new mongoose.Types.ObjectId(vehicleId),
+      isDeleted: false,
+    };
+
     if (startDate || endDate) {
       match.date = {};
       if (startDate) (match.date as Record<string, unknown>).$gte = startDate;

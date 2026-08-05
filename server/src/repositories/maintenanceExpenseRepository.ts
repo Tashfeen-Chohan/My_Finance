@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { createBaseRepository } from "./baseRepository";
 import { MaintenanceExpense, IMaintenanceExpense } from "../models/MaintenanceExpense";
 
@@ -14,8 +15,8 @@ export const maintenanceExpenseRepository = {
     return await MaintenanceExpense.find({ vehicleId, userId, isDeleted: false }).sort({ date: -1 });
   },
 
-  getUpcomingServices: async (userId: string): Promise<IMaintenanceExpense[]> => {
-    return await MaintenanceExpense.find({
+  getUpcomingServices: async (userId: string, vehicleId?: string): Promise<IMaintenanceExpense[]> => {
+    const query: Record<string, unknown> = {
       userId,
       isDeleted: false,
       $or: [
@@ -26,11 +27,20 @@ export const maintenanceExpenseRepository = {
         { nextOilChangeOdometerMin: { $exists: true, $ne: null, $gt: 0 } },
         { nextOilChangeOdometerMax: { $exists: true, $ne: null, $gt: 0 } },
       ],
-    }).sort({ date: -1 });
+    };
+    if (vehicleId) {
+      query.vehicleId = vehicleId;
+    }
+    return await MaintenanceExpense.find(query).sort({ date: -1 });
   },
 
-  aggregateTotalMaintenanceCost: async (userId: string, startDate?: Date, endDate?: Date): Promise<{ totalCost: number; count: number }> => {
-    const match: Record<string, unknown> = { userId, isDeleted: false };
+  aggregateTotalMaintenanceCost: async (userId: string, vehicleId: string, startDate?: Date, endDate?: Date): Promise<{ totalCost: number; count: number }> => {
+    const match: Record<string, unknown> = {
+      userId: new mongoose.Types.ObjectId(userId),
+      vehicleId: new mongoose.Types.ObjectId(vehicleId),
+      isDeleted: false,
+    };
+
     if (startDate || endDate) {
       match.date = {};
       if (startDate) (match.date as Record<string, unknown>).$gte = startDate;
