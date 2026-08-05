@@ -2,24 +2,10 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CardItemSkeleton, StatValueSkeleton } from "./common-skeletons";
+import { CardItemSkeleton, KpiCardsSkeleton } from "./common-skeletons";
 
 export function FuelStatCardsSkeleton({ count = 4 }) {
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {Array.from({ length: count }).map((_, i) => (
-        <Card key={i} className="border-border/50 bg-card/50 backdrop-blur-xl">
-          <CardContent className="p-5 flex items-center gap-4">
-            <Skeleton className="h-12 w-12 rounded-xl shrink-0" />
-            <div className="space-y-2 flex-1">
-              <Skeleton className="h-3 w-24 rounded" />
-              <StatValueSkeleton className="w-28" />
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
+  return <KpiCardsSkeleton count={count} />;
 }
 
 export function FuelReminderCardSkeleton() {

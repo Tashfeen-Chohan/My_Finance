@@ -1,6 +1,7 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 export function StatValueSkeleton({ className }) {
@@ -9,6 +10,30 @@ export function StatValueSkeleton({ className }) {
 
 export function BadgeSkeleton({ className }) {
   return <Skeleton className={cn("h-5 w-16 rounded-full", className)} />;
+}
+
+export function KpiCardSkeleton({ className }) {
+  return (
+    <Card className={cn("border-border/50 bg-card/50 backdrop-blur-xl", className)}>
+      <CardContent className="p-5 flex items-center gap-4">
+        <Skeleton className="h-12 w-12 shrink-0 rounded-xl" />
+        <div className="space-y-2 flex-1 min-w-0">
+          <Skeleton className="h-3.5 w-24 rounded" />
+          <Skeleton className="h-7 w-32 rounded-md" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function KpiCardsSkeleton({ count = 4, className }) {
+  return (
+    <div className={cn("grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4", className)}>
+      {Array.from({ length: count }).map((_, i) => (
+        <KpiCardSkeleton key={i} />
+      ))}
+    </div>
+  );
 }
 
 export function CardItemSkeleton({ className }) {

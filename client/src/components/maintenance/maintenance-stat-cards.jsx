@@ -1,10 +1,14 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { StatValueSkeleton } from "@/components/skeletons";
+import { MaintenanceStatCardsSkeleton } from "@/components/skeletons";
 import { Wrench, Droplet, DollarSign, CalendarCheck } from "lucide-react";
 
 export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = [], isLoading = false }) {
+  if (isLoading) {
+    return <MaintenanceStatCardsSkeleton count={4} />;
+  }
+
   // 1. Total Cost
   const totalCost = maintenanceLogs.reduce((acc, item) => acc + (Number(item.cost ?? item.totalCost) || 0), 0);
 
@@ -42,13 +46,9 @@ export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = 
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Expense</p>
-            {isLoading ? (
-              <StatValueSkeleton className="w-32" />
-            ) : (
-              <h3 className="text-2xl font-bold text-foreground truncate">
-                PKR {totalCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-              </h3>
-            )}
+            <h3 className="text-2xl font-bold text-foreground truncate">
+              PKR {totalCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+            </h3>
           </div>
         </CardContent>
       </Card>
@@ -61,11 +61,7 @@ export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = 
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Oil Changes</p>
-            {isLoading ? (
-              <StatValueSkeleton className="w-32" />
-            ) : (
-              <h3 className="text-2xl font-bold text-foreground truncate">{oilChangesCount} Logs</h3>
-            )}
+            <h3 className="text-2xl font-bold text-foreground truncate">{oilChangesCount} Logs</h3>
           </div>
         </CardContent>
       </Card>
@@ -78,11 +74,7 @@ export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = 
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Services & Repairs</p>
-            {isLoading ? (
-              <StatValueSkeleton className="w-32" />
-            ) : (
-              <h3 className="text-2xl font-bold text-foreground truncate">{servicesCount} Jobs</h3>
-            )}
+            <h3 className="text-2xl font-bold text-foreground truncate">{servicesCount} Jobs</h3>
           </div>
         </CardContent>
       </Card>
@@ -95,11 +87,7 @@ export function MaintenanceStatCards({ maintenanceLogs = [], upcomingServices = 
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Service Reminders</p>
-            {isLoading ? (
-              <StatValueSkeleton className="w-32" />
-            ) : (
-              <h3 className="text-2xl font-bold text-foreground truncate">{upcomingCount} Active</h3>
-            )}
+            <h3 className="text-2xl font-bold text-foreground truncate">{upcomingCount} Active</h3>
           </div>
         </CardContent>
       </Card>

@@ -3,9 +3,13 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Fuel, DollarSign, Gauge, TrendingUp } from "lucide-react";
-import { StatValueSkeleton } from "@/components/skeletons";
+import { FuelStatCardsSkeleton } from "@/components/skeletons";
 
 export function FuelStatCards({ fuelExpenses = [], isLoading = false }) {
+  if (isLoading) {
+    return <FuelStatCardsSkeleton count={4} />;
+  }
+
   // Compute analytics metrics
   const totalCost = fuelExpenses.reduce((acc, curr) => acc + (Number(curr.totalCost) || 0), 0);
   const totalVolume = fuelExpenses.reduce((acc, curr) => acc + (Number(curr.quantity) || 0), 0);
@@ -41,13 +45,9 @@ export function FuelStatCards({ fuelExpenses = [], isLoading = false }) {
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Fuel Cost</p>
-            {isLoading ? (
-              <StatValueSkeleton className="w-32" />
-            ) : (
-              <h3 className="text-2xl font-bold text-foreground truncate">
-                PKR {totalCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
-              </h3>
-            )}
+            <h3 className="text-2xl font-bold text-foreground truncate">
+              PKR {totalCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+            </h3>
           </div>
         </CardContent>
       </Card>
@@ -60,11 +60,7 @@ export function FuelStatCards({ fuelExpenses = [], isLoading = false }) {
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Volume</p>
-            {isLoading ? (
-              <StatValueSkeleton className="w-32" />
-            ) : (
-              <h3 className="text-2xl font-bold text-foreground truncate">{totalVolume.toFixed(1)} L</h3>
-            )}
+            <h3 className="text-2xl font-bold text-foreground truncate">{totalVolume.toFixed(1)} L</h3>
           </div>
         </CardContent>
       </Card>
@@ -77,13 +73,9 @@ export function FuelStatCards({ fuelExpenses = [], isLoading = false }) {
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Average Mileage</p>
-            {isLoading ? (
-              <StatValueSkeleton className="w-32" />
-            ) : (
-              <h3 className="text-2xl font-bold text-foreground truncate">
-                {avgEconomy > 0 ? `${avgEconomy} km/L` : "N/A"}
-              </h3>
-            )}
+            <h3 className="text-2xl font-bold text-foreground truncate">
+              {avgEconomy > 0 ? `${avgEconomy} km/L` : "N/A"}
+            </h3>
           </div>
         </CardContent>
       </Card>
@@ -96,13 +88,9 @@ export function FuelStatCards({ fuelExpenses = [], isLoading = false }) {
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Cost per Kilometer</p>
-            {isLoading ? (
-              <StatValueSkeleton className="w-32" />
-            ) : (
-              <h3 className="text-2xl font-bold text-foreground truncate">
-                {costPerKm > 0 ? `PKR ${costPerKm}/km` : "N/A"}
-              </h3>
-            )}
+            <h3 className="text-2xl font-bold text-foreground truncate">
+              {costPerKm > 0 ? `PKR ${costPerKm}/km` : "N/A"}
+            </h3>
           </div>
         </CardContent>
       </Card>
