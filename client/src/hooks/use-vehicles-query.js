@@ -1,9 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/services/api-client";
+import { useVehicleStore } from "@/stores/use-vehicle-store";
 
 export const VEHICLES_QUERY_KEY = ["vehicles"];
+export const DEFAULT_VEHICLE_QUERY_KEY = ["default-vehicle"];
 
 export function useVehicles() {
+  const setDefaultVehicle = useVehicleStore((state) => state.setDefaultVehicle);
+
   return useQuery({
     queryKey: VEHICLES_QUERY_KEY,
     queryFn: async () => {
@@ -11,14 +15,41 @@ export function useVehicles() {
       if (!res.success) {
         throw new Error(res.error || "Failed to fetch vehicles");
       }
-      return res.data?.data || [];
+      const vehiclesList = res.data?.data || [];
+      const defaultV = vehiclesList.find((v) => v.isDefault) || vehiclesList[0] || null;
+      if (defaultV) {
+        setDefaultVehicle(defaultV);
+      }
+      return vehiclesList;
     },
     staleTime: 5 * 60 * 1000,
   });
 }
 
+export function useDefaultVehicle() {
+  const defaultVehicle = useVehicleStore((state) => state.defaultVehicle);
+  const defaultVehicleId = useVehicleStore((state) => state.defaultVehicleId);
+  const fetchDefaultVehicle = useVehicleStore((state) => state.fetchDefaultVehicle);
+
+  const query = useQuery({
+    queryKey: DEFAULT_VEHICLE_QUERY_KEY,
+    queryFn: async () => {
+      return await fetchDefaultVehicle();
+    },
+    initialData: defaultVehicle,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  return {
+    ...query,
+    defaultVehicle: query.data || defaultVehicle,
+    defaultVehicleId: (query.data?.id || query.data?._id) || defaultVehicleId,
+  };
+}
+
 export function useAddVehicle() {
   const queryClient = useQueryClient();
+  const setDefaultVehicle = useVehicleStore((state) => state.setDefaultVehicle);
 
   return useMutation({
     mutationFn: async (data) => {
@@ -35,14 +66,20 @@ export function useAddVehicle() {
       }
       return res.data?.data;
     },
-    onSuccess: () => {
+    onSuccess: (newVehicle) => {
+      if (newVehicle?.isDefault || !useVehicleStore.getState().defaultVehicle) {
+        setDefaultVehicle(newVehicle);
+      }
       queryClient.invalidateQueries({ queryKey: VEHICLES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: DEFAULT_VEHICLE_QUERY_KEY });
     },
   });
 }
 
 export function useUpdateVehicle() {
   const queryClient = useQueryClient();
+  const setDefaultVehicle = useVehicleStore((state) => state.setDefaultVehicle);
+  const defaultVehicleId = useVehicleStore((state) => state.defaultVehicleId);
 
   return useMutation({
     mutationFn: async ({ id, data }) => {
@@ -58,14 +95,20 @@ export function useUpdateVehicle() {
       }
       return res.data?.data;
     },
-    onSuccess: () => {
+    onSuccess: (updatedVehicle) => {
+      const updatedId = updatedVehicle?.id || updatedVehicle?._id;
+      if (updatedVehicle?.isDefault || updatedId === defaultVehicleId) {
+        setDefaultVehicle(updatedVehicle);
+      }
       queryClient.invalidateQueries({ queryKey: VEHICLES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: DEFAULT_VEHICLE_QUERY_KEY });
     },
   });
 }
 
 export function useSetDefaultVehicle() {
   const queryClient = useQueryClient();
+  const setDefaultVehicle = useVehicleStore((state) => state.setDefaultVehicle);
 
   return useMutation({
     mutationFn: async (id) => {
@@ -75,8 +118,12 @@ export function useSetDefaultVehicle() {
       }
       return res.data?.data;
     },
-    onSuccess: () => {
+    onSuccess: (updatedVehicle) => {
+      if (updatedVehicle) {
+        setDefaultVehicle(updatedVehicle);
+      }
       queryClient.invalidateQueries({ queryKey: VEHICLES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: DEFAULT_VEHICLE_QUERY_KEY });
     },
   });
 }
@@ -92,8 +139,15 @@ export function useDeleteVehicle() {
       }
       return res.data?.data;
     },
-    onSuccess: () => {
+    onSuccess: (_, deletedId) => {
+      const currentDefaultId = useVehicleStore.getState().defaultVehicleId;
+      if (deletedId === currentDefaultId) {
+        useVehicleStore.getState().setDefaultVehicle(null);
+        useVehicleStore.getState().fetchDefaultVehicle();
+      }
       queryClient.invalidateQueries({ queryKey: VEHICLES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: DEFAULT_VEHICLE_QUERY_KEY });
     },
   });
 }
+

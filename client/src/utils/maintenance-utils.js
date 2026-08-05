@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { useVehicleStore } from "@/stores/use-vehicle-store";
 
 export const maintenanceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -22,7 +23,8 @@ export const maintenanceSchema = z.object({
 });
 
 export function getInitialMaintenanceValues(maintenanceToEdit, vehicles = []) {
-  const defaultVehicleId = vehicles.find((v) => v.isDefault)?.id || vehicles[0]?.id || vehicles[0]?._id || "";
+  const cachedDefaultId = useVehicleStore.getState().defaultVehicleId || "";
+  const defaultVehicleId = vehicles.find((v) => v.isDefault)?.id || vehicles[0]?.id || vehicles[0]?._id || cachedDefaultId;
 
   if (maintenanceToEdit) {
     const vId = maintenanceToEdit.vehicleId?._id || maintenanceToEdit.vehicleId || defaultVehicleId;
@@ -61,3 +63,4 @@ export function getInitialMaintenanceValues(maintenanceToEdit, vehicles = []) {
     notes: "",
   };
 }
+

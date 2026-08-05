@@ -4,6 +4,7 @@ import {
   createVehicle as createVehicleService,
   getUserVehicles as getUserVehiclesService,
   getVehicleById as getVehicleByIdService,
+  getDefaultVehicle as getDefaultVehicleService,
   updateVehicle as updateVehicleService,
   setDefaultVehicle as setDefaultVehicleService,
   deleteVehicle as deleteVehicleService,
@@ -20,6 +21,12 @@ export const getVehicles = async (req: AuthRequest, res: Response): Promise<void
   if (!req.user) throw UnauthorizedError();
   const vehicles = await getUserVehiclesService(req.user.id);
   res.json({ success: true, data: vehicles });
+};
+
+export const getDefaultVehicle = async (req: AuthRequest, res: Response): Promise<void> => {
+  if (!req.user) throw UnauthorizedError();
+  const vehicle = await getDefaultVehicleService(req.user.id);
+  res.json({ success: true, data: vehicle });
 };
 
 export const getVehicleById = async (req: AuthRequest, res: Response): Promise<void> => {

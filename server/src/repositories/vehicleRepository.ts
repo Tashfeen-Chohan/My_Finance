@@ -46,4 +46,8 @@ export const vehicleRepository = {
     await Vehicle.updateMany({ userId }, { $set: { isDefault: false } });
     await Vehicle.updateOne({ _id: vehicleId, userId }, { $set: { isDefault: true } });
   },
+
+  findDefaultByUserId: async (userId: string): Promise<IVehicle | null> => {
+    return await Vehicle.findOne({ userId, isDefault: true, isDeleted: false });
+  },
 };

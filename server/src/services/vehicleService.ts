@@ -61,6 +61,18 @@ export const updateVehicle = async (vehicleId: string, userId: string, updateDat
   return updated;
 };
 
+export const getDefaultVehicle = async (userId: string): Promise<IVehicle | null> => {
+  let defaultVehicle = await vehicleRepository.findDefaultByUserId(userId);
+  if (!defaultVehicle) {
+    const userVehicles = await vehicleRepository.findByUserId(userId);
+    if (userVehicles.length > 0) {
+      await vehicleRepository.setDefaultVehicle(userVehicles[0]._id.toString(), userId);
+      defaultVehicle = await vehicleRepository.findById(userVehicles[0]._id.toString());
+    }
+  }
+  return defaultVehicle;
+};
+
 export const setDefaultVehicle = async (vehicleId: string, userId: string): Promise<IVehicle> => {
   await getVehicleById(vehicleId, userId);
   await vehicleRepository.setDefaultVehicle(vehicleId, userId);
@@ -76,7 +88,9 @@ export const VehicleService = {
   createVehicle,
   getUserVehicles,
   getVehicleById,
+  getDefaultVehicle,
   updateVehicle,
   setDefaultVehicle,
   deleteVehicle,
 };
+

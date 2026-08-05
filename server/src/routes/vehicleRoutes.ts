@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createVehicle,
   getVehicles,
+  getDefaultVehicle,
   getVehicleById,
   updateVehicle,
   setDefaultVehicle,
@@ -18,6 +19,7 @@ router.use(authenticateJwt);
 
 router.post("/", validateRequest(createVehicleSchema), asyncHandler(createVehicle));
 router.get("/", asyncHandler(getVehicles));
+router.get("/default", asyncHandler(getDefaultVehicle));
 router.get("/:id", validateRequest(vehicleIdParamSchema), asyncHandler(getVehicleById));
 router.put("/:id", validateRequest(updateVehicleSchema), asyncHandler(updateVehicle));
 router.patch("/:id/default", validateRequest(vehicleIdParamSchema), asyncHandler(setDefaultVehicle));

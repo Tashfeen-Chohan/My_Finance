@@ -1,8 +1,12 @@
+import { useVehicleStore } from "@/stores/use-vehicle-store";
+
 export function getInitialFuelFormData(expenseToEdit, vehicles = []) {
+  const cachedDefault = useVehicleStore.getState().defaultVehicle;
+
   if (expenseToEdit) {
     const d = expenseToEdit.date ? new Date(expenseToEdit.date) : new Date();
     return {
-      vehicleId: expenseToEdit.vehicleId || (vehicles[0]?.id || vehicles[0]?._id || ""),
+      vehicleId: expenseToEdit.vehicleId || (vehicles[0]?.id || vehicles[0]?._id || cachedDefault?.id || cachedDefault?._id || ""),
       date: d.toISOString().split("T")[0],
       odometer: expenseToEdit.odometer || 0,
       quantity: expenseToEdit.quantity || 0,
@@ -14,7 +18,7 @@ export function getInitialFuelFormData(expenseToEdit, vehicles = []) {
     };
   }
 
-  const defaultVehicle = vehicles.find((v) => v.isDefault) || vehicles[0];
+  const defaultVehicle = vehicles.find((v) => v.isDefault) || vehicles[0] || cachedDefault;
   return {
     vehicleId: defaultVehicle ? defaultVehicle.id || defaultVehicle._id : "",
     date: new Date().toISOString().split("T")[0],
@@ -27,3 +31,4 @@ export function getInitialFuelFormData(expenseToEdit, vehicles = []) {
     notes: "",
   };
 }
+
