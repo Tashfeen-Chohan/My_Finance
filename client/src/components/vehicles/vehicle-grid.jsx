@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
 import { VehicleCard } from "@/components/vehicles/vehicle-card";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, Plus } from "lucide-react";
+import { Sparkles, Plus } from "lucide-react";
+import { VehicleGridSkeleton } from "@/components/skeletons";
 
 export function VehicleGrid({
   vehicles = [],
@@ -16,12 +16,7 @@ export function VehicleGrid({
   onAddVehicle,
 }) {
   if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 space-y-3">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm font-medium text-muted-foreground">Loading vehicle garage data...</p>
-      </div>
-    );
+    return <VehicleGridSkeleton />;
   }
 
   if (vehicles.length > 0) {
