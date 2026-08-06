@@ -1,17 +1,10 @@
 import { OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
-import { findOrCreateUser, updateUserRefreshToken, UserDTO } from "./userService";
+import { findOrCreateUser, UserDTO } from "./userService";
 import { UnauthorizedError } from "../errors/ApiError";
-import { logger } from "../utils/logger";
 
 const getGoogleClient = () => new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const getJwtSecret = () => process.env.JWT_SECRET || "dev-jwt-access-secret";
-const getJwtRefreshSecret = () => process.env.JWT_REFRESH_SECRET || "dev-jwt-refresh-secret";
-
-export interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
-}
 
 export const verifyAndExtractGoogleUser = async (
   credential?: string,
@@ -66,75 +59,25 @@ export const verifyAndExtractGoogleUser = async (
   throw UnauthorizedError("Google credential is required for authentication");
 };
 
-export const generateTokens = (userPayload: UserDTO): AuthTokens => {
+export const generateToken = (userPayload: UserDTO): string => {
   const secret = getJwtSecret();
-  const refreshSecret = getJwtRefreshSecret();
-
-  const accessToken = jwt.sign(userPayload, secret, { expiresIn: "15m" });
-  const refreshToken = jwt.sign(userPayload, refreshSecret, { expiresIn: "7d" });
-  return { accessToken, refreshToken };
+  // Single JWT Token valid for 30 days
+  return jwt.sign(userPayload, secret, { expiresIn: "30d" });
 };
 
 export const authenticateGoogleUser = async (
   credential?: string,
   mockUser?: { googleId?: string; email?: string; name?: string; avatarUrl?: string }
-): Promise<{ user: UserDTO; tokens: AuthTokens }> => {
+): Promise<{ user: UserDTO; token: string }> => {
   const extractedUser = await verifyAndExtractGoogleUser(credential, mockUser);
   const user = await findOrCreateUser(extractedUser);
-  const tokens = generateTokens(user);
+  const token = generateToken(user);
 
-  await updateUserRefreshToken(user.id, tokens.refreshToken);
-
-  return { user, tokens };
-};
-
-export const refreshSession = async (existingRefreshToken: string): Promise<{ user: UserDTO; tokens: AuthTokens }> => {
-  if (!existingRefreshToken) {
-    throw UnauthorizedError("Refresh token missing");
-  }
-
-  let decoded: UserDTO;
-  try {
-    decoded = jwt.verify(existingRefreshToken, getJwtRefreshSecret()) as UserDTO;
-  } catch (error) {
-    if ((error as Error)?.name === "TokenExpiredError") {
-      logger.warn("[Auth] Refresh token expired");
-    } else {
-      logger.warn(`[Auth] Invalid refresh token: ${(error as Error)?.message || error}`);
-    }
-    throw UnauthorizedError("Invalid or expired refresh token");
-  }
-
-  const userPayload: UserDTO = {
-    id: decoded.id,
-    googleId: decoded.googleId,
-    email: decoded.email,
-    name: decoded.name,
-    avatarUrl: decoded.avatarUrl,
-  };
-
-  const tokens = generateTokens(userPayload);
-  await updateUserRefreshToken(userPayload.id, tokens.refreshToken);
-
-  return { user: userPayload, tokens };
-};
-
-export const revokeSession = async (refreshTokenValue?: string): Promise<void> => {
-  if (!refreshTokenValue) return;
-  try {
-    const decoded = jwt.decode(refreshTokenValue) as { id?: string } | null;
-    if (decoded?.id) {
-      await updateUserRefreshToken(decoded.id, undefined);
-    }
-  } catch {
-    // Ignore decoding errors during logout
-  }
+  return { user, token };
 };
 
 export const AuthService = {
   verifyAndExtractGoogleUser,
-  generateTokens,
+  generateToken,
   authenticateGoogleUser,
-  refreshSession,
-  revokeSession,
 };

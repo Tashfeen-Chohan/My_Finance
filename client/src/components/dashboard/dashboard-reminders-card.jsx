@@ -185,7 +185,7 @@ export function DashboardRemindersCard({ upcomingServices = [], isLoading = fals
                   <div className="rounded-xl border border-border/40 bg-background/80 backdrop-blur-md px-3 py-1.5 flex items-center justify-between sm:justify-end gap-2.5 shrink-0">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Gauge className="h-4 w-4 text-foreground/70 shrink-0" />
-                      <span className="font-medium">Target Range:</span>
+                      <span className="font-medium">Target:</span>
                     </div>
                     <span className="font-mono text-xs font-bold text-foreground bg-secondary/60 px-2.5 py-1 rounded-md border border-border/40">
                       {rem.displayRange}

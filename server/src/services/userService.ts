@@ -71,13 +71,8 @@ export const getUserById = async (userId: string): Promise<IUser> => {
   return user;
 };
 
-export const updateUserRefreshToken = async (userId: string, refreshToken?: string): Promise<void> => {
-  await userRepository.updateRefreshToken(userId, refreshToken);
-};
-
 export const UserService = {
   findOrCreateUser,
   getUserById,
-  updateUserRefreshToken,
   mapUserToDTO,
 };

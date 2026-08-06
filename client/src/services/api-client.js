@@ -1,49 +1,22 @@
 import { env } from "@/env";
 
-let isRefreshing = false;
-let refreshSubscribers = [];
-
-function onRefreshed(newToken) {
-  if (typeof window !== "undefined" && newToken) {
-    localStorage.setItem("my_finance_access_token", newToken);
-  }
-  refreshSubscribers.forEach((callback) => callback(newToken));
-  refreshSubscribers = [];
-}
-
-function addRefreshSubscriber(callback) {
-  refreshSubscribers.push(callback);
-}
+const TOKEN_KEY = "my_finance_access_token";
 
 export function getStoredToken() {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem("my_finance_access_token");
+  return localStorage.getItem(TOKEN_KEY);
 }
 
 export function setStoredToken(token) {
   if (typeof window === "undefined") return;
   if (token) {
-    localStorage.setItem("my_finance_access_token", token);
+    localStorage.setItem(TOKEN_KEY, token);
   } else {
-    localStorage.removeItem("my_finance_access_token");
+    localStorage.removeItem(TOKEN_KEY);
   }
 }
 
-export function getStoredRefreshToken() {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("my_finance_refresh_token");
-}
-
-export function setStoredRefreshToken(token) {
-  if (typeof window === "undefined") return;
-  if (token) {
-    localStorage.setItem("my_finance_refresh_token", token);
-  } else {
-    localStorage.removeItem("my_finance_refresh_token");
-  }
-}
-
-async function apiRequest(endpoint, options = {}, isRetry = false) {
+async function apiRequest(endpoint, options = {}) {
   const baseUrl = env.NEXT_PUBLIC_API_URL;
   const url = `${baseUrl}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
 
@@ -66,43 +39,12 @@ async function apiRequest(endpoint, options = {}, isRetry = false) {
 
     const data = await response.json().catch(() => ({}));
 
-    // If 401, attempt refresh ONCE (except on login/refresh endpoints)
-    if (
-      response.status === 401 &&
-      !isRetry &&
-      endpoint !== "/auth/refresh" &&
-      endpoint !== "/auth/google"
-    ) {
-      if (!isRefreshing) {
-        isRefreshing = true;
-        try {
-          const refreshTokenVal = getStoredRefreshToken();
-          const refreshRes = await apiPost("/auth/refresh", { refreshToken: refreshTokenVal });
-          isRefreshing = false;
-          if (refreshRes.success && refreshRes.data?.accessToken) {
-            const newToken = refreshRes.data.accessToken;
-            setStoredToken(newToken);
-            if (refreshRes.data.refreshToken) {
-              setStoredRefreshToken(refreshRes.data.refreshToken);
-            }
-            onRefreshed(newToken);
-            return apiRequest(endpoint, options, true);
-          } else {
-            setStoredToken(null);
-            setStoredRefreshToken(null);
-          }
-        } catch {
-          isRefreshing = false;
-          setStoredToken(null);
-          setStoredRefreshToken(null);
-        }
-      } else {
-        return new Promise((resolve) => {
-          addRefreshSubscriber(() => {
-            resolve(apiRequest(endpoint, options, true));
-          });
-        });
-      }
+    if (response.status === 401) {
+      setStoredToken(null);
+      return {
+        success: false,
+        error: data.error || data.message || "Unauthorized",
+      };
     }
 
     if (!response.ok) {
@@ -112,12 +54,9 @@ async function apiRequest(endpoint, options = {}, isRetry = false) {
       };
     }
 
-    // Automatically cache token if returned in response
-    if (data?.accessToken) {
-      setStoredToken(data.accessToken);
-    }
-    if (data?.refreshToken) {
-      setStoredRefreshToken(data.refreshToken);
+    // Automatically cache token if returned in login/auth response
+    if (data?.token || data?.accessToken) {
+      setStoredToken(data.token || data.accessToken);
     }
 
     return {
@@ -141,7 +80,7 @@ export function apiPost(endpoint, payload, options) {
   return apiRequest(endpoint, {
     ...options,
     method: "POST",
-    body: JSON.stringify(payload),
+    body: payload !== undefined ? JSON.stringify(payload) : undefined,
   });
 }
 
@@ -149,7 +88,7 @@ export function apiPut(endpoint, payload, options) {
   return apiRequest(endpoint, {
     ...options,
     method: "PUT",
-    body: JSON.stringify(payload),
+    body: payload !== undefined ? JSON.stringify(payload) : undefined,
   });
 }
 

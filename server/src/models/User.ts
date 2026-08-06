@@ -6,7 +6,6 @@ export interface IUser extends Document {
   email: string;
   name: string;
   avatarUrl?: string;
-  refreshToken?: string;
   preferences: {
     currency: string;
     distanceUnit: "km" | "miles";
@@ -50,10 +49,6 @@ const UserSchema: Schema = new Schema(
     avatarUrl: {
       type: String,
       trim: true,
-    },
-    refreshToken: {
-      type: String,
-      select: false, // Hidden by default for security
     },
     preferences: {
       currency: {
@@ -117,7 +112,6 @@ const UserSchema: Schema = new Schema(
         ret.id = ret._id;
         delete ret._id;
         delete ret.__v;
-        delete ret.refreshToken;
         return ret;
       },
     },

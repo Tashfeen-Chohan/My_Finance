@@ -21,8 +21,4 @@ export const userRepository = {
   findByEmail: async (email: string): Promise<IUser | null> => {
     return await User.findOne({ email: email.toLowerCase().trim() });
   },
-
-  updateRefreshToken: async (userId: string, refreshToken?: string): Promise<void> => {
-    await User.updateOne({ _id: userId }, { $set: { refreshToken } });
-  },
 };
