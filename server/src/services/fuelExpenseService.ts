@@ -37,12 +37,19 @@ export const createFuelExpense = async (userId: string, data: Partial<IFuelExpen
   // 3. Finalize and LOCK previous refill (Refill A)
   if (lastRefill) {
     const distanceTraveled = data.odometer! - lastRefill.odometer;
-    const computedEconomy = (lastRefill.isFullTank && data.isFullTank)
+    const isFullTankInterval = Boolean(lastRefill.isFullTank && data.isFullTank);
+
+    // Fuel Economy (km/L): distance traveled divided by fuel consumed (new refill quantity)
+    const computedEconomy = isFullTankInterval && data.quantity! > 0
       ? Number((distanceTraveled / data.quantity!).toFixed(2))
       : null;
-    const lastRefillCost = lastRefill.totalCost;
-    const costPerKM = distanceTraveled > 0
-      ? Number((lastRefillCost / distanceTraveled).toFixed(2))
+
+    // Cost/KM = (Refill A unit price * fuel consumed) / distance traveled
+    const previousUnitPrice = lastRefill.unitPrice;
+    const fuelConsumedCost = data.quantity! * previousUnitPrice;
+
+    const costPerKM = isFullTankInterval && distanceTraveled > 0 && fuelConsumedCost > 0
+      ? Number((fuelConsumedCost / distanceTraveled).toFixed(2))
       : null;
 
     await fuelExpenseRepository.update(lastRefill._id.toString(), {
@@ -104,12 +111,19 @@ export const updateFuelExpense = async (id: string, userId: string, updateData: 
   // Re-sync previous refill stats if odometer/quantity/isFullTank of current refill changed
   if (lastRefill && updated.odometer && lastRefill.odometer < updated.odometer) {
     const distanceTraveled = updated.odometer - lastRefill.odometer;
-    const computedEconomy = (lastRefill.isFullTank && updated.isFullTank)
+    const isFullTankInterval = Boolean(lastRefill.isFullTank && updated.isFullTank);
+
+    // Fuel Economy (km/L): distance traveled divided by fuel consumed (updated refill quantity)
+    const computedEconomy = isFullTankInterval && updated.quantity > 0
       ? Number((distanceTraveled / updated.quantity).toFixed(2))
       : null;
-    const lastRefillCost = lastRefill.totalCost;
-    const costPerKM = distanceTraveled > 0
-      ? Number((lastRefillCost / distanceTraveled).toFixed(2))
+
+    // Cost/KM = (Refill A unit price * fuel consumed) / distance traveled
+    const previousUnitPrice = lastRefill.unitPrice;
+    const fuelConsumedCost = updated.quantity * previousUnitPrice;
+
+    const costPerKM = isFullTankInterval && distanceTraveled > 0 && fuelConsumedCost > 0
+      ? Number((fuelConsumedCost / distanceTraveled).toFixed(2))
       : null;
 
     await fuelExpenseRepository.update(lastRefill._id.toString(), {
