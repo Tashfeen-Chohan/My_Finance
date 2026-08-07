@@ -3,7 +3,7 @@ import {
   getDashboardStats,
   getDashboardRecentActivity,
   getDashboardUpcomingReminders,
-  getDashboardSummary,
+  getDashboardMonthlyComparison,
 } from "../controllers/dashboardController";
 import { authenticateJwt } from "../middleware/authMiddleware";
 import { asyncHandler } from "../middleware/asyncHandler";
@@ -15,6 +15,6 @@ router.use(authenticateJwt);
 router.get("/stats", asyncHandler(getDashboardStats));
 router.get("/recent-activity", asyncHandler(getDashboardRecentActivity));
 router.get("/upcoming-reminders", asyncHandler(getDashboardUpcomingReminders));
-router.get("/summary", asyncHandler(getDashboardSummary));
+router.get("/monthly-comparison", asyncHandler(getDashboardMonthlyComparison));
 
 export default router;

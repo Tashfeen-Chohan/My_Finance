@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { FuelExpense } from "../models/FuelExpense";
 import { MaintenanceExpense } from "../models/MaintenanceExpense";
 import { vehicleRepository } from "../repositories/vehicleRepository";
@@ -116,24 +117,126 @@ export const getDashboardUpcomingReminders = async (userId: string, vehicleId: s
   };
 };
 
-export const getDashboardSummary = async (userId: string, vehicleId: string) => {
-  const [stats, recentActivity, upcomingServices] = await Promise.all([
-    getDashboardStats(userId, vehicleId),
-    getDashboardRecentActivity(userId, vehicleId),
-    getDashboardUpcomingReminders(userId, vehicleId),
+export interface MonthlyComparisonItem {
+  year: number;
+  month: number;
+  monthName: string;
+  label: string;
+  fuel: number;
+  maintenance: number;
+  total: number;
+}
+
+export const getDashboardMonthlyComparison = async (
+  userId: string,
+  vehicleId: string
+): Promise<MonthlyComparisonItem[]> => {
+  const now = new Date();
+  const count = 6;
+
+  const match: Record<string, unknown> = {
+    userId: new mongoose.Types.ObjectId(userId),
+    vehicleId: new mongoose.Types.ObjectId(vehicleId),
+    isDeleted: false,
+  };
+
+  const [fuelMonthly, maintenanceMonthly] = await Promise.all([
+    FuelExpense.aggregate([
+      { $match: match },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$date" },
+            month: { $month: "$date" },
+          },
+          totalFuel: { $sum: "$totalCost" },
+        },
+      },
+    ]),
+    MaintenanceExpense.aggregate([
+      { $match: match },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$date" },
+            month: { $month: "$date" },
+          },
+          totalMaintenance: { $sum: "$cost" },
+        },
+      },
+    ]),
   ]);
 
-  return {
-    vehicles: stats.vehicles,
-    expenses: stats.expenses,
-    upcomingServices,
-    recentActivity,
-  };
+  const monthMap = new Map<string, { year: number; month: number; fuel: number; maintenance: number }>();
+
+  fuelMonthly.forEach((f) => {
+    const key = `${f._id.year}-${String(f._id.month).padStart(2, "0")}`;
+    monthMap.set(key, {
+      year: f._id.year,
+      month: f._id.month,
+      fuel: Number(f.totalFuel.toFixed(2)),
+      maintenance: 0,
+    });
+  });
+
+  maintenanceMonthly.forEach((m) => {
+    const key = `${m._id.year}-${String(m._id.month).padStart(2, "0")}`;
+    const existing = monthMap.get(key) || {
+      year: m._id.year,
+      month: m._id.month,
+      fuel: 0,
+      maintenance: 0,
+    };
+    existing.maintenance = Number(m.totalMaintenance.toFixed(2));
+    monthMap.set(key, existing);
+  });
+
+  if (monthMap.size === 0) {
+    return [];
+  }
+
+  const sortedKeys = Array.from(monthMap.keys()).sort();
+  const earliestKey = sortedKeys[0];
+  const [earliestYear, earliestMonth] = earliestKey.split("-").map(Number);
+
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  const totalMonthsDiff = (currentYear - earliestYear) * 12 + (currentMonth - earliestMonth) + 1;
+  const numMonthsToShow = Math.min(totalMonthsDiff, count);
+
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const result: MonthlyComparisonItem[] = [];
+
+  for (let i = numMonthsToShow - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const year = d.getFullYear();
+    const monthNum = d.getMonth() + 1;
+    const key = `${year}-${String(monthNum).padStart(2, "0")}`;
+    const monthName = monthNames[d.getMonth()];
+    const label = `${monthName} '${year.toString().slice(-2)}`;
+
+    const dataItem = monthMap.get(key) || { fuel: 0, maintenance: 0 };
+    const fuel = dataItem.fuel || 0;
+    const maintenance = dataItem.maintenance || 0;
+
+    result.push({
+      year,
+      month: monthNum,
+      monthName,
+      label,
+      fuel,
+      maintenance,
+      total: Number((fuel + maintenance).toFixed(2)),
+    });
+  }
+
+  return result;
 };
 
 export const DashboardService = {
   getStats: getDashboardStats,
   getRecentActivity: getDashboardRecentActivity,
   getUpcomingReminders: getDashboardUpcomingReminders,
-  getSummary: getDashboardSummary,
+  getMonthlyComparison: getDashboardMonthlyComparison,
 };

@@ -4,7 +4,7 @@ import { apiClient } from "@/services/api-client";
 export const DASHBOARD_STATS_KEY = ["dashboard-stats"];
 export const DASHBOARD_RECENT_ACTIVITY_KEY = ["dashboard-recent-activity"];
 export const DASHBOARD_REMINDERS_KEY = ["dashboard-upcoming-reminders"];
-export const DASHBOARD_SUMMARY_KEY = ["dashboard-summary"];
+export const DASHBOARD_MONTHLY_KEY = ["dashboard-monthly-comparison"];
 
 export function useDashboardStats(vehicleId) {
   return useQuery({
@@ -51,17 +51,17 @@ export function useDashboardUpcomingReminders(vehicleId) {
   });
 }
 
-export function useDashboardSummary(vehicleId) {
+export function useDashboardMonthlyComparison(vehicleId) {
   return useQuery({
-    queryKey: [...DASHBOARD_SUMMARY_KEY, vehicleId],
+    queryKey: [...DASHBOARD_MONTHLY_KEY, vehicleId],
     queryFn: async () => {
-      const res = await apiClient.get(`/dashboard/summary?vehicleId=${vehicleId}`);
+      const res = await apiClient.get(`/dashboard/monthly-comparison?vehicleId=${vehicleId}`);
       if (!res.success) {
-        throw new Error(res.error || "Failed to fetch dashboard summary");
+        throw new Error(res.error || "Failed to fetch monthly comparison");
       }
-      return res.data?.data;
+      return res.data?.data || [];
     },
     enabled: Boolean(vehicleId),
-    staleTime: 2 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
   });
 }
