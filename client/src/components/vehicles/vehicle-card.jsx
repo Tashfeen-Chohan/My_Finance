@@ -37,6 +37,7 @@ export function VehicleCard({ vehicle, onEdit, onDelete, onSetDefault }) {
     <Card className="group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 border-border/40 bg-card/60 backdrop-blur-xl">
       {/* Top Banner Image with Gradient Overlay */}
       <div className="relative h-44 w-full overflow-hidden bg-slate-900">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photoUrl}
           alt={vehicle.name}

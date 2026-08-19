@@ -67,6 +67,7 @@ function MaintenanceForm({
     const formattedData = {
       ...data,
       cost: Number(data.cost),
+      receiptUrl: data.receiptUrl?.trim() || null,
       nextServiceOdometerMin: sMin,
       nextServiceOdometerMax: sMax,
       nextServiceOdometer: sMax ?? sMin ?? null,
@@ -188,6 +189,17 @@ function MaintenanceForm({
               className="bg-background/50 border-border/50"
             />
           </div>
+        </div>
+
+        {/* Receipt URL / Image Link */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold text-foreground">Receipt URL / Image Link</label>
+          <Input
+            placeholder="e.g. https://images.unsplash.com/... or receipt link"
+            {...register("receiptUrl")}
+            className="bg-background/50 border-border/50"
+          />
+          {errors.receiptUrl && <p className="text-xs text-destructive">{errors.receiptUrl.message}</p>}
         </div>
 
         {/* Reminder Targets Section */}

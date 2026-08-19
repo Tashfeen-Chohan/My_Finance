@@ -14,6 +14,7 @@ export const maintenanceSchema = z.object({
     z.coerce.number({ invalid_type_error: "Service cost is required" }).min(0, "Cost cannot be negative")
   ),
   serviceProvider: z.string().max(100).optional(),
+  receiptUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   date: z.string().min(1, "Date is required"),
   nextServiceOdometerMin: z.coerce.number().min(0).optional().or(z.literal("")),
   nextServiceOdometerMax: z.coerce.number().min(0).optional().or(z.literal("")),
@@ -39,6 +40,7 @@ export function getInitialMaintenanceValues(maintenanceToEdit, vehicles = []) {
       odometer: maintenanceToEdit.odometer ?? "",
       cost: maintenanceToEdit.cost ?? maintenanceToEdit.totalCost ?? "",
       serviceProvider: maintenanceToEdit.serviceProvider || "",
+      receiptUrl: maintenanceToEdit.receiptUrl || "",
       date: dateStr,
       nextServiceOdometerMin: maintenanceToEdit.nextServiceOdometerMin ?? maintenanceToEdit.nextServiceOdometer ?? "",
       nextServiceOdometerMax: maintenanceToEdit.nextServiceOdometerMax ?? maintenanceToEdit.nextServiceOdometer ?? "",
@@ -55,6 +57,7 @@ export function getInitialMaintenanceValues(maintenanceToEdit, vehicles = []) {
     odometer: "",
     cost: "",
     serviceProvider: "",
+    receiptUrl: "",
     date: new Date().toISOString().split("T")[0],
     nextServiceOdometerMin: "",
     nextServiceOdometerMax: "",
@@ -64,3 +67,28 @@ export function getInitialMaintenanceValues(maintenanceToEdit, vehicles = []) {
   };
 }
 
+export function cleanReceiptUrl(url) {
+  if (!url || typeof url !== "string") return "";
+  const trimmed = url.trim();
+
+  // 1. Google Image Search URL
+  if (trimmed.includes("google.com/imgres") || trimmed.includes("google.com/url")) {
+    try {
+      const parsed = new URL(trimmed);
+      const imgUrl = parsed.searchParams.get("imgurl") || parsed.searchParams.get("url");
+      if (imgUrl) return imgUrl;
+    } catch {
+      // fallback
+    }
+  }
+
+  // 2. Google Drive Share Link -> Direct High-Res Image CDN Link
+  if (trimmed.includes("drive.google.com")) {
+    const fileIdMatch = trimmed.match(/\/file\/d\/([^\/]+)/) || trimmed.match(/[?&]id=([^&]+)/);
+    if (fileIdMatch && fileIdMatch[1]) {
+      return `https://lh3.googleusercontent.com/d/${fileIdMatch[1]}`;
+    }
+  }
+
+  return trimmed;
+}

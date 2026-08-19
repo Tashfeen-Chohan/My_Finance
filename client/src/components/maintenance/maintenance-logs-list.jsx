@@ -13,24 +13,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Wrench, Plus, MoreVertical, Edit2, Trash2, Gauge, Calendar, Droplet, Sparkles, Store, Eye } from "lucide-react";
+import { Wrench, Plus, MoreVertical, Edit2, Trash2, Gauge, Calendar, Droplet, Sparkles, Store, Eye, Receipt } from "lucide-react";
 import { CATEGORY_BADGES, CATEGORY_LABELS } from "@/constants/maintenance";
 
 export function MaintenanceLogsList({
   logs = [],
-  vehicles = [],
   isLoading = false,
   onView,
   onEdit,
   onDelete,
   onLogMaintenance,
 }) {
-  const getVehicleName = (vehicleId) => {
-    const vId = vehicleId?._id || vehicleId;
-    const v = vehicles.find((item) => (item.id || item._id) === vId);
-    return v ? v.name : "Vehicle";
-  };
-
   return (
     <Card className="border-border/40 bg-card/40 backdrop-blur-xl overflow-hidden rounded-2xl shadow-xl">
       <CardHeader className="p-4 sm:p-6 border-b border-border/30 bg-secondary/10">
@@ -98,7 +91,6 @@ export function MaintenanceLogsList({
                           <Tooltip content={item.title} side="top">
                             <h4 className="font-bold text-sm text-foreground truncate cursor-pointer group-hover:text-primary transition-colors">{item.title}</h4>
                           </Tooltip>
-                          <p className="text-xs text-muted-foreground font-medium truncate">{getVehicleName(item.vehicleId)}</p>
                         </div>
                       </div>
 
@@ -156,7 +148,7 @@ export function MaintenanceLogsList({
                     </div>
 
                     {/* Metadata Chips: Date & Odometer (Space-Between with Light Background) */}
-                    <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground pt-0.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground pt-0.5">
                       <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1">
                         <Calendar className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
                         <span>{dateStr}</span>
@@ -169,12 +161,20 @@ export function MaintenanceLogsList({
                       )}
                     </div>
 
-                    {item.serviceProvider && (
-                      <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1 text-xs text-foreground/80 w-fit max-w-full">
-                        <Store className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
-                        <span className="truncate">{item.serviceProvider}</span>
-                      </div>
-                    )}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {item.serviceProvider && (
+                        <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1 text-xs text-foreground/80 w-fit max-w-full">
+                          <Store className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
+                          <span className="truncate">{item.serviceProvider}</span>
+                        </div>
+                      )}
+                      {item.receiptUrl && (
+                        <div className="flex items-center gap-1.5 rounded-lg bg-purple-500/10 border border-purple-500/30 px-2.5 py-1 text-xs font-semibold text-purple-600 dark:text-purple-400">
+                          <Receipt className="h-3.5 w-3.5 text-purple-500 shrink-0" />
+                          <span>Receipt</span>
+                        </div>
+                      )}
+                    </div>
 
                     {item.notes && (
                       <p className="text-xs text-muted-foreground/80 italic bg-secondary/20 p-2.5 rounded-lg border border-border/20">
@@ -195,9 +195,12 @@ export function MaintenanceLogsList({
                           <Badge className={`capitalize text-[11px] font-medium border ${CATEGORY_BADGES[item.category] || CATEGORY_BADGES.other}`}>
                             {CATEGORY_LABELS[item.category] || item.category}
                           </Badge>
-                          <Badge variant="outline" className="text-[11px] font-mono">
-                            {getVehicleName(item.vehicleId)}
-                          </Badge>
+                          {item.receiptUrl && (
+                            <Badge className="bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/30 text-[10px] font-semibold gap-1">
+                              <Receipt className="h-3 w-3 text-purple-500" />
+                              Receipt Attached
+                            </Badge>
+                          )}
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">

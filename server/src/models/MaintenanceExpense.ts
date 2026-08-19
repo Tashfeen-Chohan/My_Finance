@@ -11,6 +11,7 @@ export interface IMaintenanceExpense extends Document {
   description?: string;
   cost: number;
   serviceProvider?: string;
+  receiptUrl?: string;
   nextServiceOdometer?: number;
   nextServiceOdometerMin?: number;
   nextServiceOdometerMax?: number;
@@ -81,6 +82,10 @@ const MaintenanceExpenseSchema: Schema = new Schema(
       type: String,
       trim: true,
       maxlength: [100, "Service provider name cannot exceed 100 characters"],
+    },
+    receiptUrl: {
+      type: String,
+      trim: true,
     },
     nextServiceOdometer: {
       type: Number,

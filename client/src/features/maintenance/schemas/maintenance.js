@@ -7,6 +7,7 @@ export const maintenanceSchema = z.object({
   cost: z.number().positive("Cost must be positive"),
   odometer: z.number().positive("Odometer reading must be positive"),
   serviceProvider: z.string().optional(),
+  receiptUrl: z.string().optional(),
   notes: z.string().optional(),
 });
 

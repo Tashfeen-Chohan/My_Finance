@@ -139,7 +139,6 @@ export default function MaintenancePage() {
       {/* Maintenance Logs History */}
       <MaintenanceLogsList
         logs={filteredLogs}
-        vehicles={vehicles}
         isLoading={isLoading}
         onView={handleOpenViewModal}
         onEdit={handleOpenEditModal}

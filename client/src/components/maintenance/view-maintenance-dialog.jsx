@@ -25,6 +25,7 @@ import {
   Coins,
 } from "lucide-react";
 import { CATEGORY_BADGES, CATEGORY_LABELS } from "@/constants/maintenance";
+import { ReceiptPreview } from "./receipt-preview";
 
 export function ViewMaintenanceDialog({
   open,
@@ -38,13 +39,18 @@ export function ViewMaintenanceDialog({
 
   const vehicleId = maintenance.vehicleId?._id || maintenance.vehicleId;
   const vehicle = vehicles.find((v) => (v.id || v._id) === vehicleId);
-  const vehicleName = vehicle ? vehicle.name : (typeof maintenance.vehicleId === "object" ? maintenance.vehicleId?.name : "Vehicle");
+  const vehicleName = vehicle
+    ? vehicle.name
+    : typeof maintenance.vehicleId === "object"
+    ? maintenance.vehicleId?.name
+    : "Vehicle";
 
   const isOilChange = maintenance.category === "oil_change";
   const rawCost = Number(maintenance.cost ?? maintenance.totalCost ?? 0);
-  const costFormatted = rawCost % 1 === 0
-    ? rawCost.toLocaleString()
-    : rawCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const costFormatted =
+    rawCost % 1 === 0
+      ? rawCost.toLocaleString()
+      : rawCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const dateStr = maintenance.date
     ? new Date(maintenance.date).toLocaleDateString("en-US", {
@@ -87,7 +93,7 @@ export function ViewMaintenanceDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg w-[94vw] sm:w-full p-4 sm:p-6">
+      <DialogContent className="max-w-lg w-[94vw] sm:w-full max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-2xl">
         {/* Header Section */}
         <DialogHeader className="space-y-2 pb-3 border-b-2 border-slate-300 dark:border-border/40 text-left">
           <div className="flex items-start gap-3 min-w-0">
@@ -207,6 +213,11 @@ export function ViewMaintenanceDialog({
                 &quot;{maintenance.notes}&quot;
               </p>
             </div>
+          )}
+
+          {/* Receipt Section (Displays only when viewing specific entry in view modal) */}
+          {maintenance.receiptUrl && (
+            <ReceiptPreview url={maintenance.receiptUrl} />
           )}
         </div>
 
