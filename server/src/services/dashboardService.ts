@@ -30,6 +30,16 @@ export interface RecentActivityItem {
   vehicleId: unknown;
 }
 
+export interface MonthlyComparisonItem {
+  year: number;
+  month: number;
+  monthName: string;
+  label: string;
+  fuel: number;
+  maintenance: number;
+  total: number;
+}
+
 export const getDashboardStats = async (userId: string, vehicleId: string): Promise<DashboardStats> => {
   const [vehicles, fuelData, maintenanceData] = await Promise.all([
     vehicleRepository.findByUserId(userId),
@@ -116,16 +126,6 @@ export const getDashboardUpcomingReminders = async (userId: string, vehicleId: s
     fuel: fuelReminder,
   };
 };
-
-export interface MonthlyComparisonItem {
-  year: number;
-  month: number;
-  monthName: string;
-  label: string;
-  fuel: number;
-  maintenance: number;
-  total: number;
-}
 
 export const getDashboardMonthlyComparison = async (
   userId: string,

@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Fuel, DollarSign, Gauge, TrendingUp } from "lucide-react";
 import { FuelStatCardsSkeleton } from "@/components/skeletons";
@@ -24,15 +23,14 @@ export function FuelStatCards({ fuelExpenses = [], isLoading = false }) {
       ? Number((validEconomies.reduce((a, b) => a + b, 0) / validEconomies.length).toFixed(2))
       : 0;
 
-  // Calculate overall cost per km
-  const sortedByOdometer = [...fuelExpenses].sort((a, b) => (a.odometer || 0) - (b.odometer || 0));
-  const minOdo = sortedByOdometer[0]?.odometer || 0;
-  const maxOdo = sortedByOdometer[sortedByOdometer.length - 1]?.odometer || 0;
-  const totalDistance = Math.max(0, maxOdo - minOdo);
+  // Compute average cost per km
+  const validCostsPerKm = fuelExpenses
+    .map((f) => Number(f.costPerKM ?? f.costPerKm))
+    .filter((val) => !isNaN(val) && val > 0);
 
   const costPerKm =
-    totalDistance > 0 && totalCost > 0
-      ? Number((totalCost / totalDistance).toFixed(2))
+    validCostsPerKm.length > 0
+      ? Number((validCostsPerKm.reduce((a, b) => a + b, 0) / validCostsPerKm.length).toFixed(2))
       : 0;
 
   return (
