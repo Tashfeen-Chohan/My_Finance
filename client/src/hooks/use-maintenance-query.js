@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/services/api-client";
 import { VEHICLES_QUERY_KEY } from "./use-vehicles-query";
+import { DASHBOARD_REMINDERS_KEY, DASHBOARD_STATS_KEY } from "./use-dashboard-query";
 
 export const MAINTENANCE_QUERY_KEY = ["maintenance-expenses"];
 export const UPCOMING_MAINTENANCE_KEY = ["maintenance-expenses", "upcoming"];
@@ -49,6 +50,8 @@ export function useAddMaintenance() {
       queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: UPCOMING_MAINTENANCE_KEY });
       queryClient.invalidateQueries({ queryKey: VEHICLES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: DASHBOARD_REMINDERS_KEY });
+      queryClient.invalidateQueries({ queryKey: DASHBOARD_STATS_KEY });
     },
   });
 }
@@ -68,6 +71,8 @@ export function useUpdateMaintenance() {
       queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: UPCOMING_MAINTENANCE_KEY });
       queryClient.invalidateQueries({ queryKey: VEHICLES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: DASHBOARD_REMINDERS_KEY });
+      queryClient.invalidateQueries({ queryKey: DASHBOARD_STATS_KEY });
     },
   });
 }
@@ -87,6 +92,8 @@ export function useDeleteMaintenance() {
       queryClient.invalidateQueries({ queryKey: MAINTENANCE_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: UPCOMING_MAINTENANCE_KEY });
       queryClient.invalidateQueries({ queryKey: VEHICLES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: DASHBOARD_REMINDERS_KEY });
+      queryClient.invalidateQueries({ queryKey: DASHBOARD_STATS_KEY });
     },
   });
 }

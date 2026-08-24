@@ -41,18 +41,21 @@ export function DashboardRemindersCard({ upcomingServices = [], isLoading = fals
 
   // 2. Process Maintenance Reminders (Oil Change & Service Targets)
   maintenanceItems.forEach((item) => {
+    const maintenanceId = item.id || item._id;
+
     // Oil Change Target Range
     const oilMin = item.nextOilChangeOdometerMin ?? (item.nextOilChangeOdometerMax ? null : item.nextOilChangeOdometer);
     const oilMax = item.nextOilChangeOdometerMax ?? (item.nextOilChangeOdometerMin ? null : item.nextOilChangeOdometer);
 
-    if (oilMin || oilMax) {
+    if (!item.isOilChangeCompleted && (oilMin || oilMax)) {
       const displayRange =
         oilMin && oilMax && oilMin !== oilMax
           ? `${oilMin.toLocaleString()} - ${oilMax.toLocaleString()} km`
           : `${(oilMin || oilMax).toLocaleString()} km`;
 
       reminders.push({
-        id: `${item.id || item._id}-oil`,
+        id: `${maintenanceId}-oil`,
+        maintenanceId,
         type: "oil_change",
         title: item.title,
         targetOdometer: oilMin || oilMax || 0,
@@ -65,14 +68,15 @@ export function DashboardRemindersCard({ upcomingServices = [], isLoading = fals
     const serviceMin = item.nextServiceOdometerMin ?? (item.nextServiceOdometerMax ? null : item.nextServiceOdometer);
     const serviceMax = item.nextServiceOdometerMax ?? (item.nextServiceOdometerMin ? null : item.nextServiceOdometer);
 
-    if (serviceMin || serviceMax) {
+    if (!item.isServiceCompleted && (serviceMin || serviceMax)) {
       const displayRange =
         serviceMin && serviceMax && serviceMin !== serviceMax
           ? `${serviceMin.toLocaleString()} - ${serviceMax.toLocaleString()} km`
           : `${(serviceMin || serviceMax).toLocaleString()} km`;
 
       reminders.push({
-        id: `${item.id || item._id}-service`,
+        id: `${maintenanceId}-service`,
+        maintenanceId,
         type: "service",
         title: item.title,
         targetOdometer: serviceMin || serviceMax || 0,

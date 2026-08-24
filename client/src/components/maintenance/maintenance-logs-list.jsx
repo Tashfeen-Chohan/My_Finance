@@ -1,27 +1,17 @@
 "use client";
 
-import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip } from "@/components/ui/tooltip";
 import { BadgeSkeleton, MaintenanceLogsListSkeleton } from "@/components/skeletons";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Wrench, Plus, MoreVertical, Edit2, Trash2, Gauge, Calendar, Droplet, Sparkles, Store, Eye, Receipt } from "lucide-react";
+import { Wrench, Plus, Gauge, Calendar, Droplet, Sparkles, Store, Receipt } from "lucide-react";
 import { CATEGORY_BADGES, CATEGORY_LABELS } from "@/constants/maintenance";
 
 export function MaintenanceLogsList({
   logs = [],
   isLoading = false,
   onView,
-  onEdit,
-  onDelete,
   onLogMaintenance,
 }) {
   return (
@@ -78,62 +68,19 @@ export function MaintenanceLogsList({
                 <div
                   key={item.id || item._id}
                   onClick={() => onView?.(item)}
-                  className="p-4 sm:p-5 rounded-xl border-2 border-border/80 hover:border-primary/50 bg-secondary/15 hover:bg-secondary/30 shadow-sm transition-all cursor-pointer group"
+                  className="p-4 sm:p-5 rounded-xl border-2 border-border/80 hover:border-purple-500/40 bg-secondary/15 hover:bg-secondary/30 shadow-sm transition-all cursor-pointer group"
                 >
                   {/* MOBILE VIEW (Block < sm) */}
                   <div className="sm:hidden space-y-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border shadow-sm ${CATEGORY_BADGES[item.category] || CATEGORY_BADGES.other}`}>
-                          {isOilChange ? <Droplet className="h-5 w-5" /> : <Wrench className="h-5 w-5" />}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <Tooltip content={item.title} side="top">
-                            <h4 className="font-bold text-sm text-foreground truncate cursor-pointer group-hover:text-primary transition-colors">{item.title}</h4>
-                          </Tooltip>
-                        </div>
+                    <div className="flex items-center gap-3">
+                      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border shadow-sm ${CATEGORY_BADGES[item.category] || CATEGORY_BADGES.other}`}>
+                        {isOilChange ? <Droplet className="h-5 w-5" /> : <Wrench className="h-5 w-5" />}
                       </div>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full shrink-0">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-44 backdrop-blur-xl">
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onView?.(item);
-                            }}
-                            className="cursor-pointer"
-                          >
-                            <Eye className="mr-2 h-4 w-4 text-primary" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onEdit(item);
-                            }}
-                            className="cursor-pointer"
-                          >
-                            <Edit2 className="mr-2 h-4 w-4" />
-                            Edit Record
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDelete(item);
-                            }}
-                            className="cursor-pointer text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete Entry
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="min-w-0 flex-1">
+                        <Tooltip content={item.title} side="top">
+                          <h4 className="font-bold text-sm text-foreground truncate cursor-pointer">{item.title}</h4>
+                        </Tooltip>
+                      </div>
                     </div>
 
                     {/* Cost & Badges Pill Bar (Mobile) */}
@@ -191,7 +138,7 @@ export function MaintenanceLogsList({
                       </div>
                       <div className="space-y-2 min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">{item.title}</h4>
+                          <h4 className="font-bold text-foreground">{item.title}</h4>
                           <Badge className={`capitalize text-[11px] font-medium border ${CATEGORY_BADGES[item.category] || CATEGORY_BADGES.other}`}>
                             {CATEGORY_LABELS[item.category] || item.category}
                           </Badge>
@@ -230,53 +177,10 @@ export function MaintenanceLogsList({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-6 shrink-0">
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-foreground">
-                          PKR {costFormatted}
-                        </p>
-                      </div>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-secondary/60">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-44 backdrop-blur-xl">
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onView?.(item);
-                            }}
-                            className="cursor-pointer"
-                          >
-                            <Eye className="mr-2 h-4 w-4 text-primary" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onEdit(item);
-                            }}
-                            className="cursor-pointer"
-                          >
-                            <Edit2 className="mr-2 h-4 w-4" />
-                            Edit Record
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDelete(item);
-                            }}
-                            className="cursor-pointer text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete Entry
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    <div className="text-right shrink-0">
+                      <p className="text-lg font-bold text-foreground">
+                        PKR {costFormatted}
+                      </p>
                     </div>
                   </div>
                 </div>

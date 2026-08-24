@@ -1,11 +1,29 @@
 import { maintenanceExpenseRepository } from "../repositories/maintenanceExpenseRepository";
 import { vehicleRepository } from "../repositories/vehicleRepository";
-import { IMaintenanceExpense } from "../models/MaintenanceExpense";
+import { MaintenanceExpense, IMaintenanceExpense } from "../models/MaintenanceExpense";
 import { NotFoundError, BadRequestError } from "../errors/ApiError";
 
 export const createMaintenance = async (userId: string, data: Partial<IMaintenanceExpense>): Promise<IMaintenanceExpense> => {
   if (!data.vehicleId) {
     throw BadRequestError("Vehicle ID is required");
+  }
+
+  // Auto-complete older active reminders for this vehicle if user is logging a new service/oil change
+  const vehicleIdStr = data.vehicleId.toString();
+  const isOilChange = data.category === "oil_change" || Boolean(data.nextOilChangeOdometer || data.nextOilChangeOdometerMin);
+  const isService = data.category === "service" || Boolean(data.nextServiceOdometer || data.nextServiceOdometerMin);
+
+  if (isOilChange) {
+    await MaintenanceExpense.updateMany(
+      { vehicleId: vehicleIdStr, userId, isDeleted: false, isOilChangeCompleted: { $ne: true } },
+      { $set: { isOilChangeCompleted: true } }
+    );
+  }
+  if (isService) {
+    await MaintenanceExpense.updateMany(
+      { vehicleId: vehicleIdStr, userId, isDeleted: false, isServiceCompleted: { $ne: true } },
+      { $set: { isServiceCompleted: true } }
+    );
   }
 
   const created = await maintenanceExpenseRepository.create({

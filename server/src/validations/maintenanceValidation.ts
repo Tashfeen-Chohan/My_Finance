@@ -17,6 +17,8 @@ export const createMaintenanceSchema = z.object({
     nextOilChangeOdometer: z.number().min(0).nullable().optional(),
     nextOilChangeOdometerMin: z.number().min(0).nullable().optional(),
     nextOilChangeOdometerMax: z.number().min(0).nullable().optional(),
+    isOilChangeCompleted: z.boolean().optional(),
+    isServiceCompleted: z.boolean().optional(),
     notes: z.string().max(1000).optional(),
   }),
 });
@@ -40,6 +42,8 @@ export const updateMaintenanceSchema = z.object({
     nextOilChangeOdometer: z.number().min(0).nullable().optional(),
     nextOilChangeOdometerMin: z.number().min(0).nullable().optional(),
     nextOilChangeOdometerMax: z.number().min(0).nullable().optional(),
+    isOilChangeCompleted: z.boolean().optional(),
+    isServiceCompleted: z.boolean().optional(),
     notes: z.string().max(1000).optional(),
   }),
 });

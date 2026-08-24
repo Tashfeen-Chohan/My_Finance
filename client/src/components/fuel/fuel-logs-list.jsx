@@ -1,26 +1,16 @@
 "use client";
 
-import React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BadgeSkeleton, FuelLogsListSkeleton } from "@/components/skeletons";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Fuel, Plus, MoreVertical, Edit2, Trash2, Gauge, Calendar, MapPin, Sparkles, CheckCircle2, Eye } from "lucide-react";
+import { Fuel, Plus, Gauge, Calendar, MapPin, Sparkles, CheckCircle2 } from "lucide-react";
 
 export function FuelLogsList({
   expenses = [],
   vehicles = [],
   isLoading = false,
   onView,
-  onEdit,
-  onDelete,
   onLogFuelRefill,
 }) {
   const getVehicleName = (vehicleId) => {
@@ -82,71 +72,28 @@ export function FuelLogsList({
                 <div
                   key={expense.id || expense._id}
                   onClick={() => onView?.(expense)}
-                  className="p-4 sm:p-5 rounded-xl border-2 border-border/80 hover:border-primary/50 bg-secondary/15 hover:bg-secondary/30 shadow-sm transition-all cursor-pointer group"
+                  className="p-4 sm:p-5 rounded-xl border-2 border-border/80 hover:border-amber-500/40 bg-secondary/15 hover:bg-secondary/30 shadow-sm transition-all cursor-pointer group"
                 >
                   {/* MOBILE VIEW (Block < sm) */}
                   <div className="sm:hidden space-y-3">
-                    {/* Top Row: Vehicle Icon, Vehicle Name, Station & Action Menu */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-sm">
-                          <Fuel className="h-5 w-5" />
-                        </div>
-                        <div className="min-w-0 flex-1 space-y-0.5">
-                          <h4 className="font-bold text-sm text-foreground truncate group-hover:text-primary transition-colors">
-                            {getVehicleName(expense.vehicleId)}
-                          </h4>
-                          {expense.stationName ? (
-                            <p className="text-xs text-muted-foreground font-medium flex items-center gap-1 truncate">
-                              <MapPin className="h-3 w-3 text-muted-foreground/70 shrink-0" />
-                              <span className="truncate">{expense.stationName}</span>
-                            </p>
-                          ) : (
-                            <p className="text-xs text-muted-foreground font-medium">Fuel Refill</p>
-                          )}
-                        </div>
+                    {/* Top Row: Vehicle Icon, Vehicle Name, Station */}
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-sm">
+                        <Fuel className="h-5 w-5" />
                       </div>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full shrink-0">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-44 backdrop-blur-xl">
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onView?.(expense);
-                            }}
-                            className="cursor-pointer"
-                          >
-                            <Eye className="mr-2 h-4 w-4 text-primary" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onEdit(expense);
-                            }}
-                            className="cursor-pointer"
-                          >
-                            <Edit2 className="mr-2 h-4 w-4" />
-                            Edit Refill Log
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDelete(expense);
-                            }}
-                            className="cursor-pointer text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete Entry
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="min-w-0 flex-1 space-y-0.5">
+                        <h4 className="font-bold text-sm text-foreground truncate">
+                          {getVehicleName(expense.vehicleId)}
+                        </h4>
+                        {expense.stationName ? (
+                          <p className="text-xs text-muted-foreground font-medium flex items-center gap-1 truncate">
+                            <MapPin className="h-3 w-3 text-muted-foreground/70 shrink-0" />
+                            <span className="truncate">{expense.stationName}</span>
+                          </p>
+                        ) : (
+                          <p className="text-xs text-muted-foreground font-medium">Fuel Refill</p>
+                        )}
+                      </div>
                     </div>
 
                     {/* Efficiency Badges Bar */}
@@ -214,7 +161,7 @@ export function FuelLogsList({
                       </div>
                       <div className="space-y-2 min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">
+                          <h4 className="font-bold text-foreground">
                             {getVehicleName(expense.vehicleId)}
                           </h4>
                           {expense.isFullTank && (
@@ -263,56 +210,13 @@ export function FuelLogsList({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-6 shrink-0">
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-foreground">
-                          PKR {costFormatted}
-                        </p>
-                        <p className="text-xs text-muted-foreground font-mono">
-                          {expense.quantity} L @ PKR {expense.unitPrice}/L
-                        </p>
-                      </div>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-secondary/60">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-44 backdrop-blur-xl">
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onView?.(expense);
-                            }}
-                            className="cursor-pointer"
-                          >
-                            <Eye className="mr-2 h-4 w-4 text-primary" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onEdit(expense);
-                            }}
-                            className="cursor-pointer"
-                          >
-                            <Edit2 className="mr-2 h-4 w-4" />
-                            Edit Refill Log
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDelete(expense);
-                            }}
-                            className="cursor-pointer text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete Entry
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    <div className="text-right shrink-0">
+                      <p className="text-lg font-bold text-foreground">
+                        PKR {costFormatted}
+                      </p>
+                      <p className="text-xs text-muted-foreground font-mono">
+                        {expense.quantity} L @ PKR {expense.unitPrice}/L
+                      </p>
                     </div>
                   </div>
                 </div>

@@ -96,6 +96,42 @@ export default function MaintenancePage() {
     }
   };
 
+  const handleCompleteReminder = async (id, reminderType) => {
+    try {
+      const data = reminderType === "oil_change" ? { isOilChangeCompleted: true } : { isServiceCompleted: true };
+      await updateMaintenanceMutation.mutateAsync({ id, data });
+      toast({
+        title: "Reminder Completed",
+        description: `${reminderType === "oil_change" ? "Oil change" : "Service"} reminder marked as completed`,
+        variant: "success",
+      });
+    } catch (err) {
+      toast({
+        title: "Action Failed",
+        description: err instanceof Error ? err.message : "Failed to update reminder status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUndoReminder = async (id, reminderType) => {
+    try {
+      const data = reminderType === "oil_change" ? { isOilChangeCompleted: false } : { isServiceCompleted: false };
+      await updateMaintenanceMutation.mutateAsync({ id, data });
+      toast({
+        title: "Reminder Restored",
+        description: `${reminderType === "oil_change" ? "Oil change" : "Service"} reminder moved back to active`,
+        variant: "info",
+      });
+    } catch (err) {
+      toast({
+        title: "Action Failed",
+        description: err instanceof Error ? err.message : "Failed to restore reminder status",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Filter maintenance records
   const filteredLogs = maintenanceLogs.filter((item) => {
     const matchesCategory = selectedCategory === "all" || item.category === selectedCategory;
@@ -126,6 +162,8 @@ export default function MaintenancePage() {
         upcomingServices={upcomingServices}
         vehicles={vehicles}
         isLoading={isLoading}
+        onCompleteReminder={handleCompleteReminder}
+        onUndoReminder={handleUndoReminder}
       />
 
       {/* Filter and Search Bar */}
