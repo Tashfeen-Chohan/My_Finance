@@ -1,12 +1,13 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { BarChart2, TrendingUp, Fuel } from "lucide-react";
-import { FuelMonthlyChartSkeleton } from "@/components/skeletons";
+import { BarChart2, TrendingUp, Wrench } from "lucide-react";
+import { MaintenanceMonthlyChartSkeleton } from "@/components/skeletons";
 
-export function FuelMonthlyChart({ fuelExpenses = [], isLoading = false }) {
+export function MaintenanceMonthlyChart({ maintenanceLogs = [], isLoading = false }) {
+
   if (isLoading) {
-    return <FuelMonthlyChartSkeleton />;
+    return <MaintenanceMonthlyChartSkeleton />;
   }
 
   // Generate last 6 months timeline
@@ -24,12 +25,13 @@ export function FuelMonthlyChart({ fuelExpenses = [], isLoading = false }) {
     monthlyMap[key] = { label, total: 0, count: 0 };
   });
 
-  fuelExpenses.forEach((item) => {
+  maintenanceLogs.forEach((item) => {
     const d = new Date(item.date || item.createdAt);
     if (isNaN(d.getTime())) return;
     const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     if (monthlyMap[monthKey]) {
-      monthlyMap[monthKey].total += Number(item.totalCost) || 0;
+      const cost = Number(item.cost ?? item.totalCost) || 0;
+      monthlyMap[monthKey].total += cost;
       monthlyMap[monthKey].count += 1;
     }
   });
@@ -44,22 +46,22 @@ export function FuelMonthlyChart({ fuelExpenses = [], isLoading = false }) {
       <CardHeader className="pb-3.5 pt-5 px-4 sm:px-6 border-b border-border/30 bg-secondary/10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-sm backdrop-blur-md">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-500/10 text-purple-500 border border-purple-500/20 shadow-sm backdrop-blur-md">
               <BarChart2 className="h-5 w-5" />
             </div>
             <div>
               <CardTitle className="text-base sm:text-lg font-extrabold text-foreground tracking-tight flex items-center gap-2">
-                Monthly Fuel Cost
+                Monthly Maintenance Cost
               </CardTitle>
             </div>
           </div>
 
           {/* Average Per Month Badge */}
-          <div className="flex items-center justify-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl text-xs shrink-0 whitespace-nowrap shadow-xs">
-            <TrendingUp className="h-4 w-4 text-amber-500 shrink-0" />
+          <div className="flex items-center justify-center gap-2 bg-purple-500/10 border border-purple-500/20 px-3 py-1.5 rounded-xl text-xs shrink-0 whitespace-nowrap shadow-xs">
+            <TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400 shrink-0" />
             <div className="flex items-center gap-1.5">
               <span className="text-muted-foreground font-semibold text-[11px] sm:text-xs">Avg. Monthly:</span>
-              <span className="font-extrabold font-mono text-amber-500 text-xs sm:text-sm">
+              <span className="font-extrabold font-mono text-purple-600 dark:text-purple-400 text-xs sm:text-sm">
                 PKR {avgMonthlyCost.toLocaleString()}
               </span>
             </div>
@@ -70,10 +72,10 @@ export function FuelMonthlyChart({ fuelExpenses = [], isLoading = false }) {
       <CardContent className="p-4 sm:p-6 space-y-4">
         {totalPeriodSpend === 0 ? (
           <div className="flex h-48 flex-col items-center justify-center rounded-2xl border border-dashed border-border/40 text-center text-xs text-muted-foreground bg-secondary/10 p-6">
-            <Fuel className="h-8 w-8 text-muted-foreground/40 mb-2" />
-            <p className="font-bold text-foreground">No Fuel Expenses Logged</p>
+            <Wrench className="h-8 w-8 text-muted-foreground/40 mb-2" />
+            <p className="font-bold text-foreground">No Maintenance Expenses Logged</p>
             <p className="text-[11px] text-muted-foreground max-w-xs mt-1">
-              Logged fuel refills will automatically populate the monthly expenditure timeline here.
+              Logged service records will automatically populate the monthly expenditure timeline here.
             </p>
           </div>
         ) : (
@@ -85,7 +87,7 @@ export function FuelMonthlyChart({ fuelExpenses = [], isLoading = false }) {
                   <div key={idx} className="group relative flex-1 flex flex-col items-center h-full justify-end">
                     {/* Tooltip on hover */}
                     <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground text-xs font-semibold px-2.5 py-1 rounded-md shadow-md pointer-events-none z-10 whitespace-nowrap border">
-                      PKR {m.total.toLocaleString()} ({m.count} refills)
+                      PKR {m.total.toLocaleString()} ({m.count} logs)
                     </div>
 
                     {/* Animated Bar */}
@@ -93,8 +95,8 @@ export function FuelMonthlyChart({ fuelExpenses = [], isLoading = false }) {
                       style={{ height: `${heightPercent}%` }}
                       className={`w-full rounded-t-lg transition-all duration-500 ${
                         m.total > 0
-                          ? "bg-gradient-to-t from-amber-600/60 to-amber-500 group-hover:from-amber-500 group-hover:to-amber-400 group-hover:shadow-lg group-hover:shadow-amber-500/30"
-                          : "bg-amber-500/10"
+                          ? "bg-gradient-to-t from-purple-600/60 to-purple-600 group-hover:from-purple-600 group-hover:to-purple-500 group-hover:shadow-lg group-hover:shadow-purple-500/30"
+                          : "bg-purple-500/10"
                       }`}
                     />
                   </div>

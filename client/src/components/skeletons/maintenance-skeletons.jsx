@@ -2,10 +2,14 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CardItemSkeleton, KpiCardsSkeleton } from "./common-skeletons";
+import { CardItemSkeleton, KpiCardsSkeleton, MonthlyChartSkeleton } from "./common-skeletons";
 
 export function MaintenanceStatCardsSkeleton({ count = 4 }) {
   return <KpiCardsSkeleton count={count} />;
+}
+
+export function MaintenanceMonthlyChartSkeleton() {
+  return <MonthlyChartSkeleton />;
 }
 
 export function MaintenanceRemindersSkeleton({ count = 2 }) {

@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BadgeSkeleton, MaintenanceRemindersSkeleton } from "@/components/skeletons";
+import { MaintenanceRemindersSkeleton } from "@/components/skeletons";
 import { Bell, Gauge, Wrench, Droplet, CheckCircle2, RotateCcw, Check } from "lucide-react";
 
 export function MaintenanceRemindersCard({

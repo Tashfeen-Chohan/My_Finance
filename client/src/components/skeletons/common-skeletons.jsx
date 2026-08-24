@@ -1,7 +1,7 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 export function StatValueSkeleton({ className }) {
@@ -56,3 +56,44 @@ export function CardItemSkeleton({ className }) {
     </div>
   );
 }
+
+export function MonthlyChartSkeleton() {
+  return (
+    <Card className="border-border/50 bg-card/60 backdrop-blur-2xl shadow-xl rounded-2xl overflow-hidden">
+      <CardHeader className="pb-3.5 pt-5 px-4 sm:px-6 border-b border-border/30 bg-secondary/10">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-10 w-10 rounded-xl shrink-0" />
+            <div className="space-y-1.5">
+              <Skeleton className="h-5 w-48 rounded" />
+            </div>
+          </div>
+          <Skeleton className="h-7 w-32 rounded-xl shrink-0" />
+        </div>
+      </CardHeader>
+
+      <CardContent className="p-4 sm:p-6 space-y-4">
+        <div className="flex h-56 items-end gap-3 sm:gap-6 pt-6 pb-2 px-2 border-b border-border/40">
+          {[40, 65, 30, 85, 50, 75].map((heightPct, idx) => (
+            <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end">
+              <Skeleton
+                style={{ height: `${heightPct}%` }}
+                className="w-full rounded-t-lg opacity-60 animate-pulse"
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-between gap-3 sm:gap-6 pt-3 px-2">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div key={idx} className="flex-1 flex flex-col items-center space-y-1">
+              <Skeleton className="h-3 w-10 rounded" />
+              <Skeleton className="h-3.5 w-14 rounded" />
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+

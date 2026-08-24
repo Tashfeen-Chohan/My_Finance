@@ -11,6 +11,7 @@ import {
 } from "@/hooks/use-maintenance-query";
 import { MaintenanceHeader } from "@/components/maintenance/maintenance-header";
 import { MaintenanceStatCards } from "@/components/maintenance/maintenance-stat-cards";
+import { MaintenanceMonthlyChart } from "@/components/maintenance/maintenance-monthly-chart";
 import { MaintenanceRemindersCard } from "@/components/maintenance/maintenance-reminders-card";
 import { MaintenanceFilters } from "@/components/maintenance/maintenance-filters";
 import { MaintenanceLogsList } from "@/components/maintenance/maintenance-logs-list";
@@ -164,6 +165,12 @@ export default function MaintenancePage() {
         isLoading={isLoading}
         onCompleteReminder={handleCompleteReminder}
         onUndoReminder={handleUndoReminder}
+      />
+
+      {/* Monthly Expenditure Bar Chart & Avg Cost */}
+      <MaintenanceMonthlyChart
+        maintenanceLogs={filteredLogs}
+        isLoading={isLoading}
       />
 
       {/* Filter and Search Bar */}
