@@ -15,26 +15,49 @@ const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
 // MongoDB Connection Caching for Vercel Serverless Execution & Environment Auto-Switch
 let isConnected = false;
-export const connectDB = async (): Promise<void> => {
-  if (isConnected || mongoose.connection.readyState === 1) return;
+let dbConnectionPromise: Promise<typeof mongoose> | null = null;
+
+export const connectDB = async (): Promise<typeof mongoose> => {
+  if (isConnected || mongoose.connection.readyState === 1) {
+    return mongoose;
+  }
+
+  if (dbConnectionPromise) {
+    return dbConnectionPromise;
+  }
 
   const isProduction = process.env.NODE_ENV === "production" || !!process.env.VERCEL;
   
   const MONGO_URI = isProduction
     ? (process.env.MONGO_URI_PROD || process.env.MONGO_URI || "mongodb://localhost:27017/my_finance")
-    : (process.env.MONGO_URI_DEV || "mongodb://localhost:27017/my_finance");
+    : (process.env.MONGO_URI_DEV || process.env.MONGO_URI || "mongodb://localhost:27017/my_finance");
 
   const dbTargetName = isProduction ? "MongoDB Atlas (Production)" : "MongoDB Compass (Development)";
 
-  try {
-    await mongoose.connect(MONGO_URI);
-    isConnected = true;
-    logger.info(`Successfully connected to ${dbTargetName}`);
-  } catch (err) {
-    logger.error(`MongoDB Connection Error [${dbTargetName}]: ${(err as Error).message}`);
-    throw err;
-  }
+  dbConnectionPromise = mongoose
+    .connect(MONGO_URI, {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    })
+    .then((m) => {
+      isConnected = true;
+      logger.info(`Successfully connected to ${dbTargetName}`);
+      return m;
+    })
+    .catch((err) => {
+      dbConnectionPromise = null;
+      logger.error(`MongoDB Connection Error [${dbTargetName}]: ${(err as Error).message}`);
+      throw err;
+    });
+
+  return dbConnectionPromise;
 };
+
+// Immediately initiate DB connection on module load / server startup to eliminate first request latency
+connectDB().catch((err) => {
+  logger.warn(`Initial MongoDB startup connection attempt failed, will reconnect on request: ${(err as Error).message}`);
+});
 
 // Middleware: Ensure DB connection before handling requests
 app.use(async (_req, _res, next) => {
