@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { filterFuelExpenses, sortFuelExpenses } from "@/utils/fuel-utils";
 import { useVehicles } from "@/hooks/use-vehicles-query";
 import {
   useFuelExpenses,
@@ -25,6 +26,8 @@ import { useToast } from "@/components/ui/use-toast";
 export default function FuelPage() {
   const [timeRangeFilter, setTimeRangeFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortField, setSortField] = useState("date");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const { data: vehicles = [], isLoading: isVehiclesLoading } = useVehicles();
   const { data: fuelExpenses = [], isLoading: isExpensesLoading } = useFuelExpenses(null);
@@ -106,27 +109,9 @@ export default function FuelPage() {
     }
   };
 
-  // Filter fuel expenses
-  const filteredExpenses = fuelExpenses.filter((item) => {
-    const matchesSearch =
-      !searchQuery ||
-      item.stationName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.notes?.toLowerCase().includes(searchQuery.toLowerCase());
-
-    if (!matchesSearch) return false;
-
-    if (timeRangeFilter === "this_month") {
-      const now = new Date();
-      const itemDate = new Date(item.date);
-      return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
-    } else if (timeRangeFilter === "last_90_days") {
-      const now = new Date();
-      const past90 = new Date(now.setDate(now.getDate() - 90));
-      return new Date(item.date) >= past90;
-    }
-
-    return true;
-  });
+  // Filter & sort fuel expenses via fuel-utils helpers
+  const filteredExpenses = filterFuelExpenses(fuelExpenses, searchQuery, timeRangeFilter);
+  const sortedExpenses = sortFuelExpenses(filteredExpenses, sortField, sortOrder);
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 sm:space-y-8 pb-12">
@@ -153,11 +138,15 @@ export default function FuelPage() {
         onSearchChange={setSearchQuery}
         timeRangeFilter={timeRangeFilter}
         onTimeRangeChange={setTimeRangeFilter}
+        sortField={sortField}
+        onSortFieldChange={setSortField}
+        sortOrder={sortOrder}
+        onSortOrderChange={setSortOrder}
       />
 
       {/* Refill Logs History */}
       <FuelLogsList
-        expenses={filteredExpenses}
+        expenses={sortedExpenses}
         vehicles={vehicles}
         isLoading={isLoading}
         onView={handleOpenViewModal}

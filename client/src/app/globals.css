@@ -124,6 +124,10 @@
   --radius-sm: calc(var(--radius) - 4px);
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
@@ -131,6 +135,13 @@ body {
   overscroll-behavior-y: none;
   -webkit-tap-highlight-color: transparent;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Prevent Radix UI scroll-lock layout shift when opening select dropdowns */
+body[data-scroll-locked] {
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+  overflow: auto !important;
 }
 
 /* Glassmorphism & Elevation */
