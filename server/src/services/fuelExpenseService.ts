@@ -52,10 +52,18 @@ export const createFuelExpense = async (userId: string, data: Partial<IFuelExpen
       ? Number((fuelConsumedCost / distanceTraveled).toFixed(2))
       : null;
 
+    // Daily Distance Driven (km/day): distanceTraveled / days elapsed between Refill A and Refill B
+    const dateA = new Date(lastRefill.date);
+    const dateB = new Date(createdExpense.date || data.date || Date.now());
+    const diffInMs = Math.max(0, dateB.getTime() - dateA.getTime());
+    const daysElapsed = Math.max(1, Math.round(diffInMs / (1000 * 60 * 60 * 24)));
+    const dailyDistanceDriven = distanceTraveled > 0 ? Math.round(distanceTraveled / daysElapsed) : null;
+
     await fuelExpenseRepository.update(lastRefill._id.toString(), {
       distanceTraveled,
       computedEconomy,
       costPerKM,
+      dailyDistanceDriven,
       isLocked: true,
       updatedBy: userId,
     });
@@ -126,10 +134,18 @@ export const updateFuelExpense = async (id: string, userId: string, updateData: 
       ? Number((fuelConsumedCost / distanceTraveled).toFixed(2))
       : null;
 
+    // Daily Distance Driven (km/day): distanceTraveled / days elapsed between Refill A and Refill B
+    const dateA = new Date(lastRefill.date);
+    const dateB = new Date(updated.date);
+    const diffInMs = Math.max(0, dateB.getTime() - dateA.getTime());
+    const daysElapsed = Math.max(1, Math.round(diffInMs / (1000 * 60 * 60 * 24)));
+    const dailyDistanceDriven = distanceTraveled > 0 ? Math.round(distanceTraveled / daysElapsed) : null;
+
     await fuelExpenseRepository.update(lastRefill._id.toString(), {
       distanceTraveled,
       computedEconomy,
       costPerKM,
+      dailyDistanceDriven,
       isLocked: true,
       updatedBy: userId,
     });
@@ -161,6 +177,7 @@ export const deleteFuelExpense = async (id: string, userId: string): Promise<voi
       distanceTraveled: null,
       computedEconomy: null,
       costPerKM: null,
+      dailyDistanceDriven: null,
       isLocked: false,
       updatedBy: userId,
     });

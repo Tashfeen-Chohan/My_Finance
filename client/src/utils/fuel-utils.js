@@ -84,6 +84,9 @@ export function sortFuelExpenses(expenses = [], sortField = "date", sortOrder = 
     } else if (sortField === "distanceTraveled") {
       valA = Number(a.distanceTraveled ?? 0);
       valB = Number(b.distanceTraveled ?? 0);
+    } else if (sortField === "dailyDistanceDriven") {
+      valA = Number(a.dailyDistanceDriven ?? 0);
+      valB = Number(b.dailyDistanceDriven ?? 0);
     } else {
       valA = Number(a[sortField] ?? 0);
       valB = Number(b[sortField] ?? 0);

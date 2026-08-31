@@ -71,6 +71,12 @@ async function recalculateFuelStats() {
           ? Number((fuelConsumedCost / distanceTraveled).toFixed(2))
           : null;
 
+        const dateA = new Date(refillA.date);
+        const dateB = new Date(refillB.date);
+        const diffInMs = Math.max(0, dateB.getTime() - dateA.getTime());
+        const daysElapsed = Math.max(1, Math.round(diffInMs / (1000 * 60 * 60 * 24)));
+        const dailyDistanceDriven = distanceTraveled > 0 ? Math.round(distanceTraveled / daysElapsed) : null;
+
         await FuelExpense.updateOne(
           { _id: refillA._id },
           {
@@ -78,6 +84,7 @@ async function recalculateFuelStats() {
               distanceTraveled: distanceTraveled > 0 ? distanceTraveled : null,
               computedEconomy,
               costPerKM,
+              dailyDistanceDriven,
               isLocked: true,
             },
           }
@@ -95,6 +102,7 @@ async function recalculateFuelStats() {
             distanceTraveled: null,
             computedEconomy: null,
             costPerKM: null,
+            dailyDistanceDriven: null,
             isLocked: false,
           },
         }

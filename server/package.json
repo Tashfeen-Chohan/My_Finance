@@ -9,7 +9,9 @@
     "db:sync-indexes": "ts-node src/scripts/syncIndexes.ts",
     "db:replicate": "ts-node src/scripts/replicateDb.ts",
     "db:recalculate-fuel": "ts-node src/scripts/recalculateFuelStats.ts",
-    "db:recalculate-fuel:prod": "ts-node src/scripts/recalculateFuelStats.ts --prod"
+    "db:recalculate-fuel:prod": "ts-node src/scripts/recalculateFuelStats.ts --prod",
+    "db:calculate-missing-daily-usage": "ts-node src/scripts/calculateMissingDailyUsage.ts",
+    "db:calculate-missing-daily-usage:prod": "ts-node src/scripts/calculateMissingDailyUsage.ts --prod"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",

@@ -97,7 +97,7 @@ export function FuelLogsList({
                     </div>
 
                     {/* Efficiency Badges Bar */}
-                    {(expense.isFullTank || expense.computedEconomy || expense.costPerKM) && (
+                    {(expense.isFullTank || expense.computedEconomy || expense.costPerKM || expense.dailyDistanceDriven) && (
                       <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                         {expense.isFullTank && (
                           <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] font-semibold gap-0.5 px-2 py-0.5">
@@ -113,6 +113,11 @@ export function FuelLogsList({
                         {expense.costPerKM && (
                           <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-[10px] font-semibold px-2 py-0.5">
                             PKR {expense.costPerKM}/km
+                          </Badge>
+                        )}
+                        {expense.dailyDistanceDriven && (
+                          <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-[10px] font-semibold px-2 py-0.5">
+                            {Math.round(expense.dailyDistanceDriven)} km/day
                           </Badge>
                         )}
                       </div>
@@ -178,6 +183,11 @@ export function FuelLogsList({
                           {expense.costPerKM && (
                             <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-[11px] font-medium">
                               PKR {expense.costPerKM}/km
+                            </Badge>
+                          )}
+                          {expense.dailyDistanceDriven && (
+                            <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-[11px] font-medium">
+                              {Math.round(expense.dailyDistanceDriven)} km/day
                             </Badge>
                           )}
                         </div>

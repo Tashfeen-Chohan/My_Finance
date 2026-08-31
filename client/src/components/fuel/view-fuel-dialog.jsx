@@ -109,6 +109,11 @@ export function ViewFuelDialog({
                     PKR {expense.costPerKM}/km
                   </Badge>
                 )}
+                 {expense.dailyDistanceDriven && (
+                  <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-[10px] font-semibold px-1.5 py-0.5">
+                    {Math.round(expense.dailyDistanceDriven)} km/day
+                  </Badge>
+                )}
               </div>
             </div>
           </div>

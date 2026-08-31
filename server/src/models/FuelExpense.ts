@@ -13,6 +13,7 @@ export interface IFuelExpense extends Document {
   isFullTank: boolean;
   computedEconomy?: number;
   costPerKM?: number;
+  dailyDistanceDriven?: number;
   isLocked: boolean;
   stationName?: string;
   notes?: string;
@@ -81,6 +82,10 @@ const FuelExpenseSchema: Schema = new Schema(
     costPerKM: {
       type: Number,
       min: [0, "Cost per kilometer cannot be negative"],
+    },
+    dailyDistanceDriven: {
+      type: Number,
+      min: [0, "Daily distance driven cannot be negative"],
     },
     isLocked: {
       type: Boolean,

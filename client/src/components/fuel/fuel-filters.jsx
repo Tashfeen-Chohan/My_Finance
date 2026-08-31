@@ -61,6 +61,7 @@ export function FuelFilters({
             <SelectItem value="unitPrice">Price / Liter (PKR/L)</SelectItem>
             <SelectItem value="quantity">Fuel Volume (Liters)</SelectItem>
             <SelectItem value="distanceTraveled">Distance Traveled (km)</SelectItem>
+            <SelectItem value="dailyDistanceDriven">Daily Distance (km/day)</SelectItem>
             <SelectItem value="computedEconomy">Fuel Economy (km/L)</SelectItem>
             <SelectItem value="costPerKM">Cost / Distance (PKR/km)</SelectItem>
           </SelectContent>
