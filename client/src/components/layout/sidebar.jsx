@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MAIN_NAV_ITEMS, SECONDARY_NAV_ITEMS } from "@/constants/navigation";
 import { useAppStore } from "@/stores/use-app-store";
+import { triggerHaptic } from "@/utils/haptics";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,11 @@ import { Button } from "@/components/ui/button";
 export function Sidebar() {
   const pathname = usePathname();
   const { isSidebarOpen, toggleSidebar } = useAppStore();
+
+  const handleToggleSidebar = () => {
+    triggerHaptic("light");
+    toggleSidebar();
+  };
 
   return (
     <aside
@@ -23,7 +29,7 @@ export function Sidebar() {
     >
       {/* Brand Header */}
       <div className="border-border flex h-16 items-center justify-between border-b px-4">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href="/" onClick={() => triggerHaptic("light")} className="flex items-center gap-3">
           <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-card/80 p-1 shadow-sm">
             <Image
               src="/icons/icon-192x192.png"
@@ -42,7 +48,7 @@ export function Sidebar() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={toggleSidebar}
+          onClick={handleToggleSidebar}
           className="h-8 w-8 rounded-lg"
           title={isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
         >
@@ -69,6 +75,7 @@ export function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => triggerHaptic("light")}
                 className={cn(
                   "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
                   isActive
@@ -97,6 +104,7 @@ export function Sidebar() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => triggerHaptic("light")}
                 className={cn(
                   "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
                   isActive

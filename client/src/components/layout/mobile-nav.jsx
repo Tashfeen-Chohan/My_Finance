@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MOBILE_NAV_ITEMS } from "@/constants/navigation";
+import { triggerHaptic } from "@/utils/haptics";
 import { cn } from "@/lib/utils";
 
 export function MobileNav() {
@@ -18,6 +19,7 @@ export function MobileNav() {
           <Link
             key={item.href}
             href={item.href}
+            onClick={() => triggerHaptic("light")}
             className={cn(
               "flex w-full flex-col items-center justify-center gap-1 py-1 text-xs transition-colors",
               isActive

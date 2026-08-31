@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +18,6 @@ import {
   FileText,
   Edit2,
   Trash2,
-  Car,
   Coins,
   CheckCircle2,
   TrendingUp,
@@ -78,21 +76,16 @@ export function ViewFuelDialog({
         {/* Header Section */}
         <DialogHeader className="space-y-2 pb-3 border-b-2 border-slate-300 dark:border-border/40 text-left">
           <div className="flex items-start gap-2.5 min-w-0">
-            <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-2xl border-2 border-amber-500/30 bg-amber-500/10 text-amber-500 shadow-sm">
-              <Fuel className="h-5 w-5 sm:h-5.5 sm:w-5.5" />
+            <div className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-amber-500/30 bg-amber-500/10 text-amber-500 shadow-sm">
+              <Fuel className="h-6 w-6" />
             </div>
             <div className="min-w-0 flex-1 space-y-1">
               <DialogTitle className="text-base sm:text-lg font-bold text-foreground leading-snug break-words">
-                {expense.stationName ? expense.stationName : "Fuel Refill"}
+                {vehicleName}
               </DialogTitle>
 
-              {/* Vehicle & Efficiency Badges */}
+              {/* Efficiency Badges */}
               <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                  <Car className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                  <span className="text-foreground/90 font-semibold truncate max-w-[140px] sm:max-w-none">{vehicleName}</span>
-                </div>
-
                 {expense.isFullTank && (
                   <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] font-semibold gap-0.5 px-1.5 py-0.5">
                     <CheckCircle2 className="h-2.5 w-2.5 shrink-0" />
@@ -109,7 +102,7 @@ export function ViewFuelDialog({
                     PKR {expense.costPerKM}/km
                   </Badge>
                 )}
-                 {expense.dailyDistanceDriven && (
+                {expense.dailyDistanceDriven && (
                   <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-[10px] font-semibold px-1.5 py-0.5">
                     {Math.round(expense.dailyDistanceDriven)} km/day
                   </Badge>

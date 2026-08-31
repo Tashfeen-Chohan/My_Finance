@@ -76,15 +76,23 @@ export function FuelLogsList({
                 >
                   {/* MOBILE VIEW (Block < sm) */}
                   <div className="sm:hidden space-y-3">
-                    {/* Top Row: Vehicle Icon, Vehicle Name, Station */}
+                    {/* Top Row: Vehicle Icon, Vehicle Name + Full Tank, Station Subtitle */}
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-sm">
-                        <Fuel className="h-5 w-5" />
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-sm">
+                        <Fuel className="h-5.5 w-5.5" />
                       </div>
                       <div className="min-w-0 flex-1 space-y-0.5">
-                        <h4 className="font-bold text-sm text-foreground truncate">
-                          {getVehicleName(expense.vehicleId)}
-                        </h4>
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="font-bold text-sm text-foreground truncate">
+                            {getVehicleName(expense.vehicleId)}
+                          </h4>
+                          {expense.isFullTank && (
+                            <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] font-semibold gap-0.5 px-2 py-0.5 shrink-0">
+                              <CheckCircle2 className="h-2.5 w-2.5 shrink-0" />
+                              Full Tank
+                            </Badge>
+                          )}
+                        </div>
                         {expense.stationName ? (
                           <p className="text-xs text-muted-foreground font-medium flex items-center gap-1 truncate">
                             <MapPin className="h-3 w-3 text-muted-foreground/70 shrink-0" />
@@ -96,15 +104,9 @@ export function FuelLogsList({
                       </div>
                     </div>
 
-                    {/* Efficiency Badges Bar */}
-                    {(expense.isFullTank || expense.computedEconomy || expense.costPerKM || expense.dailyDistanceDriven) && (
+                    {/* Efficiency Badges Bar: km/L, PKR/km, km/day in one line */}
+                    {(expense.computedEconomy || expense.costPerKM || expense.dailyDistanceDriven) && (
                       <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                        {expense.isFullTank && (
-                          <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] font-semibold gap-0.5 px-2 py-0.5">
-                            <CheckCircle2 className="h-2.5 w-2.5 shrink-0" />
-                            Full Tank
-                          </Badge>
-                        )}
                         {expense.computedEconomy && (
                           <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[10px] font-semibold px-2 py-0.5">
                             {expense.computedEconomy} km/L

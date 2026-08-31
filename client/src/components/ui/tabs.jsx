@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { triggerHaptic } from "@/utils/haptics";
 import { cn } from "@/lib/utils";
 
 const Tabs = TabsPrimitive.Root;
@@ -18,13 +19,17 @@ const TabsList = React.forwardRef(({ className, ...props }, ref) => (
 ));
 TabsList.displayName = TabsPrimitive.List.displayName;
 
-const TabsTrigger = React.forwardRef(({ className, ...props }, ref) => (
+const TabsTrigger = React.forwardRef(({ className, onClick, ...props }, ref) => (
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
       "focus-visible:ring-ring data-[state=active]:bg-background data-[state=active]:text-foreground inline-flex min-h-[40px] flex-1 cursor-pointer items-center justify-center rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm",
       className
     )}
+    onClick={(e) => {
+      triggerHaptic("light");
+      if (onClick) onClick(e);
+    }}
     {...props}
   />
 ));

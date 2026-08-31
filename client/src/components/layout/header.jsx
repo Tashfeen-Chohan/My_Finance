@@ -17,6 +17,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
+import { triggerHaptic } from "@/utils/haptics";
 
 export function Header() {
   const { user, logout, isAuthenticated } = useAuthStore();
@@ -25,6 +26,7 @@ export function Header() {
   const { toast } = useToast();
 
   const handleLogout = async () => {
+    triggerHaptic("warning");
     await logout();
     queryClient.clear();
     toast({
@@ -33,6 +35,11 @@ export function Header() {
       variant: "info",
     });
     router.push("/login");
+  };
+
+  const handleNavigateSettings = () => {
+    triggerHaptic("light");
+    router.push("/settings");
   };
 
   const formattedEmail = user?.email ? user.email.toLowerCase() : "";
@@ -125,7 +132,7 @@ export function Header() {
 
               {/* Settings Page Navigation Link */}
               <DropdownMenuItem
-                onClick={() => router.push("/settings")}
+                onClick={handleNavigateSettings}
                 className="hover:bg-accent text-foreground flex cursor-pointer items-center gap-2.5 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors"
               >
                 <Settings className="text-primary h-4 w-4" />
