@@ -23,7 +23,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "border-border/60 bg-card/70 backdrop-blur-xl sticky top-0 z-30 hidden h-screen flex-col border-r transition-all duration-300 md:flex",
+        "border-sidebar-border bg-sidebar-bg sticky top-0 z-30 hidden h-screen flex-col border-r transition-all duration-300 md:flex",
         isSidebarOpen ? "w-64" : "w-20"
       )}
     >
@@ -77,14 +77,14 @@ export function Sidebar() {
                 href={item.href}
                 onClick={() => triggerHaptic("light")}
                 className={cn(
-                  "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                   isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                    ? "bg-accent text-foreground font-semibold"
+                    : "text-muted-foreground hover:bg-accent/60 hover:text-foreground font-medium"
                 )}
                 title={!isSidebarOpen ? item.title : undefined}
               >
-                <Icon className="h-5 w-5 shrink-0" />
+                <Icon className={cn("h-4 w-4 shrink-0", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
                 {isSidebarOpen && <span>{item.title}</span>}
               </Link>
             );
@@ -106,14 +106,14 @@ export function Sidebar() {
                 href={item.href}
                 onClick={() => triggerHaptic("light")}
                 className={cn(
-                  "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                  "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                   isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                    ? "bg-accent text-foreground font-semibold"
+                    : "text-muted-foreground hover:bg-accent/60 hover:text-foreground font-medium"
                 )}
                 title={!isSidebarOpen ? item.title : undefined}
               >
-                <Icon className="h-5 w-5 shrink-0" />
+                <Icon className={cn("h-4 w-4 shrink-0", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
                 {isSidebarOpen && (
                   <div className="flex w-full items-center justify-between">
                     <span>{item.title}</span>

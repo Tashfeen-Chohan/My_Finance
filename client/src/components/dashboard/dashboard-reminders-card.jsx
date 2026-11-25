@@ -2,10 +2,8 @@
 
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip } from "@/components/ui/tooltip";
 import { BadgeSkeleton, MaintenanceRemindersSkeleton } from "@/components/skeletons";
-import { Bell, Gauge, Wrench, Droplet, Fuel, AlertTriangle } from "lucide-react";
+import { Bell, Wrench, Droplet, Fuel, AlertTriangle } from "lucide-react";
 
 export function DashboardRemindersCard({ upcomingServices = [], isLoading = false }) {
   const maintenanceItems = Array.isArray(upcomingServices)
@@ -15,7 +13,6 @@ export function DashboardRemindersCard({ upcomingServices = [], isLoading = fals
 
   const reminders = [];
 
-  // 1. Process Fuel Tank & Reserve Reminders
   if (fuelReminder) {
     if (fuelReminder.expectedReserveOdometer) {
       reminders.push({
@@ -24,7 +21,7 @@ export function DashboardRemindersCard({ upcomingServices = [], isLoading = fals
         title: "Expected Reserve Odometer",
         targetOdometer: fuelReminder.expectedReserveOdometer,
         displayRange: `${fuelReminder.expectedReserveOdometer.toLocaleString()} km`,
-        label: "Fuel Reserve Target",
+        label: "Fuel Reserve",
       });
     }
     if (fuelReminder.expectedEmptyOdometer) {
@@ -34,23 +31,21 @@ export function DashboardRemindersCard({ upcomingServices = [], isLoading = fals
         title: "Expected Tank Empty",
         targetOdometer: fuelReminder.expectedEmptyOdometer,
         displayRange: `${fuelReminder.expectedEmptyOdometer.toLocaleString()} km`,
-        label: "Tank Empty Target",
+        label: "Tank Empty",
       });
     }
   }
 
-  // 2. Process Maintenance Reminders (Oil Change & Service Targets)
   maintenanceItems.forEach((item) => {
     const maintenanceId = item.id || item._id;
 
-    // Oil Change Target Range
     const oilMin = item.nextOilChangeOdometerMin ?? (item.nextOilChangeOdometerMax ? null : item.nextOilChangeOdometer);
     const oilMax = item.nextOilChangeOdometerMax ?? (item.nextOilChangeOdometerMin ? null : item.nextOilChangeOdometer);
 
     if (!item.isOilChangeCompleted && (oilMin || oilMax)) {
       const displayRange =
         oilMin && oilMax && oilMin !== oilMax
-          ? `${oilMin.toLocaleString()} - ${oilMax.toLocaleString()} km`
+          ? `${oilMin.toLocaleString()} – ${oilMax.toLocaleString()} km`
           : `${(oilMin || oilMax).toLocaleString()} km`;
 
       reminders.push({
@@ -60,18 +55,17 @@ export function DashboardRemindersCard({ upcomingServices = [], isLoading = fals
         title: item.title,
         targetOdometer: oilMin || oilMax || 0,
         displayRange,
-        label: "Next Oil Change",
+        label: "Oil Change",
       });
     }
 
-    // Service Target Range
     const serviceMin = item.nextServiceOdometerMin ?? (item.nextServiceOdometerMax ? null : item.nextServiceOdometer);
     const serviceMax = item.nextServiceOdometerMax ?? (item.nextServiceOdometerMin ? null : item.nextServiceOdometer);
 
     if (!item.isServiceCompleted && (serviceMin || serviceMax)) {
       const displayRange =
         serviceMin && serviceMax && serviceMin !== serviceMax
-          ? `${serviceMin.toLocaleString()} - ${serviceMax.toLocaleString()} km`
+          ? `${serviceMin.toLocaleString()} – ${serviceMax.toLocaleString()} km`
           : `${(serviceMin || serviceMax).toLocaleString()} km`;
 
       reminders.push({
@@ -81,7 +75,7 @@ export function DashboardRemindersCard({ upcomingServices = [], isLoading = fals
         title: item.title,
         targetOdometer: serviceMin || serviceMax || 0,
         displayRange,
-        label: "Next Service",
+        label: "Service",
       });
     }
   });
@@ -89,73 +83,44 @@ export function DashboardRemindersCard({ upcomingServices = [], isLoading = fals
   reminders.sort((a, b) => a.targetOdometer - b.targetOdometer);
 
   return (
-    <Card className="border-border/50 bg-card/60 backdrop-blur-2xl shadow-xl rounded-2xl overflow-hidden">
-      <CardHeader className="pb-3 pt-5 px-4 sm:px-6 border-b border-border/30 bg-secondary/10">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-sm">
-              <Bell className="h-4 w-4" />
-            </div>
-            <div>
-              <CardTitle className="text-base sm:text-lg font-bold text-foreground">
-                Upcoming Vehicle Reminders
-              </CardTitle>
-              <CardDescription className="text-xs text-muted-foreground">
-                Scheduled fuel range limits & maintenance service targets
-              </CardDescription>
-            </div>
-          </div>
-          {isLoading ? (
-            <BadgeSkeleton className="w-16" />
-          ) : (
-            <Badge
-              variant="outline"
-              className="font-mono text-xs border-amber-500/30 text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full"
-            >
-              {reminders.length} Active
-            </Badge>
-          )}
+    <Card className="overflow-hidden">
+      <CardHeader className="p-5 pb-3.5 border-b border-border flex-row items-center justify-between space-y-0">
+        <div>
+          <CardTitle className="text-base font-semibold">Upcoming Reminders</CardTitle>
+          <CardDescription className="text-xs mt-0.5">Fuel range and service odometer targets</CardDescription>
         </div>
+        {isLoading ? (
+          <BadgeSkeleton className="w-16" />
+        ) : (
+          <span className="text-xs font-medium text-muted-foreground tabular-nums">
+            {reminders.length} active
+          </span>
+        )}
       </CardHeader>
 
-      <CardContent className="p-4 sm:p-6">
+      <CardContent className="p-0">
         {isLoading ? (
-          <MaintenanceRemindersSkeleton />
+          <div className="p-4">
+            <MaintenanceRemindersSkeleton />
+          </div>
         ) : reminders.length > 0 ? (
-          <div className="flex flex-col gap-3">
+          <div className="divide-y divide-border">
             {reminders.map((rem) => {
               const isOil = rem.type === "oil_change";
               const isFuelReserve = rem.type === "fuel_reserve";
               const isFuelEmpty = rem.type === "fuel_empty";
 
-              let cardStyle = "border-sky-500/20 bg-sky-500/5 hover:border-sky-500/40";
-              let iconBg = "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20";
-              let badgeStyle = "border-sky-500/30 text-sky-600 dark:text-sky-400 bg-sky-500/10";
-
-              if (isFuelReserve) {
-                cardStyle = "border-amber-500/20 bg-amber-500/5 hover:border-amber-500/40";
-                iconBg = "bg-amber-500/10 text-amber-500 border-amber-500/20";
-                badgeStyle = "border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10";
-              } else if (isOil) {
-                cardStyle = "border-purple-500/20 bg-purple-500/5 hover:border-purple-500/40";
-                iconBg = "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20";
-                badgeStyle = "border-purple-500/30 text-purple-600 dark:text-purple-400 bg-purple-500/10";
-              } else if (isFuelEmpty) {
-                cardStyle = "border-rose-500/20 bg-rose-500/5 hover:border-rose-500/40";
-                iconBg = "bg-rose-500/10 text-rose-500 border-rose-500/20";
-                badgeStyle = "border-rose-500/30 text-rose-600 dark:text-rose-400 bg-rose-500/10";
-              }
+              let iconStyle = "bg-sky-500/10 text-sky-600 dark:text-sky-400";
+              if (isFuelReserve) iconStyle = "bg-amber-500/10 text-amber-600 dark:text-amber-400";
+              else if (isFuelEmpty) iconStyle = "bg-destructive/10 text-destructive";
 
               return (
                 <div
                   key={rem.id}
-                  className={`flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border ${cardStyle} p-3.5 sm:p-4 gap-3 shadow-sm hover:shadow-md transition-all`}
+                  className="flex items-center justify-between px-5 py-3.5 gap-3 hover:bg-secondary/40 transition-colors"
                 >
-                  {/* Left Details: Icon, Title & Reminder Type */}
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border shadow-sm ${iconBg}`}
-                    >
+                    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${iconStyle}`}>
                       {isFuelEmpty ? (
                         <Fuel className="h-4 w-4" />
                       ) : isFuelReserve ? (
@@ -166,45 +131,25 @@ export function DashboardRemindersCard({ upcomingServices = [], isLoading = fals
                         <Wrench className="h-4 w-4" />
                       )}
                     </div>
-
-                    <div className="space-y-1 min-w-0 flex-1">
-                      <Tooltip content={rem.title} side="top">
-                        <h4 className="font-bold text-xs sm:text-sm text-foreground truncate cursor-pointer">
-                          {rem.title}
-                        </h4>
-                      </Tooltip>
-
-                      <div>
-                        <Badge
-                          variant="outline"
-                          className={`text-[10px] font-semibold shrink-0 px-2 py-0.5 rounded-md ${badgeStyle}`}
-                        >
-                          {rem.label}
-                        </Badge>
-                      </div>
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-medium text-sm text-foreground truncate">{rem.title}</h4>
+                      <p className="text-xs text-muted-foreground truncate">{rem.label}</p>
                     </div>
                   </div>
 
-                  {/* Right Target Range Badge */}
-                  <div className="rounded-xl border border-border/40 bg-background/80 backdrop-blur-md px-3 py-1.5 flex items-center justify-between sm:justify-end gap-2.5 shrink-0">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Gauge className="h-4 w-4 text-foreground/70 shrink-0" />
-                      <span className="font-medium">Target:</span>
-                    </div>
-                    <span className="font-mono text-xs font-bold text-foreground bg-secondary/60 px-2.5 py-1 rounded-md border border-border/40">
-                      {rem.displayRange}
-                    </span>
+                  <div className="text-right shrink-0 text-xs sm:text-sm font-semibold text-foreground tabular-nums">
+                    {rem.displayRange}
                   </div>
                 </div>
               );
             })}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center p-6 sm:p-8 text-center rounded-2xl border border-dashed border-border/40 bg-secondary/10">
-            <Bell className="h-8 w-8 text-muted-foreground/50 mb-2" />
-            <p className="text-sm font-semibold text-foreground">No Upcoming Vehicle Reminders</p>
-            <p className="text-xs text-muted-foreground max-w-sm mt-0.5">
-              Log full tank refills or set maintenance service odometer targets to populate reminders!
+          <div className="flex flex-col items-center justify-center p-8 text-center">
+            <Bell className="h-7 w-7 text-muted-foreground/40 mb-2" />
+            <p className="text-sm font-medium text-foreground">No upcoming reminders</p>
+            <p className="text-xs text-muted-foreground max-w-xs mt-1">
+              Log full tank refills or set service odometer targets to see reminders here.
             </p>
           </div>
         )}

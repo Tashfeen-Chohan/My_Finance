@@ -1,7 +1,7 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Fuel, DollarSign, Gauge, TrendingUp } from "lucide-react";
+import { KpiStatCards } from "@/components/common/kpi-stat-cards";
+import { Fuel, Wallet, Gauge, TrendingUp } from "lucide-react";
 import { FuelStatCardsSkeleton } from "@/components/skeletons";
 
 export function FuelStatCards({ fuelExpenses = [], isLoading = false }) {
@@ -9,11 +9,9 @@ export function FuelStatCards({ fuelExpenses = [], isLoading = false }) {
     return <FuelStatCardsSkeleton count={4} />;
   }
 
-  // Compute analytics metrics
   const totalCost = fuelExpenses.reduce((acc, curr) => acc + (Number(curr.totalCost) || 0), 0);
   const totalVolume = fuelExpenses.reduce((acc, curr) => acc + (Number(curr.quantity) || 0), 0);
 
-  // Compute average fuel economy
   const validEconomies = fuelExpenses
     .map((f) => Number(f.computedEconomy))
     .filter((val) => !isNaN(val) && val > 0);
@@ -23,7 +21,6 @@ export function FuelStatCards({ fuelExpenses = [], isLoading = false }) {
       ? Number((validEconomies.reduce((a, b) => a + b, 0) / validEconomies.length).toFixed(2))
       : 0;
 
-  // Compute average cost per km
   const validCostsPerKm = fuelExpenses
     .map((f) => Number(f.costPerKM ?? f.costPerKm))
     .filter((val) => !isNaN(val) && val > 0);
@@ -33,65 +30,40 @@ export function FuelStatCards({ fuelExpenses = [], isLoading = false }) {
       ? Number((validCostsPerKm.reduce((a, b) => a + b, 0) / validCostsPerKm.length).toFixed(2))
       : 0;
 
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {/* Total Spend */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-xl">
-        <CardContent className="p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shrink-0">
-            <DollarSign className="h-6 w-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Fuel Cost</p>
-            <h3 className="text-2xl font-bold text-foreground truncate">
-              PKR {totalCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
-            </h3>
-          </div>
-        </CardContent>
-      </Card>
+  const cards = [
+    {
+      id: "fuel-total-cost",
+      label: "Total Fuel Cost",
+      value: `PKR ${totalCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+      sublabel: `Across ${fuelExpenses.length} refills`,
+      icon: <Wallet className="h-4 w-4" />,
+      iconBg: "bg-primary/10 text-primary",
+    },
+    {
+      id: "fuel-total-volume",
+      label: "Total Volume",
+      value: `${totalVolume.toFixed(2)} L`,
+      sublabel: "Total fuel pumped",
+      icon: <Fuel className="h-4 w-4" />,
+      iconBg: "bg-teal-500/10 text-teal-600 dark:text-teal-400",
+    },
+    {
+      id: "fuel-avg-economy",
+      label: "Avg. Mileage",
+      value: avgEconomy > 0 ? `${avgEconomy} km/L` : "N/A",
+      sublabel: validEconomies.length > 0 ? `${validEconomies.length} full-tank cycles` : "Needs full tank",
+      icon: <Gauge className="h-4 w-4" />,
+      iconBg: "bg-secondary text-foreground",
+    },
+    {
+      id: "fuel-cost-per-km",
+      label: "Cost per Kilometer",
+      value: costPerKm > 0 ? `PKR ${costPerKm}/km` : "N/A",
+      sublabel: "Running fuel rate",
+      icon: <TrendingUp className="h-4 w-4" />,
+      iconBg: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    },
+  ];
 
-      {/* Total Fuel Volume */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-xl">
-        <CardContent className="p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shrink-0">
-            <Fuel className="h-6 w-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Volume</p>
-            <h3 className="text-2xl font-bold text-foreground truncate">{totalVolume.toFixed(1)} L</h3>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Average Mileage (Fuel Economy) */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-xl">
-        <CardContent className="p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shrink-0">
-            <Gauge className="h-6 w-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Average Mileage</p>
-            <h3 className="text-2xl font-bold text-foreground truncate">
-              {avgEconomy > 0 ? `${avgEconomy} km/L` : "N/A"}
-            </h3>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Cost Per Kilometer */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-xl">
-        <CardContent className="p-5 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
-            <TrendingUp className="h-6 w-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Cost per Kilometer</p>
-            <h3 className="text-2xl font-bold text-foreground truncate">
-              {costPerKm > 0 ? `PKR ${costPerKm}/km` : "N/A"}
-            </h3>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  return <KpiStatCards cards={cards} isLoading={isLoading} />;
 }

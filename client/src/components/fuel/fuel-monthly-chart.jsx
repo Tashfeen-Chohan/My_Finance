@@ -1,7 +1,7 @@
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { BarChart2, TrendingUp, Fuel } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Fuel } from "lucide-react";
 import { FuelMonthlyChartSkeleton } from "@/components/skeletons";
 
 export function FuelMonthlyChart({ fuelExpenses = [], isLoading = false }) {
@@ -9,7 +9,6 @@ export function FuelMonthlyChart({ fuelExpenses = [], isLoading = false }) {
     return <FuelMonthlyChartSkeleton />;
   }
 
-  // Generate last 6 months timeline
   const today = new Date();
   const last6Months = [];
   for (let i = 5; i >= 0; i--) {
@@ -40,61 +39,45 @@ export function FuelMonthlyChart({ fuelExpenses = [], isLoading = false }) {
   const maxSpend = Math.max(...sortedMonths.map((m) => m.total), 1);
 
   return (
-    <Card className="border-border/50 bg-card/60 backdrop-blur-2xl shadow-xl rounded-2xl overflow-hidden transition-all duration-300">
-      <CardHeader className="pb-3.5 pt-5 px-4 sm:px-6 border-b border-border/30 bg-secondary/10">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-sm backdrop-blur-md">
-              <BarChart2 className="h-5 w-5" />
-            </div>
-            <div>
-              <CardTitle className="text-base sm:text-lg font-extrabold text-foreground tracking-tight flex items-center gap-2">
-                Monthly Fuel Cost
-              </CardTitle>
-            </div>
-          </div>
-
-          {/* Average Per Month Badge */}
-          <div className="flex items-center justify-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl text-xs shrink-0 whitespace-nowrap shadow-xs">
-            <TrendingUp className="h-4 w-4 text-amber-500 shrink-0" />
-            <div className="flex items-center gap-1.5">
-              <span className="text-muted-foreground font-semibold text-[11px] sm:text-xs">Avg. Monthly:</span>
-              <span className="font-extrabold font-mono text-amber-500 text-xs sm:text-sm">
-                PKR {avgMonthlyCost.toLocaleString()}
-              </span>
-            </div>
-          </div>
+    <Card>
+      <CardHeader className="p-5 pb-4 border-b border-border flex flex-row items-center justify-between space-y-0">
+        <div>
+          <CardTitle className="text-base font-semibold">Monthly Fuel Cost</CardTitle>
+          <CardDescription className="text-xs mt-0.5">
+            Avg. monthly:{" "}
+            <span className="font-semibold text-foreground tabular-nums">
+              PKR {avgMonthlyCost.toLocaleString()}
+            </span>
+          </CardDescription>
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 sm:p-6 space-y-4">
+      <CardContent className="p-5">
         {totalPeriodSpend === 0 ? (
-          <div className="flex h-48 flex-col items-center justify-center rounded-2xl border border-dashed border-border/40 text-center text-xs text-muted-foreground bg-secondary/10 p-6">
-            <Fuel className="h-8 w-8 text-muted-foreground/40 mb-2" />
-            <p className="font-bold text-foreground">No Fuel Expenses Logged</p>
-            <p className="text-[11px] text-muted-foreground max-w-xs mt-1">
-              Logged fuel refills will automatically populate the monthly expenditure timeline here.
+          <div className="flex h-48 flex-col items-center justify-center rounded-xl border border-dashed border-border text-center text-xs text-muted-foreground p-6">
+            <Fuel className="h-7 w-7 text-muted-foreground/40 mb-2" />
+            <p className="font-medium text-foreground">No fuel expenses logged</p>
+            <p className="text-xs text-muted-foreground max-w-xs mt-1">
+              Logged fuel refills will populate your 6-month trend here.
             </p>
           </div>
         ) : (
           <div>
-            <div className="flex h-56 items-end gap-3 sm:gap-6 pt-6 pb-2 px-2 border-b border-border/40">
+            <div className="flex h-52 items-end gap-3 sm:gap-6 pt-6 pb-2 px-1 border-b border-border">
               {sortedMonths.map((m, idx) => {
-                const heightPercent = m.total > 0 ? Math.max(12, Math.round((m.total / maxSpend) * 100)) : 4;
+                const heightPercent = m.total > 0 ? Math.max(10, Math.round((m.total / maxSpend) * 100)) : 4;
                 return (
                   <div key={idx} className="group relative flex-1 flex flex-col items-center h-full justify-end">
-                    {/* Tooltip on hover */}
-                    <div className="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground text-xs font-semibold px-2.5 py-1 rounded-md shadow-md pointer-events-none z-10 whitespace-nowrap border">
-                      PKR {m.total.toLocaleString()} ({m.count} refills)
+                    <div className="absolute -top-9 opacity-0 group-hover:opacity-100 transition-opacity bg-popover text-popover-foreground text-xs font-medium tabular-nums px-2.5 py-1 rounded-md shadow-sm pointer-events-none z-10 whitespace-nowrap border border-border">
+                      PKR {m.total.toLocaleString()} ({m.count})
                     </div>
 
-                    {/* Animated Bar */}
                     <div
                       style={{ height: `${heightPercent}%` }}
-                      className={`w-full rounded-t-lg transition-all duration-500 ${
+                      className={`w-full rounded-t-lg transition-all duration-300 ${
                         m.total > 0
-                          ? "bg-gradient-to-t from-amber-600/60 to-amber-500 group-hover:from-amber-500 group-hover:to-amber-400 group-hover:shadow-lg group-hover:shadow-amber-500/30"
-                          : "bg-amber-500/10"
+                          ? "bg-teal-500 group-hover:bg-teal-400"
+                          : "bg-border/60"
                       }`}
                     />
                   </div>
@@ -102,14 +85,22 @@ export function FuelMonthlyChart({ fuelExpenses = [], isLoading = false }) {
               })}
             </div>
 
-            {/* Month Labels */}
-            <div className="flex justify-between gap-3 sm:gap-6 pt-3 px-2">
-              {sortedMonths.map((m, idx) => (
-                <div key={idx} className="flex-1 text-center">
-                  <p className="text-xs font-medium text-muted-foreground">{m.label}</p>
-                  <p className="text-[11px] font-semibold text-foreground mt-0.5">PKR {Math.round(m.total)}</p>
-                </div>
-              ))}
+            <div className="flex justify-between gap-2 sm:gap-6 pt-3 px-1">
+              {sortedMonths.map((m, idx) => {
+                const compactVal =
+                  m.total >= 1000
+                    ? `${(m.total / 1000).toFixed(m.total >= 10000 ? 0 : 1)}k`
+                    : Math.round(m.total).toLocaleString();
+                return (
+                  <div key={idx} className="flex-1 text-center min-w-0">
+                    <p className="text-[11px] sm:text-xs font-medium text-muted-foreground">{m.label}</p>
+                    <p className="text-[10px] sm:text-[11px] font-semibold tabular-nums text-foreground mt-0.5 truncate">
+                      <span className="sm:hidden">{compactVal}</span>
+                      <span className="hidden sm:inline">{Math.round(m.total).toLocaleString()}</span>
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

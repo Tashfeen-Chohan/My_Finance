@@ -20,24 +20,24 @@ export function FuelFilters({
   const ascLabel = isDateSort ? "Oldest First" : "Low to High";
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border/40 bg-card/40 p-4 backdrop-blur-xl">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border bg-card p-3.5 sm:p-4">
       <div className="relative flex-1 max-w-md">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search gas station or notes..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10 bg-background/50 border-border/50 rounded-xl"
+          className="pl-10 bg-background border-border rounded-xl"
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2.5 sm:flex-nowrap">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-2.5">
         {/* Time Range Filter */}
         <Select value={timeRangeFilter} onValueChange={onTimeRangeChange}>
-          <SelectTrigger className="w-full sm:w-36 bg-background/50 border-border/50 rounded-xl text-xs">
+          <SelectTrigger className="w-full sm:w-36 bg-background border-border rounded-xl text-xs">
             <div className="flex items-center gap-1.5 truncate">
               <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              <SelectValue placeholder="Time Period" />
+              <SelectValue placeholder="Period" />
             </div>
           </SelectTrigger>
           <SelectContent>
@@ -47,9 +47,27 @@ export function FuelFilters({
           </SelectContent>
         </Select>
 
+        {/* Dynamic Context-Aware Sort Order Dropdown */}
+        <Select value={sortOrder} onValueChange={onSortOrderChange}>
+          <SelectTrigger className="w-full sm:w-36 sm:order-3 bg-background border-border rounded-xl text-xs">
+            <div className="flex items-center gap-1.5 truncate">
+              {sortOrder === "asc" ? (
+                <ArrowUp className="h-3.5 w-3.5 text-primary shrink-0" />
+              ) : (
+                <ArrowDown className="h-3.5 w-3.5 text-primary shrink-0" />
+              )}
+              <SelectValue placeholder="Order" />
+            </div>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="desc">{descLabel}</SelectItem>
+            <SelectItem value="asc">{ascLabel}</SelectItem>
+          </SelectContent>
+        </Select>
+
         {/* Sort Field Options Dropdown */}
         <Select value={sortField} onValueChange={onSortFieldChange}>
-          <SelectTrigger className="w-full sm:w-48 bg-background/50 border-border/50 rounded-xl text-xs">
+          <SelectTrigger className="col-span-2 sm:col-span-1 sm:order-2 w-full sm:w-48 bg-background border-border rounded-xl text-xs">
             <div className="flex items-center gap-1.5 truncate">
               <SlidersHorizontal className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
               <SelectValue placeholder="Sort By" />
@@ -64,24 +82,6 @@ export function FuelFilters({
             <SelectItem value="dailyDistanceDriven">Daily Distance (km/day)</SelectItem>
             <SelectItem value="computedEconomy">Fuel Economy (km/L)</SelectItem>
             <SelectItem value="costPerKM">Cost / Distance (PKR/km)</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Dynamic Context-Aware Sort Order Dropdown */}
-        <Select value={sortOrder} onValueChange={onSortOrderChange}>
-          <SelectTrigger className="w-full sm:w-40 bg-background/50 border-border/50 rounded-xl text-xs">
-            <div className="flex items-center gap-1.5 truncate">
-              {sortOrder === "asc" ? (
-                <ArrowUp className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-              ) : (
-                <ArrowDown className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-              )}
-              <SelectValue placeholder="Order" />
-            </div>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="desc">{descLabel}</SelectItem>
-            <SelectItem value="asc">{ascLabel}</SelectItem>
           </SelectContent>
         </Select>
       </div>

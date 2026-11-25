@@ -16,7 +16,7 @@ export function MaintenanceRemindersSkeleton({ count = 2 }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="rounded-2xl border border-border/30 bg-secondary/10 p-4 sm:p-5 space-y-4">
+        <div key={i} className="rounded-xl border-2 border-slate-200 dark:border-slate-700/90 bg-card p-3.5 sm:p-4 space-y-3">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 flex-1 min-w-0">
               <Skeleton className="h-10 w-10 rounded-xl shrink-0" />

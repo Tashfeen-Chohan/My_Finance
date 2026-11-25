@@ -12,16 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Fuel,
-  Calendar,
-  Gauge,
-  MapPin,
-  FileText,
   Edit2,
   Trash2,
-  Coins,
   CheckCircle2,
-  TrendingUp,
-  Droplet,
 } from "lucide-react";
 
 export function ViewFuelDialog({
@@ -72,38 +65,41 @@ export function ViewFuelDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg w-[92vw] sm:w-full max-h-[90vh] overflow-y-auto p-3.5 sm:p-6 rounded-2xl">
-        {/* Header Section */}
-        <DialogHeader className="space-y-2 pb-3 border-b-2 border-slate-300 dark:border-border/40 text-left">
-          <div className="flex items-start gap-2.5 min-w-0">
-            <div className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-amber-500/30 bg-amber-500/10 text-amber-500 shadow-sm">
-              <Fuel className="h-6 w-6" />
+      <DialogContent className="max-w-lg p-0">
+        {/* Header */}
+        <DialogHeader className="pb-4 border-b border-border text-left pr-8">
+          <div className="flex items-start gap-3 min-w-0">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400">
+              <Fuel className="h-5 w-5" />
             </div>
-            <div className="min-w-0 flex-1 space-y-1">
-              <DialogTitle className="text-base sm:text-lg font-bold text-foreground leading-snug break-words">
-                {vehicleName}
-              </DialogTitle>
-
-              {/* Efficiency Badges */}
-              <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <DialogTitle className="text-base sm:text-lg font-semibold text-foreground leading-snug break-words">
+                  {vehicleName}
+                </DialogTitle>
                 {expense.isFullTank && (
-                  <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] font-semibold gap-0.5 px-1.5 py-0.5">
-                    <CheckCircle2 className="h-2.5 w-2.5 shrink-0" />
-                    Full Tank
-                  </Badge>
+                  <CheckCircle2
+                    className="h-4 w-4 text-teal-600 dark:text-teal-400 shrink-0"
+                    aria-label="Full Tank"
+                  />
                 )}
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5">
                 {expense.computedEconomy && (
-                  <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[10px] font-semibold px-1.5 py-0.5">
+                  <Badge
+                    variant="outline"
+                    className="text-[11px] font-semibold tabular-nums bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20"
+                  >
                     {expense.computedEconomy} km/L
                   </Badge>
                 )}
                 {expense.costPerKM && (
-                  <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-[10px] font-semibold px-1.5 py-0.5">
+                  <Badge variant="secondary" className="text-[11px] font-medium tabular-nums">
                     PKR {expense.costPerKM}/km
                   </Badge>
                 )}
                 {expense.dailyDistanceDriven && (
-                  <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-[10px] font-semibold px-1.5 py-0.5">
+                  <Badge variant="secondary" className="text-[11px] font-medium tabular-nums">
                     {Math.round(expense.dailyDistanceDriven)} km/day
                   </Badge>
                 )}
@@ -115,107 +111,74 @@ export function ViewFuelDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {/* Structured Refill Details */}
-        <div className="space-y-2.5 sm:space-y-3 pt-2">
-          {/* Total Cost & Odometer Grid */}
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
-            {/* Total Cost */}
-            <div className="rounded-xl border-2 border-slate-300 dark:border-border/50 bg-slate-50/80 dark:bg-secondary/20 p-2.5 sm:p-3 space-y-1 shadow-sm min-w-0">
-              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground font-medium">
-                <Coins className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                <span>Total Cost</span>
-              </div>
-              <p className="text-sm sm:text-base font-extrabold font-mono text-foreground truncate">
+        {/* Body */}
+        <div className="space-y-4 py-4">
+          {/* Summary Strip */}
+          <div className="rounded-xl border border-border bg-secondary/40 p-4 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">Total Paid</p>
+              <p className="text-xl sm:text-2xl font-bold text-foreground tabular-nums mt-0.5">
                 PKR {costFormatted}
               </p>
             </div>
-
-            {/* Odometer */}
-            <div className="rounded-xl border-2 border-slate-300 dark:border-border/50 bg-slate-50/80 dark:bg-secondary/20 p-2.5 sm:p-3 space-y-1 shadow-sm min-w-0">
-              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground font-medium">
-                <Gauge className="h-3.5 w-3.5 text-sky-500 shrink-0" />
-                <span>Odometer</span>
-              </div>
-              <p className="text-xs sm:text-base font-extrabold font-mono text-foreground truncate">
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground font-medium">Odometer</p>
+              <p className="text-sm sm:text-base font-semibold text-foreground tabular-nums mt-0.5">
                 {expense.odometer !== undefined && expense.odometer !== null
                   ? `${expense.odometer.toLocaleString()} km`
                   : "N/A"}
-                {expense.distanceTraveled ? ` (+${expense.distanceTraveled} km)` : ""}
               </p>
+              {expense.distanceTraveled ? (
+                <p className="text-[11px] text-teal-600 dark:text-teal-400 font-medium tabular-nums">
+                  +{expense.distanceTraveled} km trip
+                </p>
+              ) : null}
             </div>
           </div>
 
-          {/* Volume & Unit Price Grid */}
-          <div className="grid grid-cols-2 gap-2 sm:gap-3">
-            {/* Fuel Quantity */}
-            <div className="rounded-xl border-2 border-slate-300 dark:border-border/50 bg-slate-50/80 dark:bg-secondary/20 p-2.5 sm:p-3 space-y-1 shadow-sm min-w-0">
-              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground font-medium">
-                <Droplet className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                <span>Quantity</span>
-              </div>
-              <p className="text-sm sm:text-base font-extrabold font-mono text-foreground truncate">
-                {expense.quantity} L
-              </p>
+          {/* Specification Rows */}
+          <div className="rounded-xl border border-border divide-y divide-border text-sm">
+            <div className="flex items-center justify-between px-4 py-3">
+              <span className="text-xs text-muted-foreground">Fuel Quantity</span>
+              <span className="font-semibold text-foreground tabular-nums">{expense.quantity} L</span>
             </div>
-
-            {/* Unit Price */}
-            <div className="rounded-xl border-2 border-slate-300 dark:border-border/50 bg-slate-50/80 dark:bg-secondary/20 p-2.5 sm:p-3 space-y-1 shadow-sm min-w-0">
-              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground font-medium">
-                <TrendingUp className="h-3.5 w-3.5 text-purple-500 shrink-0" />
-                <span>Unit Price</span>
-              </div>
-              <p className="text-xs sm:text-base font-extrabold font-mono text-foreground truncate">
-                PKR {expense.unitPrice}/L
-              </p>
+            <div className="flex items-center justify-between px-4 py-3">
+              <span className="text-xs text-muted-foreground">Unit Price</span>
+              <span className="font-semibold text-foreground tabular-nums">PKR {expense.unitPrice}/L</span>
             </div>
+            <div className="flex items-center justify-between px-4 py-3">
+              <span className="text-xs text-muted-foreground">Refill Date</span>
+              <span className="font-medium text-foreground">{dateStr}</span>
+            </div>
+            {expense.stationName && (
+              <div className="flex items-center justify-between gap-4 px-4 py-3">
+                <span className="text-xs text-muted-foreground shrink-0">Gas Station</span>
+                <span className="font-medium text-foreground text-right truncate">{expense.stationName}</span>
+              </div>
+            )}
           </div>
 
-          {/* Refill Date (Full Width) */}
-          <div className="w-full rounded-xl border-2 border-slate-300 dark:border-border/50 bg-slate-50/80 dark:bg-secondary/20 p-2.5 sm:p-3 flex items-center justify-between shadow-sm min-w-0">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
-              <Calendar className="h-3.5 w-3.5 text-purple-500 shrink-0" />
-              <span>Refill Date</span>
-            </div>
-            <span className="text-xs sm:text-sm font-bold text-foreground font-mono truncate">
-              {dateStr}
-            </span>
-          </div>
-
-          {/* Gas Station Name */}
-          {expense.stationName && (
-            <div className="rounded-xl border-2 border-slate-300 dark:border-border/50 bg-slate-50/80 dark:bg-secondary/20 p-2.5 sm:p-3 flex items-center gap-2.5 shadow-sm min-w-0">
-              <MapPin className="h-4 w-4 text-amber-500 shrink-0" />
-              <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Gas Station</p>
-                <p className="text-xs sm:text-sm font-bold text-foreground truncate">{expense.stationName}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Notes & Remarks */}
+          {/* Notes */}
           {expense.notes && (
-            <div className="rounded-xl border-2 border-slate-300 dark:border-border/50 bg-slate-50/80 dark:bg-secondary/20 p-2.5 sm:p-3 space-y-1 shadow-sm min-w-0">
-              <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                <FileText className="h-3.5 w-3.5 text-purple-500 shrink-0" />
-                <span>Notes & Remarks</span>
-              </div>
-              <p className="text-xs sm:text-sm text-foreground/90 italic leading-relaxed pt-0.5 whitespace-pre-wrap break-words">
-                &quot;{expense.notes}&quot;
+            <div className="rounded-xl border border-border bg-secondary/20 p-3.5 space-y-1">
+              <p className="text-[11px] font-medium text-muted-foreground">Notes</p>
+              <p className="text-xs sm:text-sm text-foreground leading-relaxed whitespace-pre-wrap break-words">
+                {expense.notes}
               </p>
             </div>
           )}
         </div>
 
-        {/* Buttons Section */}
-        <DialogFooter className="pt-3 sm:pt-4 border-t-2 border-slate-300 dark:border-border/40 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2">
+        {/* Footer */}
+        <DialogFooter className="pt-4 border-t border-border flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2">
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
             onClick={handleDeleteClick}
-            className="gap-2 cursor-pointer border-red-500/30 text-red-600 dark:text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded-xl h-9 sm:h-10 px-3.5 text-xs sm:text-sm font-semibold transition-colors w-full sm:w-auto"
+            className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10 w-full sm:w-auto"
           >
-            <Trash2 className="h-4 w-4 text-red-500" />
-            Delete Entry
+            <Trash2 className="h-4 w-4" />
+            Delete
           </Button>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -223,18 +186,17 @@ export function ViewFuelDialog({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="cursor-pointer flex-1 sm:flex-initial rounded-xl h-9 sm:h-10 px-3.5 text-xs sm:text-sm font-semibold transition-colors border-slate-300 dark:border-border"
+              className="flex-1 sm:flex-initial"
             >
               Close
             </Button>
             <Button
               type="button"
-              variant="outline"
               onClick={handleEditClick}
-              className="gap-2 cursor-pointer border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 rounded-xl h-9 sm:h-10 px-3.5 text-xs sm:text-sm font-semibold transition-colors flex-1 sm:flex-initial"
+              className="gap-1.5 flex-1 sm:flex-initial bg-teal-600 hover:bg-teal-700 text-white dark:bg-teal-500 dark:hover:bg-teal-400 dark:text-slate-950"
             >
-              <Edit2 className="h-4 w-4 text-amber-500" />
-              Edit Record
+              <Edit2 className="h-4 w-4" />
+              Edit
             </Button>
           </div>
         </DialogFooter>

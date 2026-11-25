@@ -109,7 +109,7 @@ export default function VehiclesPage() {
   const hasFilters = Boolean(searchQuery || fuelFilter !== "all");
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 pb-12">
+    <div className="mx-auto max-w-7xl space-y-5 sm:space-y-8 pb-8 sm:pb-12">
       {/* Hero / Header Section */}
       <VehicleHeader onAddVehicle={handleOpenAddModal} />
 

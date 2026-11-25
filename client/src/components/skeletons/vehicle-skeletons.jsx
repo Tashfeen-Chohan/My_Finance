@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export function VehicleCardSkeleton({ className }) {
   return (
-    <Card className={cn("group relative overflow-hidden border-border/40 bg-card/60 backdrop-blur-xl", className)}>
+    <Card className={cn("group relative overflow-hidden", className)}>
       <div className="relative h-44 w-full overflow-hidden">
         <Skeleton className="h-full w-full rounded-none" />
         <div className="absolute top-3 left-3 flex items-center gap-2">

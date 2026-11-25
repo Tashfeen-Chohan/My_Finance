@@ -3,32 +3,29 @@
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Fuel, Wrench, Car } from "lucide-react";
+import { Fuel, Wrench, Car } from "lucide-react";
 
 export function QuickActionsBar() {
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border/40 bg-card/40 p-4 backdrop-blur-xl">
-      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-2">
-        Quick Actions:
-      </span>
-      <Link href="/fuel">
-        <Button size="sm" className="gap-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold shadow-md shadow-amber-500/10 cursor-pointer">
-          <Fuel className="h-4 w-4" />
-          Log Fuel Refill
+    <div className="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:gap-2.5">
+      <Link href="/fuel" className="w-full sm:w-auto">
+        <Button size="sm" variant="outline" className="w-full sm:w-auto gap-1.5 font-medium bg-card">
+          <Fuel className="h-3.5 w-3.5 shrink-0 text-teal-600 dark:text-teal-400" />
+          <span className="truncate">Log Fuel</span>
         </Button>
       </Link>
 
-      <Link href="/maintenance">
-        <Button size="sm" className="gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-md shadow-purple-500/10 cursor-pointer">
-          <Wrench className="h-4 w-4" />
-          Log Maintenance
+      <Link href="/maintenance" className="w-full sm:w-auto">
+        <Button size="sm" variant="outline" className="w-full sm:w-auto gap-1.5 font-medium bg-card">
+          <Wrench className="h-3.5 w-3.5 shrink-0 text-sky-600 dark:text-sky-400" />
+          <span className="truncate">Service</span>
         </Button>
       </Link>
 
-      <Link href="/vehicles">
-        <Button size="sm" variant="outline" className="gap-2 cursor-pointer border-border/60">
-          <Car className="h-4 w-4 text-primary" />
-          Add Vehicle
+      <Link href="/vehicles" className="w-full sm:w-auto">
+        <Button size="sm" variant="outline" className="w-full sm:w-auto gap-1.5 font-medium bg-card">
+          <Car className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          <span className="truncate">Vehicle</span>
         </Button>
       </Link>
     </div>

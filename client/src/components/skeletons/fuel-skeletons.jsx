@@ -10,8 +10,8 @@ export function FuelStatCardsSkeleton({ count = 4 }) {
 
 export function FuelReminderCardSkeleton() {
   return (
-    <Card className="border-border/40 bg-card/40 backdrop-blur-xl overflow-hidden rounded-2xl shadow-xl">
-      <CardHeader className="p-4 sm:p-6 border-b border-border/30 bg-secondary/10">
+    <Card className="overflow-hidden">
+      <CardHeader className="p-4 sm:p-5 border-b border-border">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Skeleton className="h-11 w-11 rounded-2xl shrink-0" />

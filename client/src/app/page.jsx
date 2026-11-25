@@ -27,7 +27,7 @@ export default function DashboardPage() {
   const vehiclesCount = statsData?.vehicles || {};
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 pb-12">
+    <div className="mx-auto max-w-7xl space-y-5 sm:space-y-8 pb-8 sm:pb-12">
       {/* Header Banner */}
       <DashboardHeader />
 

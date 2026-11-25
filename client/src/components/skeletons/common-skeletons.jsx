@@ -14,12 +14,15 @@ export function BadgeSkeleton({ className }) {
 
 export function KpiCardSkeleton({ className }) {
   return (
-    <Card className={cn("border-border/50 bg-card/50 backdrop-blur-xl", className)}>
-      <CardContent className="p-5 flex items-center gap-4">
-        <Skeleton className="h-12 w-12 shrink-0 rounded-xl" />
-        <div className="space-y-2 flex-1 min-w-0">
-          <Skeleton className="h-3.5 w-24 rounded" />
-          <Skeleton className="h-7 w-32 rounded-md" />
+    <Card className={cn("bg-card border-border", className)}>
+      <CardContent className="p-4 sm:p-5 flex flex-row items-center justify-between gap-4 sm:flex-col sm:items-stretch sm:gap-3">
+        <div className="flex items-center gap-3 sm:justify-between sm:gap-2 min-w-0">
+          <Skeleton className="h-10 w-10 sm:h-8 sm:w-8 shrink-0 rounded-xl sm:rounded-lg sm:order-2" />
+          <Skeleton className="h-3.5 w-24 rounded sm:order-1" />
+        </div>
+        <div className="space-y-1.5 text-right sm:text-left">
+          <Skeleton className="h-6 sm:h-7 w-28 rounded-md ml-auto sm:ml-0" />
+          <Skeleton className="hidden sm:block h-3 w-20 rounded" />
         </div>
       </CardContent>
     </Card>
@@ -38,7 +41,7 @@ export function KpiCardsSkeleton({ count = 4, className }) {
 
 export function CardItemSkeleton({ className }) {
   return (
-    <div className={cn("p-4 sm:p-5 rounded-xl border border-border/30 bg-secondary/10 space-y-3", className)}>
+    <div className={cn("p-4 sm:p-5 rounded-xl border-2 border-slate-200 dark:border-slate-700/90 bg-card space-y-3", className)}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <Skeleton className="h-10 w-10 shrink-0 rounded-xl" />
@@ -59,8 +62,8 @@ export function CardItemSkeleton({ className }) {
 
 export function MonthlyChartSkeleton() {
   return (
-    <Card className="border-border/50 bg-card/60 backdrop-blur-2xl shadow-xl rounded-2xl overflow-hidden">
-      <CardHeader className="pb-3.5 pt-5 px-4 sm:px-6 border-b border-border/30 bg-secondary/10">
+    <Card className="overflow-hidden">
+      <CardHeader className="p-5 pb-4 border-b border-border">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Skeleton className="h-10 w-10 rounded-xl shrink-0" />
@@ -78,7 +81,7 @@ export function MonthlyChartSkeleton() {
             <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end">
               <Skeleton
                 style={{ height: `${heightPct}%` }}
-                className="w-full rounded-t-lg opacity-60 animate-pulse"
+                className="w-full rounded-t-lg"
               />
             </div>
           ))}

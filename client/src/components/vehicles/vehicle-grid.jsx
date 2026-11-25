@@ -3,7 +3,7 @@
 import { VehicleCard } from "@/components/vehicles/vehicle-card";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Plus } from "lucide-react";
+import { Car, Plus } from "lucide-react";
 import { VehicleGridSkeleton } from "@/components/skeletons";
 
 export function VehicleGrid({
@@ -36,9 +36,9 @@ export function VehicleGrid({
   }
 
   return (
-    <Card className="border-dashed border-border/60 bg-card/20 p-12 text-center backdrop-blur-xl">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4">
-        <Sparkles className="h-8 w-8" />
+    <Card className="border-dashed border-border p-12 text-center">
+      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-muted-foreground mb-4">
+        <Car className="h-6 w-6" />
       </div>
       <h3 className="text-xl font-bold tracking-tight text-foreground">No Vehicles Found</h3>
       <p className="text-muted-foreground text-sm max-w-sm mx-auto mt-1 mb-6">

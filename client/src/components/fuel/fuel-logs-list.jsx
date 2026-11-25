@@ -4,7 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BadgeSkeleton, FuelLogsListSkeleton } from "@/components/skeletons";
-import { Fuel, Plus, Gauge, Calendar, MapPin, Sparkles, CheckCircle2 } from "lucide-react";
+import {
+  Fuel,
+  Plus,
+  MapPin,
+  CheckCircle2,
+  Gauge,
+  Calendar,
+  Droplet,
+  TrendingUp,
+  Route,
+  ChevronRight,
+} from "lucide-react";
 
 export function FuelLogsList({
   expenses = [],
@@ -20,40 +31,29 @@ export function FuelLogsList({
   };
 
   return (
-    <Card className="border-border/40 bg-card/40 backdrop-blur-xl overflow-hidden rounded-2xl shadow-xl">
-      <CardHeader className="p-4 sm:p-6 border-b border-border/30 bg-secondary/10">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-md shadow-amber-500/5">
-              <Fuel className="h-5.5 w-5.5" />
-            </div>
-            <div>
-              <CardTitle className="text-base sm:text-lg font-bold text-foreground">
-                Refill Logs History
-              </CardTitle>
-              <CardDescription className="text-xs text-muted-foreground">
-                Detailed history of fuel refills sorted chronologically
-              </CardDescription>
-            </div>
-          </div>
-
-          {isLoading ? (
-            <BadgeSkeleton className="h-8 w-20 rounded-xl" />
-          ) : (
-            <div className="flex items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 shadow-sm shrink-0">
-              <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-              <span className="font-mono font-extrabold text-sm sm:text-base">{expenses.length}</span>
-              <span className="hidden sm:inline text-[11px] opacity-80">{expenses.length === 1 ? "Refill Log" : "Total Logs"}</span>
-            </div>
-          )}
+    <Card className="overflow-hidden">
+      <CardHeader className="p-4 sm:p-5 border-b border-border flex flex-row items-center justify-between gap-3 space-y-0">
+        <div>
+          <CardTitle className="text-base font-semibold">Refill History</CardTitle>
+          <CardDescription className="text-xs mt-0.5">
+            Complete fuel refill logs and efficiency metrics
+          </CardDescription>
         </div>
+
+        {isLoading ? (
+          <BadgeSkeleton className="h-6 w-16" />
+        ) : (
+          <Badge variant="secondary" className="text-xs font-medium tabular-nums shrink-0">
+            {expenses.length} {expenses.length === 1 ? "entry" : "entries"}
+          </Badge>
+        )}
       </CardHeader>
 
-      <CardContent className="p-0">
+      <CardContent className="p-3 sm:p-6 bg-secondary/15 dark:bg-black/25">
         {isLoading ? (
           <FuelLogsListSkeleton />
         ) : expenses.length > 0 ? (
-          <div className="p-3 sm:p-4 space-y-3">
+          <div className="space-y-4 md:space-y-8">
             {expenses.map((expense) => {
               const dateStr = expense.date
                 ? new Date(expense.date).toLocaleDateString("en-US", {
@@ -72,179 +72,220 @@ export function FuelLogsList({
                 <div
                   key={expense.id || expense._id}
                   onClick={() => onView?.(expense)}
-                  className="p-4 sm:p-5 rounded-xl border-2 border-border/80 hover:border-amber-500/40 bg-secondary/15 hover:bg-secondary/30 shadow-sm transition-all cursor-pointer group"
+                  className="group rounded-xl border-2 border-slate-200 dark:border-slate-700/90 bg-card hover:border-teal-500/50 active:bg-secondary/30 shadow-sm transition-all cursor-pointer overflow-hidden md:pb-2"
                 >
-                  {/* MOBILE VIEW (Block < sm) */}
-                  <div className="sm:hidden space-y-3">
-                    {/* Top Row: Vehicle Icon, Vehicle Name + Full Tank, Station Subtitle */}
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-sm">
-                        <Fuel className="h-5.5 w-5.5" />
-                      </div>
-                      <div className="min-w-0 flex-1 space-y-0.5">
-                        <div className="flex items-center justify-between gap-2">
-                          <h4 className="font-bold text-sm text-foreground truncate">
+                  {/* Card Top Bar */}
+                  <div className="px-3.5 py-3 sm:px-4 sm:py-3.5 bg-secondary/30 border-b border-border space-y-2.5">
+                    {/* Row 1: Icon + Vehicle Name + Full Tank + Total Cost */}
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                        <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400">
+                          <Fuel className="h-4 w-4 sm:h-5 sm:w-5" />
+                        </div>
+                        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                          <h4 className="font-semibold text-sm sm:text-base text-foreground truncate">
                             {getVehicleName(expense.vehicleId)}
                           </h4>
                           {expense.isFullTank && (
-                            <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] font-semibold gap-0.5 px-2 py-0.5 shrink-0">
-                              <CheckCircle2 className="h-2.5 w-2.5 shrink-0" />
-                              Full Tank
-                            </Badge>
+                            <>
+                              {/* Mobile: Tick only */}
+                              <CheckCircle2
+                                className="h-4 w-4 text-teal-600 dark:text-teal-400 shrink-0 sm:hidden"
+                                aria-label="Full Tank"
+                              />
+                              {/* Desktop: Full Tank badge */}
+                              <Badge
+                                variant="secondary"
+                                className="hidden sm:inline-flex text-[11px] font-medium gap-1 text-teal-600 dark:text-teal-400 px-2 py-0 shrink-0"
+                              >
+                                <CheckCircle2 className="h-3 w-3 shrink-0" />
+                                Full Tank
+                              </Badge>
+                            </>
                           )}
                         </div>
-                        {expense.stationName ? (
-                          <p className="text-xs text-muted-foreground font-medium flex items-center gap-1 truncate">
-                            <MapPin className="h-3 w-3 text-muted-foreground/70 shrink-0" />
-                            <span className="truncate">{expense.stationName}</span>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="text-right">
+                          <p className="hidden sm:block text-[10px] text-muted-foreground uppercase tracking-wider font-medium leading-none mb-0.5">
+                            Total
                           </p>
-                        ) : (
-                          <p className="text-xs text-muted-foreground font-medium">Fuel Refill</p>
-                        )}
+                          <p className="text-sm sm:text-base font-bold text-foreground tabular-nums leading-tight">
+                            PKR {costFormatted}
+                          </p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-teal-500 transition-colors hidden sm:block" />
                       </div>
                     </div>
 
-                    {/* Efficiency Badges Bar: km/L, PKR/km, km/day in one line */}
-                    {(expense.computedEconomy || expense.costPerKM || expense.dailyDistanceDriven) && (
-                      <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                        {expense.computedEconomy && (
-                          <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[10px] font-semibold px-2 py-0.5">
-                            {expense.computedEconomy} km/L
-                          </Badge>
-                        )}
-                        {expense.costPerKM && (
-                          <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-[10px] font-semibold px-2 py-0.5">
-                            PKR {expense.costPerKM}/km
-                          </Badge>
-                        )}
-                        {expense.dailyDistanceDriven && (
-                          <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-[10px] font-semibold px-2 py-0.5">
-                            {Math.round(expense.dailyDistanceDriven)} km/day
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Reverted Single Line Pricing Bar */}
-                    <div className="flex items-center justify-between rounded-xl bg-secondary/40 p-2.5 border border-border/30 shadow-sm">
-                      <div className="flex items-center gap-1.5 text-xs font-mono font-medium text-muted-foreground">
-                        <span className="font-bold text-foreground">{expense.quantity} L</span>
-                        <span className="text-muted-foreground/40">•</span>
-                        <span>@ PKR {expense.unitPrice}/L</span>
-                      </div>
-
-                      <span className="text-sm font-extrabold text-foreground font-mono">
-                        PKR {costFormatted}
-                      </span>
-                    </div>
-
-                    {/* Metadata Chips: Date & Odometer */}
-                    <div className="flex items-center justify-between gap-1.5 text-xs text-muted-foreground pt-0.5">
-                      <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2 py-1 text-[11px] whitespace-nowrap shrink-0">
-                        <Calendar className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
+                    {/* Row 2: Full-width Date & Station side-by-side */}
+                    <div className="flex items-center justify-between gap-3 w-full pt-2 border-t border-border/60 text-[11px] sm:text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1.5 shrink-0">
+                        <Calendar className="h-3.5 w-3.5 shrink-0" />
                         <span>{dateStr}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2 py-1 text-[11px] font-mono whitespace-nowrap shrink-0">
-                        <Gauge className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
-                        <span>
-                          {expense.odometer?.toLocaleString()} km
-                          {expense.distanceTraveled ? ` (+${expense.distanceTraveled} km)` : ""}
+                      </span>
+                      {expense.stationName && (
+                        <span className="inline-flex items-center justify-end gap-1 min-w-0 flex-1 text-right">
+                          <MapPin className="h-3.5 w-3.5 shrink-0" />
+                          <span className="truncate">{expense.stationName}</span>
                         </span>
-                      </div>
-                    </div>
-
-                    {expense.notes && (
-                      <p className="text-xs text-muted-foreground/80 italic bg-secondary/20 p-2.5 rounded-lg border border-border/20">
-                        &quot;{expense.notes}&quot;
-                      </p>
-                    )}
-                  </div>
-
-                  {/* DESKTOP VIEW (Hidden < sm) */}
-                  <div className="hidden sm:flex items-center justify-between gap-4">
-                    <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                        <Fuel className="h-5 w-5" />
-                      </div>
-                      <div className="space-y-2 min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h4 className="font-bold text-foreground">
-                            {getVehicleName(expense.vehicleId)}
-                          </h4>
-                          {expense.isFullTank && (
-                            <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[11px] font-medium gap-1">
-                              <CheckCircle2 className="h-3 w-3" />
-                              Full Tank
-                            </Badge>
-                          )}
-                          {expense.computedEconomy && (
-                            <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[11px] font-medium">
-                              {expense.computedEconomy} km/L
-                            </Badge>
-                          )}
-                          {expense.costPerKM && (
-                            <Badge className="bg-purple-500/10 text-purple-400 border-purple-500/20 text-[11px] font-medium">
-                              PKR {expense.costPerKM}/km
-                            </Badge>
-                          )}
-                          {expense.dailyDistanceDriven && (
-                            <Badge className="bg-blue-500/10 text-blue-400 border-blue-500/20 text-[11px] font-medium">
-                              {Math.round(expense.dailyDistanceDriven)} km/day
-                            </Badge>
-                          )}
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1">
-                            <Calendar className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
-                            <span>{dateStr}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1 font-mono">
-                            <Gauge className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
-                            <span>
-                              {expense.odometer?.toLocaleString()} km
-                              {expense.distanceTraveled ? ` (+${expense.distanceTraveled} km)` : ""}
-                            </span>
-                          </div>
-                          {expense.stationName && (
-                            <div className="flex items-center gap-1.5 rounded-lg bg-secondary/40 border border-border/30 px-2.5 py-1 text-foreground/80">
-                              <MapPin className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
-                              <span className="truncate max-w-[200px]">{expense.stationName}</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {expense.notes && (
-                          <p className="text-xs text-muted-foreground/80 italic pt-0.5 max-w-2xl line-clamp-2">
-                            &quot;{expense.notes}&quot;
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="text-right shrink-0">
-                      <p className="text-lg font-bold text-foreground">
-                        PKR {costFormatted}
-                      </p>
-                      <p className="text-xs text-muted-foreground font-mono">
-                        {expense.quantity} L @ PKR {expense.unitPrice}/L
-                      </p>
+                      )}
                     </div>
                   </div>
+
+                  {/* Mobile Metrics: Two Merged Sections (No Icons) */}
+                  <div className="sm:hidden p-3 space-y-2.5">
+                    {/* Merged Section 1: Volume & Odometer */}
+                    <div className="grid grid-cols-2 gap-2.5 rounded-lg bg-secondary/40 px-3 py-2 text-left">
+                      <div className="min-w-0 space-y-0.5">
+                        <p className="text-[10px] text-muted-foreground">Volume</p>
+                        <p className="text-xs font-semibold text-foreground tabular-nums truncate">
+                          {expense.quantity} L
+                        </p>
+                        <p className="text-[10px] text-muted-foreground tabular-nums truncate">
+                          @ PKR {expense.unitPrice}/L
+                        </p>
+                      </div>
+
+                      <div className="min-w-0 border-l-2 border-slate-300 dark:border-slate-600/80 pl-3 space-y-0.5">
+                        <p className="text-[10px] text-muted-foreground">Odometer</p>
+                        <p className="text-xs font-semibold text-foreground tabular-nums truncate">
+                          {expense.odometer !== undefined && expense.odometer !== null
+                            ? `${expense.odometer.toLocaleString()} km`
+                            : "—"}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground tabular-nums truncate">
+                          {expense.distanceTraveled ? `+${expense.distanceTraveled} km trip` : "—"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Merged Section 2: Mileage & Daily Avg */}
+                    <div className="grid grid-cols-2 gap-2.5 rounded-lg bg-secondary/40 px-3 py-2 text-left">
+                      <div className="min-w-0 space-y-0.5">
+                        <p className="text-[10px] text-muted-foreground">Mileage</p>
+                        <p
+                          className={`text-xs font-bold tabular-nums truncate ${
+                            expense.computedEconomy
+                              ? "text-teal-600 dark:text-teal-400"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {expense.computedEconomy ? `${expense.computedEconomy} km/L` : "—"}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground tabular-nums truncate">
+                          {expense.costPerKM ? `PKR ${expense.costPerKM}/km` : "—"}
+                        </p>
+                      </div>
+
+                      <div className="min-w-0 border-l-2 border-slate-300 dark:border-slate-600/80 pl-3 space-y-0.5">
+                        <p className="text-[10px] text-muted-foreground">Daily Avg</p>
+                        <p className="text-xs font-semibold text-foreground tabular-nums truncate">
+                          {expense.dailyDistanceDriven
+                            ? `${Math.round(expense.dailyDistanceDriven)} km/day`
+                            : "—"}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground truncate">
+                          {expense.dailyDistanceDriven ? "Driving pace" : "—"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Desktop Metrics Bar: Unified 4-Column Strip with Icons */}
+                  <div className="hidden sm:block px-4 py-3">
+                    <div className="grid grid-cols-4 gap-3 rounded-lg bg-secondary/40 px-4 py-2.5 text-left">
+                      {/* Volume & Unit Price */}
+                      <div className="space-y-0.5 min-w-0">
+                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                          <Droplet className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <span>Volume</span>
+                        </div>
+                        <p className="text-sm font-semibold text-foreground tabular-nums truncate">
+                          {expense.quantity} L
+                        </p>
+                        <p className="text-[11px] text-muted-foreground tabular-nums truncate">
+                          @ PKR {expense.unitPrice}/L
+                        </p>
+                      </div>
+
+                      {/* Odometer & Distance Traveled */}
+                      <div className="border-l-2 border-slate-300 dark:border-slate-600/80 pl-3 space-y-0.5 min-w-0">
+                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                          <Gauge className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <span>Odometer</span>
+                        </div>
+                        <p className="text-sm font-semibold text-foreground tabular-nums truncate">
+                          {expense.odometer !== undefined && expense.odometer !== null
+                            ? `${expense.odometer.toLocaleString()} km`
+                            : "—"}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground tabular-nums truncate">
+                          {expense.distanceTraveled ? `+${expense.distanceTraveled} km trip` : "—"}
+                        </p>
+                      </div>
+
+                      {/* Fuel Economy (Mileage in Teal) */}
+                      <div className="border-l-2 border-slate-300 dark:border-slate-600/80 pl-3 space-y-0.5 min-w-0">
+                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                          <TrendingUp className="h-3 w-3 text-teal-600 dark:text-teal-400 shrink-0" />
+                          <span>Mileage</span>
+                        </div>
+                        <p
+                          className={`text-sm font-bold tabular-nums truncate ${
+                            expense.computedEconomy
+                              ? "text-teal-600 dark:text-teal-400"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {expense.computedEconomy ? `${expense.computedEconomy} km/L` : "—"}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground tabular-nums truncate">
+                          {expense.costPerKM ? `PKR ${expense.costPerKM}/km` : "—"}
+                        </p>
+                      </div>
+
+                      {/* Daily Distance Driven */}
+                      <div className="border-l-2 border-slate-300 dark:border-slate-600/80 pl-3 space-y-0.5 min-w-0">
+                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                          <Route className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <span>Daily Avg</span>
+                        </div>
+                        <p className="text-sm font-semibold text-foreground tabular-nums truncate">
+                          {expense.dailyDistanceDriven
+                            ? `${Math.round(expense.dailyDistanceDriven)} km/day`
+                            : "—"}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground truncate">
+                          {expense.dailyDistanceDriven ? "Driving pace" : "—"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Notes Footer (if present) */}
+                  {expense.notes && (
+                    <div className="px-3.5 pb-3 sm:px-4 sm:pb-3.5 pt-0.5">
+                      <p className="text-xs text-muted-foreground bg-secondary/25 border border-border/60 rounded-lg px-3 py-2 line-clamp-2">
+                        {expense.notes}
+                      </p>
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
         ) : (
-          <div className="p-12 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500 mb-4">
-              <Sparkles className="h-7 w-7" />
+          <div className="p-10 text-center">
+            <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-muted-foreground mb-3">
+              <Fuel className="h-5 w-5" />
             </div>
-            <h3 className="text-lg font-bold text-foreground">No Fuel Refills Logged</h3>
-            <p className="text-muted-foreground text-sm max-w-sm mx-auto mt-1 mb-6">
-              Start tracking your fuel expenses to unlock monthly mileage trends and cost per kilometer analytics.
+            <h3 className="text-base font-semibold text-foreground">No fuel refills logged</h3>
+            <p className="text-muted-foreground text-xs sm:text-sm max-w-sm mx-auto mt-1 mb-5">
+              Start logging fuel refills to track mileage and cost per kilometer.
             </p>
-            <Button onClick={onLogFuelRefill} className="gap-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold cursor-pointer">
+            <Button onClick={onLogFuelRefill} size="sm" className="gap-1.5 font-medium">
               <Plus className="h-4 w-4" />
               Log First Fuel Refill
             </Button>

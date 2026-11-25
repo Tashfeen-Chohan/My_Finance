@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Gauge, Star, MoreVertical, Edit2, Trash2, Fuel, ShieldCheck } from "lucide-react";
+import { Gauge, Star, MoreVertical, Edit2, Trash2, Fuel } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +13,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const fuelTypeColors = {
-  petrol: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-  diesel: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-  electric: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-  hybrid: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-  cng: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  other: "bg-slate-500/10 text-slate-400 border-slate-500/20",
+  petrol: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+  diesel: "bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20",
+  electric: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
+  hybrid: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
+  cng: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+  other: "bg-secondary text-muted-foreground border-border",
 };
 
 const defaultVehicleImages = {
@@ -34,44 +34,41 @@ export function VehicleCard({ vehicle, onEdit, onDelete, onSetDefault }) {
   const photoUrl = vehicle.photoUrl || defaultVehicleImages.sedan;
 
   return (
-    <Card className="group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 border-border/40 bg-card/60 backdrop-blur-xl">
-      {/* Top Banner Image with Gradient Overlay */}
-      <div className="relative h-44 w-full overflow-hidden bg-slate-900">
+    <Card className="group overflow-hidden transition-colors hover:border-foreground/20">
+      <div className="relative h-40 w-full overflow-hidden bg-secondary">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photoUrl}
           alt={vehicle.name}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-103"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
 
-        {/* Badges Overlay */}
-        <div className="absolute top-3 left-3 flex flex-wrap items-center gap-2">
+        <div className="absolute top-3 left-3 flex flex-wrap items-center gap-1.5">
           {isDefault && (
-            <Badge className="bg-amber-500/90 text-slate-950 font-semibold gap-1 shadow-md border-none backdrop-blur-md">
-              <Star className="h-3.5 w-3.5 fill-slate-950" />
-              Default Vehicle
+            <Badge className="bg-background/90 text-foreground font-medium gap-1 border border-border">
+              <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+              Default
             </Badge>
           )}
-          <Badge className={`capitalize font-medium border ${fuelTypeColors[vehicle.fuelType] || fuelTypeColors.other}`}>
+          <Badge className={`capitalize font-medium border bg-background/90 ${fuelTypeColors[vehicle.fuelType] || fuelTypeColors.other}`}>
             <Fuel className="mr-1 h-3 w-3 inline" />
             {vehicle.fuelType}
           </Badge>
         </div>
 
-        {/* Action Dropdown Menu */}
         <div className="absolute top-3 right-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="secondary"
                 size="icon"
-                className="h-8 w-8 rounded-full bg-background/70 backdrop-blur-md hover:bg-background shadow-md"
+                className="h-8 w-8 rounded-full bg-background/85 hover:bg-background"
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 backdrop-blur-xl">
+            <DropdownMenuContent align="end" className="w-44">
               {!isDefault && (
                 <>
                   <DropdownMenuItem onClick={() => onSetDefault(vehicleId)} className="cursor-pointer">
@@ -98,39 +95,34 @@ export function VehicleCard({ vehicle, onEdit, onDelete, onSetDefault }) {
         </div>
       </div>
 
-      {/* Card Content Body */}
       <CardContent className="p-5 space-y-4">
         <div className="space-y-1">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold tracking-tight text-foreground line-clamp-1">{vehicle.name}</h3>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-base font-semibold tracking-tight text-foreground truncate">{vehicle.name}</h3>
             {vehicle.licensePlate && (
-              <Badge variant="outline" className="font-mono text-xs uppercase tracking-wider bg-secondary/50">
+              <Badge variant="outline" className="font-mono text-[11px] uppercase tracking-wider shrink-0">
                 {vehicle.licensePlate}
               </Badge>
             )}
           </div>
-          <p className="text-sm text-muted-foreground">
-            {vehicle.make} {vehicle.model} {vehicle.year ? `(${vehicle.year})` : ""}
+          <p className="text-xs text-muted-foreground">
+            {vehicle.make} {vehicle.model} {vehicle.year ? `· ${vehicle.year}` : ""}
           </p>
         </div>
 
-        {/* Specs Grid */}
-        <div className="pt-2">
-          <div className="flex items-center gap-2.5 rounded-lg border border-border/50 bg-secondary/30 p-2.5">
+        <div className="flex items-center justify-between rounded-xl border border-border bg-secondary/40 px-3.5 py-2.5">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Gauge className="h-4 w-4 text-primary shrink-0" />
-            <div className="min-w-0">
-              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Odometer Reading</p>
-              <p className="text-sm font-semibold text-foreground truncate">
-                {vehicle.currentOdometer?.toLocaleString()} {vehicle.mileageUnit || "km"}
-              </p>
-            </div>
+            <span>Odometer</span>
           </div>
+          <span className="text-sm font-semibold text-foreground tabular-nums">
+            {vehicle.currentOdometer?.toLocaleString()} {vehicle.mileageUnit || "km"}
+          </span>
         </div>
 
-        {/* Footer Notes */}
         {vehicle.notes && (
-          <p className="text-xs text-muted-foreground line-clamp-2 pt-1 border-t border-border/40 italic">
-            &quot;{vehicle.notes}&quot;
+          <p className="text-xs text-muted-foreground line-clamp-2 pt-2 border-t border-border">
+            {vehicle.notes}
           </p>
         )}
       </CardContent>

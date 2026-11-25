@@ -45,7 +45,7 @@ export function Header() {
   const formattedEmail = user?.email ? user.email.toLowerCase() : "";
 
   return (
-    <header className="border-border/60 bg-card/75 sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b px-4 backdrop-blur-xl md:px-6">
+    <header className="border-border bg-background/90 sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b px-4 backdrop-blur-md md:px-6">
       {/* Mobile Brand / Page Title */}
       <div className="flex items-center gap-2 md:hidden">
         <div className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-primary/20 bg-card/80 p-0.5 shadow-sm">
@@ -102,7 +102,7 @@ export function Header() {
               </button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="glass-panel border-border/80 w-64 rounded-2xl p-2 shadow-2xl backdrop-blur-xl">
+            <DropdownMenuContent align="end" className="border-border bg-popover w-64 rounded-xl p-2 shadow-lg">
               {/* User Profile Header */}
               <DropdownMenuLabel className="font-normal p-2">
                 <div className="flex items-center gap-3">

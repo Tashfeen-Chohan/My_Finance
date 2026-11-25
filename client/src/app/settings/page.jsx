@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/components/ui/use-toast";
 import {
-  Settings,
   Sun,
   Moon,
   Laptop,
@@ -20,9 +19,6 @@ import {
   Printer,
   LogOut,
   ShieldCheck,
-  Database,
-  Info,
-  User,
   CheckCircle2,
 } from "lucide-react";
 
@@ -178,51 +174,43 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8 pb-12">
-      {/* Header Banner */}
-      <div className="space-y-1.5">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-sm">
-            <Settings className="h-5 w-5" />
-          </div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Application Settings</h1>
-        </div>
-        <p className="text-muted-foreground text-sm">
-          Manage your account profile, theme preferences, data export & backup utilities.
+    <div className="mx-auto max-w-4xl space-y-6 pb-12">
+      {/* Header */}
+      <div className="space-y-1">
+        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Settings</h1>
+        <p className="text-muted-foreground text-xs sm:text-sm">
+          Manage your account, appearance, data exports, and backups.
         </p>
       </div>
 
-      {/* 1. Google Account Section */}
-      <Card className="border-border/40 bg-card/40 backdrop-blur-xl">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <User className="h-5 w-5 text-primary" />
-            <CardTitle className="text-lg">Google / User Account</CardTitle>
-          </div>
-          <CardDescription>Authentication profile and active login session details</CardDescription>
+      {/* 1. Account Section */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold">Account</CardTitle>
+          <CardDescription className="text-xs">Active authentication profile and session</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-border/50 bg-secondary/20">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-12 w-12 border border-primary/20 shadow-sm">
+        <CardContent>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-border bg-secondary/30">
+            <div className="flex items-center gap-3.5">
+              <Avatar className="h-11 w-11 border border-border">
                 <AvatarImage src={user?.avatar} alt={user?.name || "User Avatar"} />
-                <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
                   {user?.name ? user.name.slice(0, 2).toUpperCase() : "US"}
                 </AvatarFallback>
               </Avatar>
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
-                  <h4 className="font-bold text-foreground">{user?.name || "Authenticated User"}</h4>
-                  <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] gap-1">
+                  <h4 className="font-semibold text-sm text-foreground">{user?.name || "Authenticated User"}</h4>
+                  <Badge variant="secondary" className="text-[10px] font-medium gap-1 text-teal-600 dark:text-teal-400">
                     <ShieldCheck className="h-3 w-3" />
-                    Verified Session
+                    Verified
                   </Badge>
                 </div>
                 <p className="text-xs text-muted-foreground">{user?.email || "user@example.com"}</p>
               </div>
             </div>
 
-            <Button variant="outline" onClick={logout} className="gap-2 text-destructive hover:text-destructive cursor-pointer">
+            <Button variant="outline" size="sm" onClick={logout} className="gap-2 text-destructive hover:text-destructive">
               <LogOut className="h-4 w-4" />
               Sign Out
             </Button>
@@ -231,97 +219,88 @@ export default function SettingsPage() {
       </Card>
 
       {/* 2. Theme Customizer */}
-      <Card className="border-border/40 bg-card/40 backdrop-blur-xl">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Sun className="h-5 w-5 text-amber-500" />
-            <CardTitle className="text-lg">Appearance & Theme</CardTitle>
-          </div>
-          <CardDescription>Customize the visual interface mode of MyFinance</CardDescription>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold">Appearance</CardTitle>
+          <CardDescription className="text-xs">Choose light, dark, or system theme</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
             <button
               type="button"
               onClick={() => setTheme("light")}
-              className={`flex items-center justify-center gap-3 p-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
+              className={`flex flex-col sm:flex-row items-center justify-center gap-2 p-3 rounded-xl border text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
                 theme === "light"
-                  ? "border-primary bg-primary/10 text-primary shadow-sm"
-                  : "border-border/50 bg-secondary/20 text-muted-foreground hover:bg-secondary/40"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-secondary/30 text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Sun className="h-5 w-5 text-amber-500" />
-              Light Mode
+              <Sun className="h-4 w-4" />
+              <span>Light</span>
             </button>
 
             <button
               type="button"
               onClick={() => setTheme("dark")}
-              className={`flex items-center justify-center gap-3 p-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
+              className={`flex flex-col sm:flex-row items-center justify-center gap-2 p-3 rounded-xl border text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
                 theme === "dark"
-                  ? "border-primary bg-primary/10 text-primary shadow-sm"
-                  : "border-border/50 bg-secondary/20 text-muted-foreground hover:bg-secondary/40"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-secondary/30 text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Moon className="h-5 w-5 text-indigo-400" />
-              Dark Mode
+              <Moon className="h-4 w-4" />
+              <span>Dark</span>
             </button>
 
             <button
               type="button"
               onClick={() => setTheme("system")}
-              className={`flex items-center justify-center gap-3 p-4 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
+              className={`flex flex-col sm:flex-row items-center justify-center gap-2 p-3 rounded-xl border text-xs sm:text-sm font-medium transition-colors cursor-pointer ${
                 theme === "system"
-                  ? "border-primary bg-primary/10 text-primary shadow-sm"
-                  : "border-border/50 bg-secondary/20 text-muted-foreground hover:bg-secondary/40"
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-secondary/30 text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Laptop className="h-5 w-5 text-emerald-400" />
-              System Default
+              <Laptop className="h-4 w-4" />
+              <span>System</span>
             </button>
           </div>
         </CardContent>
       </Card>
 
       {/* 3. Export CSV & PDF */}
-      <Card className="border-border/40 bg-card/40 backdrop-blur-xl">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <FileSpreadsheet className="h-5 w-5 text-emerald-500" />
-            <CardTitle className="text-lg">Export Data (CSV & PDF)</CardTitle>
-          </div>
-          <CardDescription>Export your financial records for accounting and external reporting</CardDescription>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold">Export Data</CardTitle>
+          <CardDescription className="text-xs">Download CSV spreadsheets or print a summary</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap gap-4">
-            <Button onClick={handleExportFuelCSV} className="gap-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold cursor-pointer">
+        <CardContent>
+          <div className="grid grid-cols-1 gap-2.5 sm:flex sm:flex-wrap">
+            <Button onClick={handleExportFuelCSV} size="sm" className="w-full sm:w-auto gap-2 font-medium">
               <FileSpreadsheet className="h-4 w-4" />
-              Export Fuel Logs (CSV)
+              Fuel Logs (CSV)
             </Button>
 
-            <Button onClick={handleExportMaintenanceCSV} className="gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold cursor-pointer">
+            <Button onClick={handleExportMaintenanceCSV} variant="outline" size="sm" className="w-full sm:w-auto gap-2 font-medium">
               <FileSpreadsheet className="h-4 w-4" />
-              Export Maintenance (CSV)
+              Maintenance (CSV)
             </Button>
 
-            <Button onClick={() => window.print()} variant="outline" className="gap-2 cursor-pointer border-border/60">
-              <Printer className="h-4 w-4 text-primary" />
-              Print / Save Summary PDF
+            <Button onClick={() => window.print()} variant="outline" size="sm" className="w-full sm:w-auto gap-2 font-medium">
+              <Printer className="h-4 w-4" />
+              Print / PDF
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* 4. Backup & Restore */}
-      <Card className="border-border/40 bg-card/40 backdrop-blur-xl">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Database className="h-5 w-5 text-blue-400" />
-            <CardTitle className="text-lg">Backup & Restore</CardTitle>
-          </div>
-          <CardDescription>Download a full JSON database snapshot or restore records</CardDescription>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold">Backup & Restore</CardTitle>
+          <CardDescription className="text-xs">Full JSON snapshot of vehicles, fuel, and maintenance</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent>
           <input
             type="file"
             ref={fileInputRef}
@@ -330,44 +309,41 @@ export default function SettingsPage() {
             className="hidden"
           />
 
-          <div className="flex flex-wrap gap-4">
-            <Button onClick={handleExportBackup} variant="outline" className="gap-2 border-border/60 cursor-pointer">
-              <Download className="h-4 w-4 text-emerald-500" />
-              Download Full JSON Backup
+          <div className="grid grid-cols-1 gap-2.5 sm:flex sm:flex-wrap">
+            <Button onClick={handleExportBackup} variant="outline" size="sm" className="w-full sm:w-auto gap-2 font-medium">
+              <Download className="h-4 w-4" />
+              Download JSON Backup
             </Button>
 
-            <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="gap-2 border-border/60 cursor-pointer">
-              <Upload className="h-4 w-4 text-blue-400" />
-              Restore / Import JSON Backup
+            <Button onClick={() => fileInputRef.current?.click()} variant="outline" size="sm" className="w-full sm:w-auto gap-2 font-medium">
+              <Upload className="h-4 w-4" />
+              Import JSON Backup
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* 5. About Section */}
-      <Card className="border-border/40 bg-card/40 backdrop-blur-xl">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Info className="h-5 w-5 text-purple-400" />
-            <CardTitle className="text-lg">About MyFinance</CardTitle>
-          </div>
-          <CardDescription>System specifications and version info</CardDescription>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold">About</CardTitle>
+          <CardDescription className="text-xs">Application details</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-3 text-xs text-muted-foreground">
-          <div className="flex items-center justify-between py-1.5 border-b border-border/40">
-            <span>App Version:</span>
-            <span className="font-mono font-bold text-foreground">v1.0.0 (Direct MongoDB Architecture)</span>
+        <CardContent className="divide-y divide-border text-xs text-muted-foreground">
+          <div className="flex items-center justify-between py-2.5">
+            <span>Version</span>
+            <span className="font-mono font-medium text-foreground">v1.0.0</span>
           </div>
-          <div className="flex items-center justify-between py-1.5 border-b border-border/40">
-            <span>State & Data Engine:</span>
-            <span className="font-mono font-bold text-emerald-500 flex items-center gap-1">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              TanStack Query v5 + Zustand Auth
+          <div className="flex items-center justify-between py-2.5">
+            <span>Data Engine</span>
+            <span className="font-medium text-foreground flex items-center gap-1.5">
+              <CheckCircle2 className="h-3.5 w-3.5 text-teal-600 dark:text-teal-400" />
+              TanStack Query v5 + Zustand
             </span>
           </div>
-          <div className="flex items-center justify-between py-1.5">
-            <span>PWA Support:</span>
-            <span className="font-mono font-bold text-blue-400">Service Worker Active</span>
+          <div className="flex items-center justify-between py-2.5">
+            <span>Offline PWA</span>
+            <span className="font-medium text-foreground">Active</span>
           </div>
         </CardContent>
       </Card>

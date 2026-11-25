@@ -3,7 +3,6 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PieChart, Activity, Fuel, Wrench } from "lucide-react";
 
 export function DashboardCharts({ expenses = {}, isLoading = false }) {
   const fuelSpend = expenses.totalFuelSpend || 0;
@@ -14,60 +13,52 @@ export function DashboardCharts({ expenses = {}, isLoading = false }) {
   const maintenancePct = Math.round((maintenanceSpend / grandTotal) * 100) || 0;
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6">
       {/* Category Expense Proportion Card */}
-      <Card className="border-border/40 bg-card/40 backdrop-blur-xl overflow-hidden">
-        <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
-              <PieChart className="h-4 w-4" />
-            </div>
-            <div className="min-w-0">
-              <CardTitle className="text-sm sm:text-base font-bold truncate">Expense Distribution</CardTitle>
-              <CardDescription className="text-[11px] sm:text-xs truncate">Fuel vs Maintenance proportion</CardDescription>
-            </div>
-          </div>
+      <Card>
+        <CardHeader className="p-5 pb-3">
+          <CardTitle className="text-base font-semibold">Expense Breakdown</CardTitle>
+          <CardDescription className="text-xs">Fuel vs. maintenance share of total spend</CardDescription>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6 space-y-4">
+        <CardContent className="p-5 pt-2 space-y-5">
           {isLoading ? (
             <div className="space-y-4">
-              <Skeleton className="h-4 w-full rounded-full" />
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <Skeleton className="h-12 w-full rounded-xl" />
-                <Skeleton className="h-12 w-full rounded-xl" />
+              <Skeleton className="h-2.5 w-full rounded-full" />
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <Skeleton className="h-10 w-full rounded-lg" />
+                <Skeleton className="h-10 w-full rounded-lg" />
               </div>
             </div>
           ) : (
             <>
-              {/* Progress Bar Visualization */}
-              <div className="h-2 w-full overflow-hidden rounded-full bg-secondary flex border border-border/20">
+              <div className="h-3 w-full overflow-hidden rounded-full bg-secondary flex gap-0.5">
                 <div
                   style={{ width: `${fuelPct}%` }}
-                  className="bg-amber-500 transition-all duration-500"
+                  className="bg-teal-500 transition-all duration-500 rounded-l-full"
                   title={`Fuel: ${fuelPct}%`}
                 />
                 <div
                   style={{ width: `${maintenancePct}%` }}
-                  className="bg-purple-500 transition-all duration-500"
+                  className="bg-sky-500 dark:bg-sky-400 transition-all duration-500 rounded-r-full"
                   title={`Maintenance: ${maintenancePct}%`}
                 />
               </div>
 
-              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-2.5 pt-1">
-                <div className="flex items-center justify-between rounded-xl border border-amber-500/20 bg-amber-500/5 p-2.5 sm:p-3 min-w-0 gap-2">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <Fuel className="h-4 w-4 text-amber-500 shrink-0" />
-                    <span className="text-xs font-semibold truncate">Fuel</span>
+              <div className="grid grid-cols-2 items-center pt-1">
+                <div className="flex items-center justify-between border-r-2 border-slate-300 dark:border-slate-600/80 pr-4 sm:pr-5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="h-2.5 w-2.5 rounded-full bg-teal-500 shrink-0" />
+                    <span className="text-xs font-medium text-muted-foreground truncate">Fuel</span>
                   </div>
-                  <span className="text-xs sm:text-sm font-extrabold text-amber-500 shrink-0">{fuelPct}%</span>
+                  <span className="text-sm font-bold tabular-nums text-foreground">{fuelPct}%</span>
                 </div>
 
-                <div className="flex items-center justify-between rounded-xl border border-purple-500/20 bg-purple-500/5 p-2.5 sm:p-3 min-w-0 gap-2">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <Wrench className="h-4 w-4 text-purple-400 shrink-0" />
-                    <span className="text-xs font-semibold truncate">Maintenance</span>
+                <div className="flex items-center justify-between pl-4 sm:pl-5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="h-2.5 w-2.5 rounded-full bg-sky-500 dark:bg-sky-400 shrink-0" />
+                    <span className="text-xs font-medium text-muted-foreground truncate">Maintenance</span>
                   </div>
-                  <span className="text-xs sm:text-sm font-extrabold text-purple-400 shrink-0">{maintenancePct}%</span>
+                  <span className="text-sm font-bold tabular-nums text-foreground">{maintenancePct}%</span>
                 </div>
               </div>
             </>
@@ -76,39 +67,32 @@ export function DashboardCharts({ expenses = {}, isLoading = false }) {
       </Card>
 
       {/* Vehicle Activity Summary Card */}
-      <Card className="border-border/40 bg-card/40 backdrop-blur-xl overflow-hidden">
-        <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-400">
-              <Activity className="h-4 w-4" />
-            </div>
-            <div className="min-w-0">
-              <CardTitle className="text-sm sm:text-base font-bold truncate">Vehicle Activity Summary</CardTitle>
-              <CardDescription className="text-[11px] sm:text-xs truncate">Fuel volume consumed & maintenance jobs logged</CardDescription>
-            </div>
-          </div>
+      <Card>
+        <CardHeader className="p-5 pb-3">
+          <CardTitle className="text-base font-semibold">Activity Summary</CardTitle>
+          <CardDescription className="text-xs">Total fuel volume and completed service logs</CardDescription>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6 space-y-3 text-xs text-muted-foreground">
+        <CardContent className="p-5 pt-2">
           {isLoading ? (
             <div className="space-y-3">
-              <Skeleton className="h-6 w-full rounded" />
-              <Skeleton className="h-6 w-full rounded" />
+              <Skeleton className="h-8 w-full rounded" />
+              <Skeleton className="h-8 w-full rounded" />
             </div>
           ) : (
-            <>
-              <div className="flex flex-wrap items-center justify-between gap-1.5 py-1.5 border-b border-border/40 min-w-0">
-                <span className="truncate">Fuel Volume Consumed:</span>
-                <strong className="text-foreground font-mono text-xs sm:text-sm shrink-0">
-                  {expenses.totalFuelVolume || 0} Liters
-                </strong>
+            <div className="divide-y divide-border text-sm">
+              <div className="flex items-center justify-between py-2.5">
+                <span className="text-muted-foreground text-xs sm:text-sm">Fuel Volume Consumed</span>
+                <span className="font-semibold tabular-nums text-foreground">
+                  {expenses.totalFuelVolume || 0} L
+                </span>
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-1.5 py-1.5 min-w-0">
-                <span className="truncate">Maintenance Jobs Logged:</span>
-                <strong className="text-foreground font-mono text-xs sm:text-sm shrink-0">
-                  {expenses.maintenanceCount || 0} Services
-                </strong>
+              <div className="flex items-center justify-between py-2.5">
+                <span className="text-muted-foreground text-xs sm:text-sm">Maintenance Jobs Logged</span>
+                <span className="font-semibold tabular-nums text-foreground">
+                  {expenses.maintenanceCount || 0} services
+                </span>
               </div>
-            </>
+            </div>
           )}
         </CardContent>
       </Card>

@@ -7,7 +7,7 @@ import { useAuthStore } from "@/stores/use-auth-store";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { env } from "@/env";
-import { LogIn, Sparkles } from "lucide-react";
+import { LogIn } from "lucide-react";
 
 export function GoogleLoginButton() {
   const { loginWithGoogleCredential, loginWithMockUser, isLoading } = useAuthStore();
@@ -97,8 +97,7 @@ export function GoogleLoginButton() {
             Sign in (Dev Mock Login)
           </Button>
           <div className="text-muted-foreground flex flex-col items-center justify-center gap-1 text-center text-xs">
-            <div className="flex items-center gap-1.5 font-medium text-amber-500">
-              <Sparkles className="h-3.5 w-3.5" />
+            <div className="flex items-center gap-1.5 font-medium text-amber-600 dark:text-amber-400">
               <span>Dev Mode Active (Mock Client ID)</span>
             </div>
             <span className="text-[11px] opacity-80">

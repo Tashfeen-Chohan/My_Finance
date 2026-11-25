@@ -5,7 +5,7 @@ const Card = React.forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "border-border bg-card text-card-foreground rounded-2xl border shadow-sm transition-all duration-200",
+      "border-border bg-card text-card-foreground rounded-2xl border transition-colors duration-150",
       className
     )}
     {...props}
@@ -18,7 +18,7 @@ const InteractiveCard = React.forwardRef(({ className, onClick, ...props }, ref)
     ref={ref}
     onClick={onClick}
     className={cn(
-      "border-border bg-card text-card-foreground hover:border-primary/40 cursor-pointer touch-manipulation rounded-2xl border shadow-sm transition-all duration-200 hover:shadow-md active:scale-[0.99]",
+      "border-border bg-card text-card-foreground hover:border-foreground/20 cursor-pointer touch-manipulation rounded-2xl border transition-all duration-150 active:scale-[0.99]",
       className
     )}
     {...props}
@@ -56,7 +56,7 @@ const CardFooter = React.forwardRef(({ className, ...props }, ref) => (
 CardFooter.displayName = "CardFooter";
 
 const MetricCard = React.forwardRef(({ title, value, description, icon, trend, className, ...props }, ref) => (
-  <Card ref={ref} className={cn("glass-panel p-5", className)} {...props}>
+  <Card ref={ref} className={cn("p-5", className)} {...props}>
     <div className="flex items-center justify-between">
       <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
         {title}
@@ -64,11 +64,11 @@ const MetricCard = React.forwardRef(({ title, value, description, icon, trend, c
       {icon && <div className="text-primary bg-primary/10 rounded-xl p-2">{icon}</div>}
     </div>
     <div className="mt-3 flex items-baseline gap-2">
-      <span className="text-foreground text-2xl font-bold tracking-tight">{value}</span>
+      <span className="text-foreground text-2xl font-bold tracking-tight tabular-nums">{value}</span>
       {trend && (
         <span
           className={cn(
-            "rounded-full px-2 py-0.5 text-xs font-semibold",
+            "rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums",
             trend.isPositive
               ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
               : "bg-rose-500/15 text-rose-600 dark:text-rose-400"
