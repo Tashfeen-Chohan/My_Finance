@@ -14,8 +14,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "MyFinance - Personal Finance & Expense Tracker",
-  description: "Mobile-first offline-capable personal finance and expense tracking PWA",
+  title: "RideLedger - Vehicle Expense & Maintenance Tracker",
+  description: "Mobile-first offline-capable vehicle fuel, mileage, and maintenance tracker",
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -32,7 +32,7 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "MyFinance",
+    title: "RideLedger",
   },
   formatDetection: {
     telephone: false,
@@ -41,9 +41,9 @@ export const metadata = {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
-    "apple-mobile-web-app-title": "MyFinance",
-    "application-name": "MyFinance",
-    "msapplication-TileColor": "#090d16",
+    "apple-mobile-web-app-title": "RideLedger",
+    "application-name": "RideLedger",
+    "msapplication-TileColor": "#0B0D11",
     "msapplication-tap-highlight": "no",
   },
 };

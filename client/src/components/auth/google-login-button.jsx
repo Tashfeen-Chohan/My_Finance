@@ -33,7 +33,7 @@ export function GoogleLoginButton() {
     if (result.success) {
       toast({
         title: "Authenticated Successfully",
-        description: "Welcome to MyFinance!",
+        description: "Welcome to RideLedger!",
         variant: "success",
       });
       router.push("/");

@@ -10,7 +10,7 @@ import { ServiceWorkerRegister } from "./sw-register";
 
 export function AppProviders({ children }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
       <QueryProvider>
         <ToastProvider>
           <AuthProvider>

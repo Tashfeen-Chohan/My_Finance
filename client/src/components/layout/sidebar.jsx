@@ -33,7 +33,7 @@ export function Sidebar() {
           <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-card/80 p-1 shadow-sm">
             <Image
               src="/icons/icon-192x192.png"
-              alt="MyFinance Logo"
+              alt="RideLedger Logo"
               width={36}
               height={36}
               className="h-full w-full rounded-lg object-cover"
@@ -41,7 +41,10 @@ export function Sidebar() {
           </div>
           {isSidebarOpen && (
             <div className="flex flex-col">
-              <span className="text-base leading-tight font-bold tracking-tight">MyFinance</span>
+              <span className="text-base leading-tight font-bold tracking-tight">RideLedger</span>
+              <span className="text-muted-foreground mt-1 text-[10.5px] leading-tight font-medium">
+                Smart Vehicle Logbook
+              </span>
             </div>
           )}
         </Link>
@@ -77,14 +80,26 @@ export function Sidebar() {
                 href={item.href}
                 onClick={() => triggerHaptic("light")}
                 className={cn(
-                  "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                  "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200",
+                  !isSidebarOpen && "justify-center px-0",
                   isActive
-                    ? "bg-accent text-foreground font-semibold"
+                    ? "bg-primary/10 text-foreground font-semibold"
                     : "text-muted-foreground hover:bg-accent/60 hover:text-foreground font-medium"
                 )}
                 title={!isSidebarOpen ? item.title : undefined}
               >
-                <Icon className={cn("h-4 w-4 shrink-0", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+                {isActive && (
+                  <span
+                    aria-hidden="true"
+                    className="bg-primary absolute top-1/2 left-0 h-5 w-[3px] -translate-y-1/2 rounded-r-full transition-all duration-200"
+                  />
+                )}
+                <Icon
+                  className={cn(
+                    "h-4 w-4 shrink-0 transition-colors duration-200",
+                    isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                  )}
+                />
                 {isSidebarOpen && <span>{item.title}</span>}
               </Link>
             );
@@ -106,14 +121,26 @@ export function Sidebar() {
                 href={item.href}
                 onClick={() => triggerHaptic("light")}
                 className={cn(
-                  "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+                  "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200",
+                  !isSidebarOpen && "justify-center px-0",
                   isActive
-                    ? "bg-accent text-foreground font-semibold"
+                    ? "bg-primary/10 text-foreground font-semibold"
                     : "text-muted-foreground hover:bg-accent/60 hover:text-foreground font-medium"
                 )}
                 title={!isSidebarOpen ? item.title : undefined}
               >
-                <Icon className={cn("h-4 w-4 shrink-0", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+                {isActive && (
+                  <span
+                    aria-hidden="true"
+                    className="bg-primary absolute top-1/2 left-0 h-5 w-[3px] -translate-y-1/2 rounded-r-full transition-all duration-200"
+                  />
+                )}
+                <Icon
+                  className={cn(
+                    "h-4 w-4 shrink-0 transition-colors duration-200",
+                    isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                  )}
+                />
                 {isSidebarOpen && (
                   <div className="flex w-full items-center justify-between">
                     <span>{item.title}</span>

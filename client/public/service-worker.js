@@ -1,5 +1,5 @@
-// Service Worker for MyFinance PWA
-const CACHE_NAME = "myfinance-v1";
+// Service Worker for RideLedger PWA
+const CACHE_NAME = "rideledger-v2";
 const STATIC_ASSETS = [
   "/",
   "/manifest.json",

@@ -26,7 +26,7 @@ export default function LoginPage() {
           <div className="border-border bg-card flex h-16 w-16 items-center justify-center rounded-2xl border p-2 shadow-xs">
             <Image
               src="/icons/icon-192x192.png"
-              alt="MyFinance Logo"
+              alt="RideLedger Logo"
               width={56}
               height={56}
               className="h-full w-full rounded-xl object-cover"
@@ -35,7 +35,7 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-1">
-            <h1 className="text-foreground text-2xl font-bold tracking-tight">MyFinance</h1>
+            <h1 className="text-foreground text-2xl font-bold tracking-tight">RideLedger</h1>
             <p className="text-muted-foreground text-xs sm:text-sm">
               Vehicle expense, fuel, and maintenance ledger
             </p>

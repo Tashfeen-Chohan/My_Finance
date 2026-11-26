@@ -92,12 +92,18 @@ export function MaintenanceLogsList({
 
                     {/* Structured Labeled Data Strip with Strong Separator */}
                     <div className="grid grid-cols-2 gap-2.5 rounded-lg bg-secondary/40 px-3 py-2 text-left">
-                      <div className="min-w-0">
-                        <p className="text-[10px] text-muted-foreground">Date</p>
+                      <div className="min-w-0 space-y-0.5">
+                        <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <Calendar className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
+                          <span>Date</span>
+                        </div>
                         <p className="text-xs font-semibold text-foreground truncate">{dateStr}</p>
                       </div>
-                      <div className="min-w-0 border-l-2 border-slate-300 dark:border-slate-600/80 pl-3">
-                        <p className="text-[10px] text-muted-foreground">Odometer</p>
+                      <div className="min-w-0 border-l-2 border-slate-300 dark:border-slate-600/80 pl-3 space-y-0.5">
+                        <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <Gauge className="h-2.5 w-2.5 text-sky-600 dark:text-sky-400 shrink-0" />
+                          <span>Odometer</span>
+                        </div>
                         <p className="text-xs font-semibold text-foreground tabular-nums truncate">
                           {item.odometer !== undefined && item.odometer !== null
                             ? `${item.odometer.toLocaleString()} km`

@@ -53,7 +53,7 @@ export function AppLayout({ children }) {
             <div className="border-border bg-card relative flex h-20 w-20 items-center justify-center rounded-2xl border p-2.5 shadow-sm transition-transform duration-300 group-hover:scale-105">
               <Image
                 src="/icons/icon-192x192.png"
-                alt="MyFinance Logo"
+                alt="RideLedger Logo"
                 width={72}
                 height={72}
                 className="h-full w-full rounded-xl object-cover"
@@ -65,7 +65,7 @@ export function AppLayout({ children }) {
           {/* Title & Status Pill */}
           <div className="flex flex-col items-center space-y-2.5">
             <h2 className="text-foreground text-2xl font-bold tracking-tight">
-              MyFinance
+              RideLedger
             </h2>
             <div className="border-border bg-card flex items-center gap-2.5 rounded-full border px-4 py-1.5 text-xs font-medium text-muted-foreground shadow-sm">
               <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />

@@ -2,9 +2,23 @@
 
 import React from "react";
 import Image from "next/image";
-import { ThemeToggle } from "@/components/common/theme-toggle";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/use-auth-store";
-import { User, Wallet, Bell, LogOut, ShieldCheck, Settings, ChevronDown } from "lucide-react";
+import { MAIN_NAV_ITEMS, SECONDARY_NAV_ITEMS } from "@/constants/navigation";
+import {
+  User,
+  Bell,
+  LogOut,
+  ShieldCheck,
+  Settings,
+  ChevronDown,
+  ChevronRight,
+  Car,
+  Fuel,
+  Wrench,
+  LayoutDashboard,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,15 +29,29 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { triggerHaptic } from "@/utils/haptics";
 
+const ROUTE_ACCENTS = {
+  "/": "bg-primary/10 text-primary",
+  "/vehicles": "bg-primary/10 text-primary",
+  "/fuel": "bg-teal-500/10 text-teal-600 dark:text-teal-400",
+  "/maintenance": "bg-sky-500/10 text-sky-600 dark:text-sky-400",
+  "/settings": "bg-secondary text-muted-foreground",
+};
+
 export function Header() {
+  const pathname = usePathname();
   const { user, logout, isAuthenticated } = useAuthStore();
   const queryClient = useQueryClient();
   const router = useRouter();
   const { toast } = useToast();
+
+  const allNavItems = [...MAIN_NAV_ITEMS, ...SECONDARY_NAV_ITEMS];
+  const currentNav = allNavItems.find((item) => item.href === pathname);
+  const CurrentIcon = currentNav?.icon || LayoutDashboard;
+  const currentTitle = currentNav?.title || "Dashboard";
+  const currentAccent = ROUTE_ACCENTS[pathname] || "bg-primary/10 text-primary";
 
   const handleLogout = async () => {
     triggerHaptic("warning");
@@ -51,26 +79,82 @@ export function Header() {
         <div className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-primary/20 bg-card/80 p-0.5 shadow-sm">
           <Image
             src="/icons/icon-192x192.png"
-            alt="MyFinance Logo"
+            alt="RideLedger Logo"
             width={32}
             height={32}
             className="h-full w-full rounded-md object-cover"
           />
         </div>
-        <span className="text-sm font-bold tracking-tight">MyFinance</span>
+        <span className="text-sm font-bold tracking-tight">RideLedger</span>
       </div>
 
-      {/* Desktop Subtitle */}
-      <div className="text-muted-foreground hidden items-center gap-3 text-sm md:flex">
-        <span className="text-foreground font-semibold">Personal Finance Tracker</span>
+      {/* Desktop Breadcrumb & Active Section */}
+      <div className="hidden items-center gap-2.5 md:flex min-w-0">
+        <Link
+          href="/"
+          onClick={() => triggerHaptic("light")}
+          className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors truncate"
+        >
+          RideLedger
+        </Link>
+        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+        <div className="flex items-center gap-2 min-w-0">
+          <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${currentAccent}`}>
+            <CurrentIcon className="h-3.5 w-3.5" />
+          </span>
+          <span className="text-sm font-semibold tracking-tight text-foreground truncate">
+            {currentTitle}
+          </span>
+        </div>
       </div>
 
       {/* Header Actions */}
-      <div className="flex items-center gap-2.5">
-        <Button variant="ghost" size="icon" className="rounded-xl hover:bg-accent/80" title="Notifications">
+      <div className="flex items-center gap-1.5 sm:gap-2">
+        {/* Desktop Quick Jump Pills */}
+        <div className="hidden lg:flex items-center gap-1 mr-1">
+          <Link
+            href="/vehicles"
+            onClick={() => triggerHaptic("light")}
+            className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
+              pathname === "/vehicles"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:bg-secondary/70 hover:text-foreground"
+            }`}
+          >
+            <Car className="h-3.5 w-3.5 text-primary" />
+            <span>Vehicles</span>
+          </Link>
+          <Link
+            href="/fuel"
+            onClick={() => triggerHaptic("light")}
+            className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
+              pathname === "/fuel"
+                ? "bg-teal-500/10 text-teal-600 dark:text-teal-400"
+                : "text-muted-foreground hover:bg-secondary/70 hover:text-foreground"
+            }`}
+          >
+            <Fuel className="h-3.5 w-3.5 text-teal-600 dark:text-teal-400" />
+            <span>Fuel</span>
+          </Link>
+          <Link
+            href="/maintenance"
+            onClick={() => triggerHaptic("light")}
+            className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
+              pathname === "/maintenance"
+                ? "bg-sky-500/10 text-sky-600 dark:text-sky-400"
+                : "text-muted-foreground hover:bg-secondary/70 hover:text-foreground"
+            }`}
+          >
+            <Wrench className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
+            <span>Service</span>
+          </Link>
+        </div>
+
+        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-accent/80" title="Notifications">
           <Bell className="text-muted-foreground h-4 w-4" />
         </Button>
-        <ThemeToggle />
+
+        <span className="hidden md:block h-5 w-px bg-border mx-1" aria-hidden="true" />
 
         {/* User Profile Avatar & Enhanced Dropdown */}
         {isAuthenticated && user ? (

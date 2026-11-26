@@ -134,12 +134,15 @@ export function FuelLogsList({
                     </div>
                   </div>
 
-                  {/* Mobile Metrics: Two Merged Sections (No Icons) */}
+                  {/* Mobile Metrics: Two Merged Sections with Icons */}
                   <div className="sm:hidden p-3 space-y-2.5">
                     {/* Merged Section 1: Volume & Odometer */}
                     <div className="grid grid-cols-2 gap-2.5 rounded-lg bg-secondary/40 px-3 py-2 text-left">
                       <div className="min-w-0 space-y-0.5">
-                        <p className="text-[10px] text-muted-foreground">Volume</p>
+                        <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <Droplet className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
+                          <span>Volume</span>
+                        </div>
                         <p className="text-xs font-semibold text-foreground tabular-nums truncate">
                           {expense.quantity} L
                         </p>
@@ -149,7 +152,10 @@ export function FuelLogsList({
                       </div>
 
                       <div className="min-w-0 border-l-2 border-slate-300 dark:border-slate-600/80 pl-3 space-y-0.5">
-                        <p className="text-[10px] text-muted-foreground">Odometer</p>
+                        <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <Gauge className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
+                          <span>Odometer</span>
+                        </div>
                         <p className="text-xs font-semibold text-foreground tabular-nums truncate">
                           {expense.odometer !== undefined && expense.odometer !== null
                             ? `${expense.odometer.toLocaleString()} km`
@@ -164,7 +170,10 @@ export function FuelLogsList({
                     {/* Merged Section 2: Mileage & Daily Avg */}
                     <div className="grid grid-cols-2 gap-2.5 rounded-lg bg-secondary/40 px-3 py-2 text-left">
                       <div className="min-w-0 space-y-0.5">
-                        <p className="text-[10px] text-muted-foreground">Mileage</p>
+                        <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <TrendingUp className="h-3 w-3 text-teal-600 dark:text-teal-400 shrink-0" />
+                          <span>Mileage</span>
+                        </div>
                         <p
                           className={`text-xs font-bold tabular-nums truncate ${
                             expense.computedEconomy
@@ -180,7 +189,10 @@ export function FuelLogsList({
                       </div>
 
                       <div className="min-w-0 border-l-2 border-slate-300 dark:border-slate-600/80 pl-3 space-y-0.5">
-                        <p className="text-[10px] text-muted-foreground">Daily Avg</p>
+                        <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <Route className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
+                          <span>Daily Avg</span>
+                        </div>
                         <p className="text-xs font-semibold text-foreground tabular-nums truncate">
                           {expense.dailyDistanceDriven
                             ? `${Math.round(expense.dailyDistanceDriven)} km/day`
