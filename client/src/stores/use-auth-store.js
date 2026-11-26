@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { apiClient, setStoredToken, getStoredToken } from "@/services/api-client";
+import { clearPersistedQueryCache } from "@/components/providers/query-provider";
 
 export const useAuthStore = create(
   persist(
@@ -66,6 +67,7 @@ export const useAuthStore = create(
 
         // If no token exists, clear session immediately without calling server
         if (!token) {
+          clearPersistedQueryCache();
           set({ user: null, isAuthenticated: false, isInitialized: true, isLoading: false });
           return;
         }
@@ -79,10 +81,12 @@ export const useAuthStore = create(
             set({ user: userObj, isAuthenticated: true, isInitialized: true, isLoading: false });
           } else {
             setStoredToken(null);
+            clearPersistedQueryCache();
             set({ user: null, isAuthenticated: false, isInitialized: true, isLoading: false });
           }
         } catch {
           setStoredToken(null);
+          clearPersistedQueryCache();
           set({ user: null, isAuthenticated: false, isInitialized: true, isLoading: false });
         }
       },
@@ -93,6 +97,7 @@ export const useAuthStore = create(
           await apiClient.post("/auth/logout");
         } finally {
           setStoredToken(null);
+          clearPersistedQueryCache();
           set({ user: null, isAuthenticated: false, isLoading: false });
         }
       },

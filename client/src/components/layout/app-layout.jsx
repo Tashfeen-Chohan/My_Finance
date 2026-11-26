@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/use-auth-store";
+import { apiClient } from "@/services/api-client";
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
 import { MobileNav } from "./mobile-nav";
@@ -19,7 +20,8 @@ export function AppLayout({ children }) {
   const isPublicPage = isLoginPage;
 
   useEffect(() => {
-    // Verify session asynchronously in background on mount
+    // Pre-warm serverless backend + DB connection and verify session in background
+    apiClient.get("/health").catch(() => {});
     checkAuthSession();
   }, [checkAuthSession]);
 
